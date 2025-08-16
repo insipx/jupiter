@@ -3,11 +3,10 @@
     # Hardware configuration
     raspberry-pi-5.base
     raspberry-pi-5.display-vc4
-    ./pi5-configtxt.nix
+    ./pi5_configtxt.nix
     ./pretty_console.nix
     ./user.nix
     ./network.nix
-    ./config.nix
   ];
 
   time.timeZone = "UTC";
@@ -22,14 +21,4 @@
   environment.systemPackages = with pkgs; [
     tree
   ];
-
-  system.nixos.tags =
-    let
-      cfg = config.boot.loader.raspberryPi;
-    in
-    [
-      "raspberry-pi-${cfg.variant}"
-      cfg.bootloader
-      config.boot.kernelPackages.kernel.version
-    ];
 }
