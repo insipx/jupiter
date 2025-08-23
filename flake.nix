@@ -39,7 +39,7 @@
         };
       };
       flake = {
-        nixosConfiguration.rpi5 = { ... }: {
+        nixosConfiguration.rpi5-install = { ... }: {
           imports = [ ./base_configuration ];
           rpiHomeLab = {
             inherit inputs disko;
