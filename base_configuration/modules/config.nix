@@ -1,4 +1,4 @@
-{ nixos-raspberrypi, config, pkgs, ... }: {
+{ nixos-raspberrypi, pkgs, ... }: {
   imports = with nixos-raspberrypi.nixosModules; [
     # Hardware configuration
     raspberry-pi-5.base
@@ -22,4 +22,6 @@
     tree
     raspberrypi-eeprom
   ];
+  environment.enableAllTerminfo = true;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }

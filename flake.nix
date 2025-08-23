@@ -39,25 +39,16 @@
         };
       };
       flake = {
-        nixosConfigurations.rpi5 = nixos-raspberrypi.lib.nixosSystemFull {
-          specialArgs = inputs;
-          modules = [
-            {
-              networking.hostName = "ganymede";
-            }
-            ./modules/config.nix # main configuration
-            # Disk configuration
-            disko.nixosModules.disko
-            # WARNING: formatting disk with disko is DESTRUCTIVE, check if
-            # `disko.devices.disk.nvme0.device` is set correctly!
-            ./disko-nvme-zfs.nix
-            { networking.hostId = "8821e309"; } # NOTE: for zfs, must be unique
-            # Further user configuration
-            # common-user-config
-            {
-              boot.tmp.useTmpfs = true;
-            }
-          ];
+        nixosConfiguration.rpi5 = { ... }: {
+          imports = [ ./base_configuration ];
+          rpiHomeLab = {
+            inherit inputs disko;
+            lib = nixos-raspberrypi;
+            networking = {
+              hostId = "cb5cda31";
+              hostName = "ganymede";
+            };
+          };
         };
       };
     };
