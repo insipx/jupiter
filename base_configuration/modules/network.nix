@@ -2,29 +2,11 @@
   # This is mostly portions of safe network configuration defaults that
   # nixos-images and srvos provide
   networking = {
-    useNetworkd = true;
+    useNetworkd = false;
+    useDHCP = true;
     # mdns
     firewall.allowedUDPPorts = [ 5353 ];
-    # Use iwd instead of wpa_supplicant. It has a user friendly CLI
-    wireless = {
-      enable = false;
-      iwd = {
-        enable = true;
-        settings = {
-          Network = {
-            EnableIPv6 = true;
-            RoutePriorityOffset = 300;
-          };
-          Settings.AutoConnect = true;
-        };
-      };
-    };
   };
-  systemd.network.networks = {
-    "99-ethernet-default-dhcp".networkConfig.MulticastDNS = "yes";
-    "99-wireless-client-dhcp".networkConfig.MulticastDNS = "yes";
-  };
-
   # This comment was lifted from `srvos`
   # Do not take down the network for too long when upgrading,
   # This also prevents failures of services that are restarted instead of stopped.

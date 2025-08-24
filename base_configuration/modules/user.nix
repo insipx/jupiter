@@ -1,7 +1,4 @@
 { config, ... }: {
-  # This is identical to what nixos installer does in
-  # (modulesPash + "profiles/installation-device.nix")
-
   # Use less privileged nixos user
   users.users.insipx = {
     isNormalUser = true;
@@ -9,6 +6,9 @@
       "wheel"
       "networkmanager"
       "video"
+      "docker"
+      "seat"
+      "input"
     ];
     # Allow the graphical user to login without password
     initialHashedPassword = "";
@@ -44,11 +44,11 @@
   # mounting the storage in a different system.
   services.openssh = {
     enable = true;
-    settings.PermitRootLogin = "yes";
+    settings.PermitRootLogin = "no";
   };
 
   # allow nix-copy to live system
-  nix.settings.trusted-users = [ "insipx" ];
+  nix.settings.trusted-users = [ "root" "insipx" ];
 
   # We are stateless, so just default to latest.
   system.stateVersion = config.system.nixos.release;
