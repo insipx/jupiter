@@ -35,101 +35,97 @@
   outputs = { nixpkgs, flake-parts, nixos-raspberrypi, colmena, disko, nixos-anywhere, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } ({ withSystem, ... }:
       let
-        flakeModules.default =  {pkgs, ...}: {
+        homelabModules.default = { ... }: {
           imports = [ ./base_configuration ];
-        # rpiHomeLab = withSystem pkgs.stdenv.hostPlatform.system ({ config, ... }: {
-        #   networking = {
-        #     inherit (config.rpiHomeLab.networking) hostId hostName address;
-        #   };
-        #   inherit (inputs) disko;
-        # });
         };
-      in {
-      systems = import inputs.systems;
-      perSystem = { pkgs, system, ... }: {
-        devShells.default = pkgs.mkShell {
-          nativeBuildInputs = [
-            nixos-anywhere.packages.${system}.default
-            colmena.packages.${system}.colmena
-          ];
-        };
-      };
-      flake = {
-        inherit flakeModules;
-        nixosConfiguration.rpi5-install = nixos-raspberrypi.lib.nixosSystemFull {
-          modules = [ flakeModules.default ];
-          rpiHomeLab = {
-            networking = {
-              hostId = "cb5cda31"; # this should be unique per-machine
-            };
+      in
+      {
+        systems = import inputs.systems;
+        perSystem = { pkgs, system, ... }: {
+          devShells.default = pkgs.mkShell {
+            nativeBuildInputs = [
+              nixos-anywhere.packages.${system}.default
+              colmena.packages.${system}.colmena
+            ];
           };
-          specialArgs = inputs;
         };
-        colmenaHive = colmena.lib.makeHive {
-          meta = {
-            nixpkgs = import nixos-raspberrypi.inputs.nixpkgs {
-              system = "x86_64-linux";
-            };
+        flake = {
+          inherit homelabModules;
+          nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystem {
+            modules = [
+              homelabModules.default
+              inputs.disko.nixosModules.disko
+              {
+                rpiHomeLab = {
+                  networking = {
+                    hostId = "11111111"; # this should be unique per-machine
+                    hostName = "initial-deploy-1";
+                  };
+                };
+              }
+            ];
             specialArgs = inputs;
           };
-          defaults = _: {
-            nixpkgs.system = "aarch64-linux";
-            deployment = {
-              tags = [ "homelab" ];
-              targetUser = "insipx";
-              buildOnTarget = false;
+          colmenaHive = colmena.lib.makeHive {
+            meta = {
+              nixpkgs = import nixos-raspberrypi.inputs.nixpkgs {
+                system = "x86_64-linux";
+              };
+              # nodeNixpkgs = import nixos-raspberrypi.inputs.nixpkgs { system = "aarch64-linux"; };
+              specialArgs = inputs;
             };
-            imports = [
-              flakeModules.default
-              nixos-raspberrypi.lib.inject-overlays
-              ./base_configuration/modules
-              inputs.disko.nixosModules.disko
-              ./base_configuration/disko-nvme-zfs.nix
-            ];
-            rpiHomeLab.disko = inputs.disko;
-          };
-          ganymede = _: {
-            deployment = {
-              targetHost = "ganymede.jupiter.lan";
+            defaults = _: {
+              nixpkgs.system = "aarch64-linux";
+              deployment = {
+                tags = [ "homelab" ];
+                targetUser = "insipx";
+                buildOnTarget = true;
+              };
+              imports = [
+                homelabModules.default
+                nixos-raspberrypi.lib.inject-overlays
+                inputs.disko.nixosModules.disko
+              ];
             };
-            rpiHomeLab.networking = {
-              hostId = "76fa8e01";
-              hostName = "ganymede";
-              address = "10.10.69.10";
+            ganymede = _: {
+              deployment = {
+                targetHost = "ganymede.jupiter.lan";
+              };
+              rpiHomeLab.networking = {
+                hostId = "76fa8e01";
+                hostName = "ganymede";
+                address = "10.10.69.10";
+              };
             };
-          };
-          io = _: {
-            deployment = {
-              # targetHost = "io.jupter.lan": NO
-              targetHost = "10.10.69.155";
+            io = _: {
+              deployment = {
+                targetHost = "io.jupiter.lan";
+              };
+              rpiHomeLab.networking = {
+                hostName = "io";
+                hostId = "19454311";
+                address = "10.10.69.11";
+              };
             };
-            rpiHomeLab.networking = {
-              hostName = "io";
-              hostId = "19454311";
-              address = "10.10.69.11";
+            europa = _: {
+              deployment = {
+                targetHost = "europa.jupiter.lan";
+              };
+              rpiHomeLab.networking = {
+                hostId = "29af5daa";
+                hostName = "europa";
+                address = "10.10.69.12";
+              };
             };
-          };
-          europa = _: {
-            deployment = {
-                # targetHost = "europa.jupiter.lan"; NO
-                targetHost = "10.10.69.152";
+            callisto = _: {
+              rpiHomeLab.networking = {
+                hostId = "b0d6aebd";
+                hostName = "callisto";
+                address = "10.10.69.14";
+              };
+              deployment.targetHost = "callisto.jupiter.lan";
             };
-            rpiHomeLab.networking = {
-              hostId = "29af5daa";
-              hostName = "europa";
-              address = "10.10.69.12";
-            };
-          };
-          callisto = _: {
-            rpiHomeLab.networking = {
-              hostId = "b0d6aebd";
-              hostName = "callisto";
-              address = "10.10.69.14";
-            };
-            deployment.targetHost = "10.10.69.14";
-            # deployment.targetHost = "callisto.jupiter.lan";
           };
         };
-      };
-    });
+      });
 }

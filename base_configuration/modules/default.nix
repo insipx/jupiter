@@ -7,6 +7,7 @@
     ./pretty_console.nix
     ./user.nix
     ./network.nix
+    ./server-config.nix
   ];
 
   time.timeZone = "America/New_York";
@@ -21,6 +22,9 @@
   environment.systemPackages = with pkgs; [
     tree
     raspberrypi-eeprom
+    neovim
+    htop
+    ghostty.terminfo
   ];
   environment.enableAllTerminfo = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
