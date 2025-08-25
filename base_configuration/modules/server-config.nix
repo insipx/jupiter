@@ -20,6 +20,7 @@
   # https://github.com/NixOS/nixpkgs/issues/247608
   systemd.services.NetworkManager-wait-online.enable = false;
   systemd.network.wait-online.enable = false;
+  systemd.dhcpcd.wait-online.enable = false;
 
   # Do not take down the network for too long when upgrading,
   # This also prevents failures of services that are restarted instead of stopped.
@@ -28,4 +29,6 @@
   systemd.services.systemd-networkd.stopIfChanged = false;
   # Services that are only restarted might be not able to resolve when resolved is stopped before
   systemd.services.systemd-resolved.stopIfChanged = false;
+  systemd.services.dhcpcd.stopIfChanged = false;
+
 }

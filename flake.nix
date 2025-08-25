@@ -79,7 +79,7 @@
               deployment = {
                 tags = [ "homelab" ];
                 targetUser = "insipx";
-                buildOnTarget = true;
+                buildOnTarget = false;
               };
               imports = [
                 homelabModules.default

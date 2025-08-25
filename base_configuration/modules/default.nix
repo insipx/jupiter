@@ -25,6 +25,7 @@
     neovim
     htop
     ghostty.terminfo
+    powertop
   ];
   environment.enableAllTerminfo = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
