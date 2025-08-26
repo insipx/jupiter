@@ -2,8 +2,8 @@
   # This is mostly portions of safe network configuration defaults that
   # nixos-images and srvos provide
   networking = {
-    useNetworkd = false;
-    useDHCP = true;
+    useNetworkd = true;
+    useDHCP = false;
     # mdns
     firewall.allowedUDPPorts = [ 5353 ];
   };
