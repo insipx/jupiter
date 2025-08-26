@@ -26,6 +26,7 @@
     htop
     ghostty.terminfo
     powertop
+    sops
   ];
   environment.enableAllTerminfo = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

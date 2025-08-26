@@ -22,6 +22,8 @@
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
   nixConfig = {
     extra-substituters = [
@@ -85,6 +87,7 @@
                 homelabModules.default
                 nixos-raspberrypi.lib.inject-overlays
                 inputs.disko.nixosModules.disko
+                inputs.sops-nix.nixosModules.sops
               ];
             };
             ganymede = _: {
