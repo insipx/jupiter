@@ -1,4 +1,10 @@
 {
+  # boot.kernelParams = [
+  #   "cgroup_enable=memory"
+  #   "cgroup_memory=1"
+  #   "cgroup_enable=cpuset"
+  #   "systemd.unified_cgroup_hierarchy=1" # Enable cgroup v2
+  # ];
   hardware.raspberry-pi.config = {
     all = {
       # [all] conditional filter, https://www.raspberrypi.com/documentation/computers/config_txt.html#conditional-filters
@@ -19,8 +25,11 @@
           enable = true;
           value = true;
         };
+        cmdline = {
+          enable = true;
+          value = "cgroup_enable=memory cgroup_enable=cpuset";
+        };
       };
-
       # Base DTB parameters
       # https://github.com/raspberrypi/linux/blob/a1d3defcca200077e1e382fe049ca613d16efd2b/arch/arm/boot/dts/overlays/README#L132
       base-dt-params = {

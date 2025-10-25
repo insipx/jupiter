@@ -24,6 +24,8 @@
     };
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    ghostty.url = "github:ghostty-org/ghostty";
+    ghostty.inputs.nixpkgs.follows = "nixpkgs";
   };
   nixConfig = {
     extra-substituters = [
@@ -34,11 +36,11 @@
     ];
   };
 
-  outputs = { nixpkgs, flake-parts, nixos-raspberrypi, colmena, disko, nixos-anywhere, ... }@inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } ({ withSystem, ... }:
+  outputs = { flake-parts, nixos-raspberrypi, colmena, nixos-anywhere, ... }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } (_:
       let
         homelabModules.default = { ... }: {
-          imports = [ ./base_configuration ];
+          imports = [ ./homelab ];
         };
       in
       {
@@ -57,13 +59,19 @@
             modules = [
               homelabModules.default
               inputs.disko.nixosModules.disko
+              inputs.sops-nix.nixosModules.sops
               {
                 rpiHomeLab = {
                   networking = {
-                    hostId = "11111111"; # this should be unique per-machine
-                    hostName = "initial-deploy-1";
+                    hostId = "00000000"; # this should be unique per-machine
+                    hostName = "nixos-anywhere-placeholder";
+                    address = "10.10.69.69";
                   };
                 };
+                imports = [
+                  ./base_configuration/modules
+                  ./base_configuration/disko-nvme-zfs.nix
+                ];
               }
             ];
             specialArgs = inputs;
@@ -72,6 +80,7 @@
             meta = {
               nixpkgs = import nixos-raspberrypi.inputs.nixpkgs {
                 system = "x86_64-linux";
+                overlays = [ inputs.ghostty.overlays.default ];
               };
               # nodeNixpkgs = import nixos-raspberrypi.inputs.nixpkgs { system = "aarch64-linux"; };
               specialArgs = inputs;
@@ -81,14 +90,17 @@
               deployment = {
                 tags = [ "homelab" ];
                 targetUser = "insipx";
-                buildOnTarget = false;
+                buildOnTarget = true;
               };
-              imports = [
+              imports = with nixos-raspberrypi.nixosModules; [
                 homelabModules.default
                 nixos-raspberrypi.lib.inject-overlays
                 inputs.disko.nixosModules.disko
                 inputs.sops-nix.nixosModules.sops
+                ./base_configuration/modules
+                ./base_configuration/disko-nvme-zfs.nix
               ];
+              rpiHomeLab.k3s.enable = false;
             };
             ganymede = _: {
               deployment = {
@@ -97,8 +109,9 @@
               rpiHomeLab.networking = {
                 hostId = "76fa8e01";
                 hostName = "ganymede";
-                address = "10.10.69.10";
+                address = "10.10.69.10/24";
               };
+              rpiHomeLab.k3s.leader = true;
             };
             io = _: {
               deployment = {
@@ -107,7 +120,10 @@
               rpiHomeLab.networking = {
                 hostName = "io";
                 hostId = "19454311";
-                address = "10.10.69.11";
+                address = "10.10.69.11/24";
+              };
+              rpiHomeLab.k3s = {
+                leaderAddress = "10.10.69.10";
               };
             };
             europa = _: {
@@ -117,16 +133,22 @@
               rpiHomeLab.networking = {
                 hostId = "29af5daa";
                 hostName = "europa";
-                address = "10.10.69.12";
+                address = "10.10.69.12/24";
+              };
+              rpiHomeLab.k3s = {
+                leaderAddress = "10.10.69.10";
               };
             };
             callisto = _: {
               rpiHomeLab.networking = {
                 hostId = "b0d6aebd";
                 hostName = "callisto";
-                address = "10.10.69.14";
+                address = "10.10.69.14/24";
               };
-              deployment.targetHost = "callisto.jupiter.lan";
+              rpiHomeLab.k3s = {
+                leaderAddress = "10.10.69.10";
+              };
+              deployment.targetHost = "10.10.69.14";
             };
           };
         };

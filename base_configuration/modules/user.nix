@@ -24,7 +24,6 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUArrr4oix6p/bSjeuXKi2crVzsuSqSYoz//YJMsTlo cardno:14_836_775"
     ];
   };
-
   # Don't require sudo/root to `reboot` or `poweroff`.
   security.polkit.enable = true;
 
