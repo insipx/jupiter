@@ -49,8 +49,24 @@ let
 
 in
 {
-
-  boot.supportedFilesystems = [ "zfs" ];
+  fileSystems."/" = {
+    device = "rpool/system/root";
+    fsType = "zfs";
+  };
+  # Boot settings
+  boot = {
+    kernelParams = [
+      "cgroup_enable=cpuset"
+      "cgroup_memory=1"
+      "cgroup_enable=memory"
+    ];
+  };
+  boot.supportedFilesystems = [ "zfs" "vfat" ];
+  boot.initrd.supportedFilesystems = [ "zfs" "vfat" ];
+  boot.tmp.useTmpfs = true;
+  boot.blacklistedKernelModules = [ "vc4" ];
+  boot.kernelModules = [ "vc4" ];
+  # boot.zfs.devNodes = "/dev/disk/by-uuid/"
   # networking.hostId is set somewhere else
   services.zfs.autoScrub.enable = true;
   services.zfs.trim.enable = true;
@@ -176,7 +192,6 @@ in
             };
             mountpoint = "/var/lib";
           };
-
         };
       };
     };

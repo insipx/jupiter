@@ -4,7 +4,7 @@
 # for a more complex example.
 keys:
   - &admin_insipx age1yubikey1qw0ux80u4fpkrl7xuqap8hufkjey3tfrnhcwge5dmzwnrstlv4g8u9ztmdj
-  - &node_ganymede age1m2fdlcwyrvs2euh0zccwgsydhe8cjm9n7nplfs0svnvcucxequ7sxjsvfq
+  - &node_ganymede age17k5gs4q7yuunvlm9svd5gqeqj36ufmddlzguwykygan6arle549q9ynmff
   - &node_io age1q9420838rcwr3mykp3juf3f5ntwwudndlmeyxmaanr5ekqmgzdvshjph7z
   - &node_europa age1ru0z7n6mkc60mpz0ayzd3y3racpag60hqwggt6gtp3djugnvj43slv0pgv
   - &node_callisto age15l35yfzelwk7ge6dq028r3qx6frzkdzpp4lkg2p4vyppzc3t5vnsnf7mst

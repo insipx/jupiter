@@ -25,10 +25,10 @@
           enable = true;
           value = true;
         };
-        cmdline = {
-          enable = true;
-          value = "cgroup_enable=memory cgroup_enable=cpuset";
-        };
+        #cmdline = {
+        #  enable = true;
+        #  value = "cgroup_enable=memory cgroup_enable=cpuset";
+        #};
       };
       # Base DTB parameters
       # https://github.com/raspberrypi/linux/blob/a1d3defcca200077e1e382fe049ca613d16efd2b/arch/arm/boot/dts/overlays/README#L132

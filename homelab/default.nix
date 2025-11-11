@@ -1,4 +1,4 @@
-{ lib, config, inputs, ... }: {
+{ lib, config, ... }: {
   options = {
     rpiHomeLab = {
       networking = {
@@ -33,6 +33,13 @@
           default = null;
         };
       };
+      secrets = {
+        enable = lib.mkOption {
+          defaultText = "Enable sops k3s secrets. requires a built system with a ed25519 key.";
+          type = lib.types.bool;
+          default = true;
+        };
+      };
     };
   };
 
@@ -56,28 +63,8 @@
     };
     networking = {
       inherit (config.rpiHomeLab.networking) hostName hostId;
-      useNetworkd = true;
-      useDHCP = false;
-      firewall.allowedTCPPorts = [
-        6443 # k3s: required so that pods can reach the API server (running on port 6443 by default)
-        2379 # k3s, etcd clients: required if using a "High Availability Embedded etcd" configuration
-        2380 # k3s, etcd peers: required if using a "High Availability Embedded etcd" configuration
-      ];
-      firewall.allowedUDPPorts = [
-        5353
-        8472 # k3s, flannel: required if using multi-node for inter-node networking
-      ];
     };
-    sops = {
-      age = {
-        sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-        generateKey = false;
-      };
-      secrets.k3s_token = {
-        sopsFile = ./../secrets/homelab.yaml;
-      };
-    };
-    services.k3s = {
+    services.k3s = lib.mkIf config.rpiHomeLab.k3s.enable {
       inherit (config.rpiHomeLab.k3s) enable;
       role = "server";
       serverAddr = lib.mkIf (!config.rpiHomeLab.k3s.leader) config.rpiHomeLab.k3s.leaderAddress;
@@ -86,6 +73,23 @@
       extraFlags = [ "--debug" ];
     };
     time.timeZone = "America/New_York";
-    boot.tmp.useTmpfs = true;
+    systemd.services.modprobe-vc4 = {
+      serviceConfig = {
+        Type = "oneshot";
+        User = "root";
+      };
+      before = [ "multi-user.target" ];
+      wantedBy = [ "multi-user.target" ];
+      script = "/run/current-system/sw/bin/modprobe vc4";
+    };
+  };
+  config.sops = lib.mkIf config.rpiHomeLab.secrets.enable {
+    age = {
+      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      generateKey = false;
+    };
+    secrets.k3s_token = {
+      sopsFile = ./../secrets/homelab.yaml;
+    };
   };
 }
