@@ -128,7 +128,7 @@
                     ./base_configuration/disko-nvme-zfs.nix
                   ];
                   rpiHomeLab = {
-                    k3s.enable = false;
+                    k3s.enable = true;
                     secrets.enable = true;
                   };
                 };
