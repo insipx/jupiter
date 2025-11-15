@@ -38,6 +38,7 @@
   services.avahi = {
     enable = true;
     nssmdns4 = true;
+    domainName = "lan";
     publish = {
       enable = true;
       addresses = true;
@@ -46,5 +47,6 @@
       userServices = true;
       workstation = true;
     };
+    wideArea = false;
   };
 }

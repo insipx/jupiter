@@ -1,15 +1,8 @@
-{ nixos-raspberrypi, pkgs, ... }: {
-  imports = with nixos-raspberrypi.nixosModules; [
-    # Hardware configuration
-    raspberry-pi-5.base
-    raspberry-pi-5.page-size-16k
-    raspberry-pi-5.display-vc4
-    raspberry-pi-5.bluetooth
-    ./configtxt.nix
-    ./pretty-console.nix
+{ pkgs, ... }: {
+  imports = [
+    ./console.nix
     ./user.nix
     ./network.nix
-    ./override_kernel.nix
   ];
 
   time.timeZone = "America/New_York";

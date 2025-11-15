@@ -27,7 +27,7 @@
   # Don't require sudo/root to `reboot` or `poweroff`.
   security.polkit.enable = true;
 
-  # Allow passwordless sudo from nixos user
+  # Allow passwordless sudo from insipx user
   security.sudo = {
     enable = true;
     wheelNeedsPassword = false;

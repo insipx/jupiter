@@ -1,15 +1,0 @@
-Script started on 2025-11-12 09:36:44-05:00 [TERM="xterm-ghostty" TTY="/dev/pts/1" COLUMNS="316" LINES="74"]
-[1;31m[]0;root@ganymede: /boot/firmwareroot@ganymede:/boot/firmware]#[0m nixos-rebuild switch --[K[K[K[K[K[K[K[K[K[K list-generations
-[?2004lGeneration  Build-date           NixOS version  Kernel   Configuration Revision  Specialisation
-4 current   2025-11-12 09:29:48  25.05pre-git   6.12.34                          *
-[?2004h
-[1;31m[]0;root@ganymede: /boot/firmwareroot@ganymede:/boot/firmware]#[0m nixos[K[K[K[K[Kcat nix/s[K[Kos/4-default/cmdline.txt 
-[?2004lconsole=serial0,115200n8 console=tty1 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory nohibernate loglevel=7 lsm=landlock,yama,bpf vt.default_red=0x00,0xCC,0x4E,0xC4,0x34,0x75,0x06,0xD3,0x55,0xEF,0x8A,0xFC,0x73,0xAD,0x34,0xEE vt.default_grn=0x00,0x00,0x9A,0xA0,0x65,0x50,0x98,0xD7,0x57,0x29,0xE2,0xE9,0x9F,0x7F,0xE2,0xEE vt.default_blu=0x00,0x00,0x06,0x00,0xA4,0x7B,0x9A,0xCF,0x53,0x29,0x34,0x4F,0xCF,0xA8,0xE2,0xEC init=/nix/var/nix/profiles/system-4-link/init
-[?2004h
-[1;31m[]0;root@ganymede: /boot/firmwareroot@ganymede:/boot/firmware]#[0m /[Kcat /proc/cmdline 
-[?2004lreboot=w coherent_pool=1M 8250.nr_uarts=1 pci=pcie_bus_safe cgroup_disable=memory numa_policy=interleave nvme.max_host_mem_size_mb=0  numa=fake=8 system_heap.max_order=0 smsc95xx.macaddr=2C:CF:67:EF:11:04 vc_mem.mem_base=0x3fc00000 vc_mem.mem_size=0x40000000  console=ttyAMA0,115200n8 console=tty1 nohibernate loglevel=7 lsm=landlock,yama,bpf vt.default_red=0x00,0xCC,0x4E,0xC4,0x34,0x75,0x06,0xD3,0x55,0xEF,0x8A,0xFC,0x73,0xAD,0x34,0xEE vt.default_grn=0x00,0x00,0x9A,0xA0,0x65,0x50,0x98,0xD7,0x57,0x29,0xE2,0xE9,0x9F,0x7F,0xE2,0xEE vt.default_blu=0x00,0x00,0x06,0x00,0xA4,0x7B,0x9A,0xCF,0x53,0x29,0x34,0x4F,0xCF,0xA8,0xE2,0xEC init=/nix/store/1jhi8np8zhqkg1fv9qcmcaa1d5lrc051-nixos-system-ganymede-25.05.20251031.791ec2c/init
-[?2004h
-[1;31m[]0;root@ganymede: /boot/firmwareroot@ganymede:/boot/firmware]#[0m exit
-[?2004lexit
-
-Script done on 2025-11-12 09:37:31-05:00 [COMMAND_EXIT_CODE="0"]

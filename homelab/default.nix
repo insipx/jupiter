@@ -28,16 +28,14 @@
           type = lib.types.bool;
           default = false;
         };
+        agent = lib.mkOption {
+          defaultText = "make this node a worker-only agent node";
+          type = lib.types.bool;
+          default = false;
+        };
         leaderAddress = lib.mkOption {
           type = lib.types.nullOr lib.types.str;
           default = null;
-        };
-      };
-      secrets = {
-        enable = lib.mkOption {
-          defaultText = "Enable sops k3s secrets. requires a built system with a ed25519 key.";
-          type = lib.types.bool;
-          default = true;
         };
       };
     };
@@ -66,7 +64,7 @@
     };
     services.k3s = lib.mkIf config.rpiHomeLab.k3s.enable {
       inherit (config.rpiHomeLab.k3s) enable;
-      role = "server";
+      role = if config.rpiHomeLab.k3s.agent then "agent" else "server";
       serverAddr = lib.mkIf (!config.rpiHomeLab.k3s.leader) config.rpiHomeLab.k3s.leaderAddress;
       clusterInit = lib.mkIf config.rpiHomeLab.k3s.leader true;
       tokenFile = config.sops.secrets.k3s_token.path;
@@ -81,15 +79,6 @@
       before = [ "multi-user.target" ];
       wantedBy = [ "multi-user.target" ];
       script = "/run/current-system/sw/bin/modprobe vc4";
-    };
-  };
-  config.sops = lib.mkIf config.rpiHomeLab.secrets.enable {
-    age = {
-      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-      generateKey = false;
-    };
-    secrets.k3s_token = {
-      sopsFile = ./../secrets/homelab.yaml;
     };
   };
 }
