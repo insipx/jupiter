@@ -27,7 +27,8 @@
     ghostty.url = "github:ghostty-org/ghostty";
     ghostty.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     jupiter-secrets = {
-      url = "git+ssh://git@github.com/insipx/jupiter-secrets";
+      # url = "git+ssh://git@github.com/insipx/jupiter-secrets";
+      url = "path:/Users/andrewplaza/code/insipx/jupiter-secrets";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
       inputs.sops-nix.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
@@ -120,14 +121,14 @@
                 defaults = _: {
                   deployment = {
                     tags = [ "homelab" ];
-                    targetUser = "insipx";
-                    buildOnTarget = false;
+                    # targetUser = "insipx";
+                    buildOnTarget = true;
                   };
                   imports = [
                     homelabModules.default
                     nixos-raspberrypi.lib.inject-overlays
                     inputs.disko.nixosModules.disko
-                    inputs.jupiter-secrets.flakeModules.default
+                    inputs.jupiter-secrets.nixosModules.default
                     ./base
                   ];
                   rpiHomeLab = {
@@ -221,6 +222,7 @@
                   deployment = {
                     tags = [ "workers" ];
                     targetHost = "sinope.jupiter.lan";
+                    targetUser = "nixos";
                   };
                   rpiHomeLab.networking = {
                     hostId = "0c461a51";

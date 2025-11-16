@@ -3,7 +3,7 @@
     raspberry-pi-4.base
     ./kernel.nix
     ./config.nix
-    ./../sd-filesytem.nix
+    ./../sd-filesystem.nix
     raspberry-pi-4.display-vc4
   ];
 }

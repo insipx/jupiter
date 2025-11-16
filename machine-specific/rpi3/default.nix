@@ -3,6 +3,6 @@
     raspberry-pi-3.base
     ./kernel.nix
     ./config.nix
-    ./../sd-filesytem.nix
+    ./../sd-filesystem.nix
   ];
 }

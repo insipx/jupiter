@@ -258,17 +258,14 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1763238846,
-        "narHash": "sha256-opNwna+A0rHFAUrOXpycO+grYlWAc3sZGfCC5ZRPjl4=",
-        "ref": "refs/heads/main",
-        "rev": "434f4ecfa40ca202dac9ced40020ec851101377f",
-        "revCount": 5,
-        "type": "git",
-        "url": "ssh://git@github.com/insipx/jupiter-secrets"
+        "lastModified": 1763258859,
+        "narHash": "sha256-dvZjQJLJu6jDYGXnKYf1wtShHgPkg9NGOZEu3RRflZ4=",
+        "path": "/Users/andrewplaza/code/insipx/jupiter-secrets",
+        "type": "path"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/insipx/jupiter-secrets"
+        "path": "/Users/andrewplaza/code/insipx/jupiter-secrets",
+        "type": "path"
       }
     },
     "nix-github-actions": {
@@ -396,7 +393,7 @@
         "argononed": "argononed",
         "flake-compat": "flake-compat_3",
         "nixos-images": "nixos-images_2",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_3"
       },
       "locked": {
         "lastModified": 1761934681,
@@ -474,6 +471,22 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1763191728,
+        "narHash": "sha256-esRhOS0APE6k40Hs/jjReXg+rx+J5LkWw7cuWFKlwYA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "1d4c88323ac36805d09657d13a5273aea1b34f0c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1761934558,
         "narHash": "sha256-0gB7tv25nPv+Vkr9YNi6gOEpX5cuDTnaTZlRNHZfgqA=",
         "owner": "nvmd",
@@ -502,10 +515,7 @@
     },
     "sops-nix": {
       "inputs": {
-        "nixpkgs": [
-          "nixos-raspberrypi",
-          "nixpkgs"
-        ]
+        "nixpkgs": "nixpkgs_2"
       },
       "locked": {
         "lastModified": 1763069729,
@@ -516,9 +526,8 @@
         "type": "github"
       },
       "original": {
-        "owner": "Mic92",
-        "repo": "sops-nix",
-        "type": "github"
+        "id": "sops-nix",
+        "type": "indirect"
       }
     },
     "stable": {
