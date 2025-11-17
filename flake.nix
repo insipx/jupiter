@@ -19,6 +19,7 @@
       # flake parts does not use nixpkgs
       # inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
+    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
     systems.url = "github:nix-systems/default";
     colmena = {
       url = "github:zhaofengli/colmena";
@@ -27,11 +28,12 @@
     ghostty.url = "github:ghostty-org/ghostty";
     ghostty.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     jupiter-secrets = {
-      # url = "git+ssh://git@github.com/insipx/jupiter-secrets";
-      url = "path:/Users/andrewplaza/code/insipx/jupiter-secrets";
+      url = "git+ssh://git@github.com/insipx/jupiter-secrets";
+      # url = "path:/Users/andrewplaza/code/insipx/jupiter-secrets";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
       inputs.sops-nix.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
+    kubenix.url = "github:hall/kubenix";
   };
   nixConfig = {
     extra-substituters = [
@@ -52,8 +54,12 @@
         };
       in
       {
+        imports = [
+          inputs.pkgs-by-name-for-flake-parts.flakeModule
+        ];
         systems = import inputs.systems;
         perSystem = { pkgs, system, ... }: {
+          pkgsDirectory = ./deployments;
           _module.args = import nixos-raspberrypi.inputs.nixpkgs {
             inherit system;
             overlays = [ inputs.ghostty.overlays.default inputs.jupiter-secrets.overlays.default ];
@@ -88,11 +94,10 @@
                       address = "0.0.0.0/24"; # change before installing
                     };
                     k3s.enable = false;
-                    jupiter-secrets.enable = false;
                   };
                   imports = [
                     ./base
-                    # ./machine-specific/rpi5
+                    ./machine-specific/rpi5
                     # ./machine-specific/rpi4
                     # ./machine-specific/rpi3
                   ];
@@ -103,136 +108,7 @@
               ];
               specialArgs = inputs;
             };
-            colmenaHive = colmena.lib.makeHive
-              {
-                meta = {
-                  nixpkgs = import nixos-raspberrypi.inputs.nixpkgs {
-                    system = "aarch64-linux";
-                    overlays = [
-                      # inputs.ghostty.overlays.default
-                      piOverride
-                      #  (_: prev: {
-                      #    nixosSystem = inputs.nixos-raspberrypi.lib.nixosSystemFull;
-                      #  })
-                    ];
-                  };
-                  specialArgs = inputs;
-                };
-                defaults = _: {
-                  deployment = {
-                    tags = [ "homelab" ];
-                    # targetUser = "insipx";
-                    buildOnTarget = true;
-                  };
-                  imports = [
-                    homelabModules.default
-                    nixos-raspberrypi.lib.inject-overlays
-                    inputs.disko.nixosModules.disko
-                    inputs.jupiter-secrets.nixosModules.default
-                    ./base
-                  ];
-                  rpiHomeLab = {
-                    k3s.enable = true;
-                    k3s.leaderAddress = "https://ganymede.jupiter.lan:6443";
-                  };
-                  jupiter-secrets.enable = true;
-                };
-                ganymede = _: {
-                  imports = [
-                    ./machine-specific/rpi5
-                  ];
-                  deployment = {
-                    targetHost = "ganymede.jupiter.lan";
-                  };
-                  rpiHomeLab = {
-                    networking = {
-                      hostId = "445ba108";
-                      hostName = "ganymede";
-                      address = "10.10.69.10/24";
-                    };
-                  };
-                  rpiHomeLab.k3s.leader = true;
-                  services.k3s.extraFlags = [
-                    "--tls-san ganymede.jupiter.lan"
-                    "--tls-san ganymede"
-                    "--tls-san 10.10.69.10"
-                  ];
-                };
-                io = _: {
-                  deployment = {
-                    targetHost = "io.jupiter.lan";
-                    tags = [ "workers" ];
-                  };
-                  rpiHomeLab.networking = {
-                    hostName = "io";
-                    hostId = "19454311";
-                    address = "10.10.69.11/24";
-                  };
-                };
-                europa = _: {
-                  imports = [
-                    ./machine-specific/rpi5
-                  ];
-                  deployment = {
-                    tags = [ "workers" ];
-                    targetHost = "europa.jupiter.lan";
-                  };
-                  rpiHomeLab.networking = {
-                    hostId = "29af5daa";
-                    hostName = "europa";
-                    address = "10.10.69.12/24";
-                  };
-                };
-                callisto = _: {
-                  imports = [
-                    ./machine-specific/rpi5
-                  ];
-                  deployment = {
-                    tags = [ "workers" ];
-                    targetHost = "callisto.jupiter.lan";
-                  };
-                  rpiHomeLab.networking = {
-                    hostId = "b0d6aebd";
-                    hostName = "callisto";
-                    address = "10.10.69.14/24";
-                  };
-                  # callisto is the only node which is a worker
-                  rpiHomeLab.k3s.agent = true;
-                };
-                amalthea = _: {
-                  imports = [
-                    ./machine-specific/rpi4
-                  ];
-                  deployment = {
-                    tags = [ "workers" ];
-                    targetHost = "amalthea.jupiter.lan";
-                  };
-                  rpiHomeLab.networking = {
-                    hostId = "0de35cfb";
-                    hostName = "amalthea";
-                    address = "10.10.69.15/24";
-                  };
-                  # callisto is the only node which is a worker
-                  rpiHomeLab.k3s.agent = true;
-                };
-                sinope = _: {
-                  imports = [
-                    ./machine-specific/rpi3
-                  ];
-                  deployment = {
-                    tags = [ "workers" ];
-                    targetHost = "sinope.jupiter.lan";
-                    targetUser = "nixos";
-                  };
-                  rpiHomeLab.networking = {
-                    hostId = "0c461a51";
-                    hostName = "sinope";
-                    address = "10.10.69.16/24";
-                  };
-                  # callisto is the only node which is a worker
-                  rpiHomeLab.k3s.agent = true;
-                };
-              };
+            colmenaHive = import ./hive { inherit inputs homelabModules; };
           };
       });
 }

@@ -11,5 +11,9 @@ in
       firmwarePackage = kernelBundle.raspberrypifw;
     };
     kernelPackages = kernelBundle.linuxPackages_rpi3;
+    kernelParams = [
+      "cgroup_enable=memory"
+      "cgroup_memory=1"
+    ];
   };
 }

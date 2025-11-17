@@ -13,5 +13,9 @@ in
     initrd.availableKernelModules = [
       "nvme" # cm4 may have nvme drive connected with pcie
     ];
+    kernelParams = [
+      "cgroup_enable=memory"
+      "cgroup_memory=1"
+    ];
   };
 }

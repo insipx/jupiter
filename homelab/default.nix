@@ -2,6 +2,10 @@
   options = {
     rpiHomeLab = {
       networking = {
+        interface = lib.mkOption {
+          defaultText = lib.literalMD "interface name for ethernet";
+          type = lib.types.nullOr lib.types.str;
+        };
         hostId = lib.mkOption {
           defaultText = lib.literalMD "for ZFS. must be unique";
           type = lib.types.nullOr lib.types.str;
@@ -44,7 +48,7 @@
   config = {
     systemd.network.networks."50-static" = lib.mkIf (config.rpiHomeLab.networking.address != null) {
       # match the interface by name
-      matchConfig.Name = "end0";
+      matchConfig.Name = config.rpiHomeLab.networking.interface;
       address = [
         # configure addresses including subnet mask
         config.rpiHomeLab.networking.address
