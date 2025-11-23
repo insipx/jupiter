@@ -274,11 +274,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1763319557,
-        "narHash": "sha256-BzTDk3WWmeBRF48Yrad6uJAml+pbdlgkWVmJpf4v6vM=",
+        "lastModified": 1763867571,
+        "narHash": "sha256-gjaMaHJhGpJc0ZRLYUZrbYQHhVarsxQAJrRWh/wSZHc=",
         "ref": "refs/heads/main",
-        "rev": "2d6e8dd545ff76f8a9a6ca078595b2bb062322d3",
-        "revCount": 17,
+        "rev": "684a8ba12075fa25b9389e4cce62c2c4d76768a0",
+        "revCount": 18,
         "type": "git",
         "url": "ssh://git@github.com/insipx/jupiter-secrets"
       },

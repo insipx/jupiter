@@ -42,7 +42,6 @@ inputs.colmena.lib.makeHive {
       ./../machine-specific/rpi5
     ];
     deployment = {
-      targetUser = "insipx";
       targetHost = "ganymede.jupiter.lan";
     };
     rpiHomeLab = {
@@ -139,4 +138,21 @@ inputs.colmena.lib.makeHive {
     };
     rpiHomeLab.k3s.agent = true;
   };
+  carme = _: {
+    imports = [
+      ./../machine-specific/kiosk
+    ];
+    deployment = {
+      tags = [ "gui" ];
+      targetHost = "carme.jupiter.lan";
+    };
+    rpiHomeLab.networking = {
+      hostId = "5ae157ad";
+      hostName = "carme";
+      address = "10.10.69.17/24";
+      interface = "end0";
+    };
+    rpiHomeLab.k3s.agent = true;
+  };
+
 }

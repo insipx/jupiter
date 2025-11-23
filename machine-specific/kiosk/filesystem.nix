@@ -53,18 +53,13 @@ in
     device = "rpool/system/root";
     fsType = "zfs";
   };
-  # Boot settings
   boot = {
-    kernelParams = [
-      "cgroup_enable=memory"
-      "cgroup_memory=1"
-    ];
+    supportedFilesystems = [ "zfs" "vfat" ];
+    initrd.supportedFilesystems = [ "zfs" "vfat" ];
+    tmp.useTmpfs = true;
+    blacklistedKernelModules = [ "vc4" ];
+    kernelModules = [ "vc4" ];
   };
-  boot.supportedFilesystems = [ "zfs" "vfat" ];
-  boot.initrd.supportedFilesystems = [ "zfs" "vfat" ];
-  boot.tmp.useTmpfs = true;
-  boot.blacklistedKernelModules = [ "vc4" ];
-  boot.kernelModules = [ "vc4" ];
   # boot.zfs.devNodes = "/dev/disk/by-uuid/"
   # networking.hostId is set somewhere else
   services.zfs.autoScrub.enable = true;

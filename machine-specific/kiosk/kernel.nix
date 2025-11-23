@@ -7,6 +7,10 @@ in
     loader.raspberryPi.firmwarePackage = kernelBundle.raspberrypifw;
     loader.raspberryPi.bootloader = "kernel";
     kernelPackages = kernelBundle.linuxPackages_rpi5;
+    kernelParams = [
+      "cgroup_enable=memory"
+      "cgroup_memory=1"
+    ];
   };
 
   nixpkgs.overlays = lib.mkAfter [
