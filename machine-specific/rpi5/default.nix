@@ -1,4 +1,4 @@
-{ nixos-raspberrypi, pkgs, ... }: {
+{ nixos-raspberrypi, ... }: {
   imports = with nixos-raspberrypi.nixosModules; [
     ./kernel.nix
     raspberry-pi-5.base
@@ -6,11 +6,7 @@
     raspberry-pi-5.display-vc4
     raspberry-pi-5.bluetooth
     ./config.nix
-    ./../sd-filesystem.nix
-  ];
-  environment.systemPackages = with pkgs; [
-    labwc
-    dillo-plus
+    ./filesystem.nix
   ];
 }
 
