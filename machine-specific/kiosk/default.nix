@@ -15,13 +15,14 @@
     swayidle
   ];
   users.users.kiosk = {
+    isNormalUser = true;
     extraGroups = [
       "video"
       "seat"
       "input"
       "audio"
     ];
-    uid = "2000";
+    uid = 2000;
   };
   systemd.tmpfiles.rules = [
     "d /run/user/2000 0700 kiosk users -"
@@ -79,7 +80,7 @@
     };
   };
 
-  services.getty.autologinuser = "kiosk";
+  services.getty.autologinUser = "kiosk";
   systemd.services.labwc-kiosk = {
     description = "jupiter homelab monitoring kiosk";
     documentation = [ "man:labwc(1)" ];

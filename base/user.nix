@@ -33,9 +33,6 @@
     wheelNeedsPassword = false;
   };
 
-  # Automatically log in at the virtual consoles.
-  services.getty.autologinUser = "insipx";
-
   # We run sshd by default. Login is only possible after adding a
   # password via "passwd" or by adding a ssh key to ~/.ssh/authorized_keys.
   # The latter one is particular useful if keys are manually added to
