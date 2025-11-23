@@ -59,7 +59,7 @@
         ];
         systems = import inputs.systems;
         perSystem = { pkgs, system, ... }: {
-          pkgsDirectory = ./deployments;
+          # pkgsDirectory = ./deployments;
           _module.args = import nixos-raspberrypi.inputs.nixpkgs {
             inherit system;
             overlays = [ inputs.ghostty.overlays.default inputs.jupiter-secrets.overlays.default ];
