@@ -1,5 +1,5 @@
-{ nixos-raspberrypi, pkgs, lib, ... }: {
-  imports = with nixos-raspberrypi.nixosModules; [
+{ inputs, pkgs, lib, ... }: {
+  imports = with inputs.nixos-raspberrypi.nixosModules; [
     ./kernel.nix
     raspberry-pi-5.base
     raspberry-pi-5.page-size-16k
@@ -10,9 +10,9 @@
   ];
   environment.systemPackages = with pkgs; [
     labwc
-    firefox
     wlopm
     swayidle
+    firefox-bin
   ];
   users.users.kiosk = {
     isNormalUser = true;
@@ -23,6 +23,9 @@
       "audio"
     ];
     uid = 2000;
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUArrr4oix6p/bSjeuXKi2crVzsuSqSYoz//YJMsTlo cardno:14_836_775"
+    ];
   };
   systemd.tmpfiles.rules = [
     "d /run/user/2000 0700 kiosk users -"
@@ -47,7 +50,7 @@
             resume '${pkgs.wlopm}/bin/wlopm --on "*"' &
 
           # Launch browser in kiosk mode
-          ${pkgs.firefox}/bin/firefox \
+          ${pkgs.lib.getBin pkgs.firefox-bin}/bin/firefox \
             --kiosk \
             --private-window \
             "xmtp.org" &

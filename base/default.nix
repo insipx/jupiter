@@ -1,8 +1,13 @@
-{ pkgs, ... }: {
+{ inputs, homelabModules, pkgs, ... }: {
   imports = [
     ./console.nix
     ./network.nix
     ./user.nix
+    inputs.nixos-raspberrypi.lib.inject-overlays
+    inputs.disko.nixosModules.disko
+    inputs.jupiter-secrets.nixosModules.default
+    inputs.chaotic.nixosModules.default
+    homelabModules.default
   ];
   time.timeZone = "America/New_York";
   environment.systemPackages = with pkgs; [
@@ -32,5 +37,9 @@
       max-free = ${toString (1024 * 1024 * 1024)}
     '';
   };
-
+  rpiHomeLab = {
+    k3s.enable = true;
+    k3s.leaderAddress = "https://ganymede.jupiter.lan:6443";
+  };
+  jupiter-secrets.enable = true;
 }

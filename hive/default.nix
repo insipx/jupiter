@@ -5,44 +5,40 @@ let
   };
 in
 inputs.colmena.lib.makeHive {
-  meta = {
-    nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs {
-      system = "aarch64-linux";
-      overlays = [
-        # inputs.ghostty.overlays.default
-        piOverride
-        #  (_: prev: {
-        #    nixosSystem = inputs.nixos-raspberrypi.lib.nixosSystemFull;
-        #  })
-      ];
+  meta =
+    let
+      pkgs-firefox = import inputs.chaotic-nixpkgs {
+        system = "aarch64-linux";
+        overlays = [ inputs.chaotic.overlays.default ];
+      };
+      firefox-overlay = final: prev: {
+        inherit (pkgs-firefox) firefox_nightly;
+      };
+    in
+    {
+      nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs {
+        system = "aarch64-linux";
+        overlays = [
+          # inputs.ghostty.overlays.default
+          piOverride
+          firefox-overlay
+          #  (_: prev: {
+          #    nixosSystem = inputs.nixos-raspberrypi.lib.nixosSystemFull;
+          #  })
+        ];
+        allowUnfree = true;
+      };
+      specialArgs = { inherit inputs homelabModules; };
+      machinesFile = /etc/nix/machines;
     };
-    specialArgs = inputs;
-  };
-  defaults = _: {
-    deployment = {
-      tags = [ "homelab" ];
-      targetUser = "insipx";
-      buildOnTarget = false;
-    };
-    imports = [
-      homelabModules.default
-      inputs.nixos-raspberrypi.lib.inject-overlays
-      inputs.disko.nixosModules.disko
-      inputs.jupiter-secrets.nixosModules.default
-      ./../base
-    ];
-    rpiHomeLab = {
-      k3s.enable = true;
-      k3s.leaderAddress = "https://ganymede.jupiter.lan:6443";
-    };
-    jupiter-secrets.enable = true;
-  };
   ganymede = _: {
     imports = [
       ./../machine-specific/rpi5
+      ./../base
     ];
     deployment = {
       targetHost = "ganymede.jupiter.lan";
+      tags = [ "homelab" ];
     };
     rpiHomeLab = {
       networking = {
@@ -62,10 +58,11 @@ inputs.colmena.lib.makeHive {
   io = _: {
     imports = [
       ./../machine-specific/rpi5
+      ./../base
     ];
     deployment = {
       targetHost = "io.jupiter.lan";
-      tags = [ "workers" ];
+      tags = [ "workers" "homelab" ];
     };
     rpiHomeLab.networking = {
       hostName = "io";
@@ -77,9 +74,10 @@ inputs.colmena.lib.makeHive {
   europa = _: {
     imports = [
       ./../machine-specific/rpi5
+      ./../base
     ];
     deployment = {
-      tags = [ "workers" ];
+      tags = [ "workers" "homelab" ];
       targetHost = "europa.jupiter.lan";
     };
     rpiHomeLab.networking = {
@@ -92,9 +90,10 @@ inputs.colmena.lib.makeHive {
   callisto = _: {
     imports = [
       ./../machine-specific/rpi5
+      ./../base
     ];
     deployment = {
-      tags = [ "workers" ];
+      tags = [ "workers" "homelab" ];
       targetHost = "callisto.jupiter.lan";
     };
     rpiHomeLab.networking = {
@@ -109,9 +108,10 @@ inputs.colmena.lib.makeHive {
   amalthea = _: {
     imports = [
       ./../machine-specific/rpi4
+      ./../base
     ];
     deployment = {
-      tags = [ "lowpower" ];
+      tags = [ "lowpower" "homelab" ];
       targetHost = "amalthea.jupiter.lan";
     };
     rpiHomeLab.networking = {
@@ -125,9 +125,10 @@ inputs.colmena.lib.makeHive {
   sinope = _: {
     imports = [
       ./../machine-specific/rpi3
+      ./../base
     ];
     deployment = {
-      tags = [ "lowpower" ];
+      tags = [ "lowpower" "homelab" ];
       targetHost = "sinope.jupiter.lan";
     };
     rpiHomeLab.networking = {
@@ -141,10 +142,13 @@ inputs.colmena.lib.makeHive {
   carme = _: {
     imports = [
       ./../machine-specific/kiosk
+      ./../base
     ];
     deployment = {
-      tags = [ "gui" ];
+      targetUser = "insipx";
+      tags = [ "gui" "homelab" ];
       targetHost = "carme.jupiter.lan";
+      buildOnTarget = false;
     };
     rpiHomeLab.networking = {
       hostId = "5ae157ad";
@@ -154,5 +158,4 @@ inputs.colmena.lib.makeHive {
     };
     rpiHomeLab.k3s.agent = true;
   };
-
 }

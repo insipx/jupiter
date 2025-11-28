@@ -2,8 +2,9 @@
   description = "flake for managing rpi homelab";
 
   inputs = {
+    nixpkgs.url = "github:NixOs/nixpkgs/nixpkgs-unstable";
     nixos-raspberrypi = {
-      url = "github:nvmd/nixos-raspberrypi/develop";
+      url = "github:nvmd/nixos-raspberrypi/main";
     };
     disko = {
       # the fork is needed for partition attributes support
@@ -34,19 +35,22 @@
       inputs.sops-nix.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
     kubenix.url = "github:hall/kubenix";
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
   };
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"
       "https://nix-community.cachix.org"
+      "https://chaotic-nyx.cachix.org/"
     ];
     extra-trusted-public-keys = [
       "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "chaotic-nyx.cachix.org-1:HfnXSw4pj95iI/n17rIDy40agHj12WfF+Gqk6SonIT8="
     ];
   };
 
-  outputs = inputs@{ flake-parts, nixos-raspberrypi, colmena, nixos-anywhere, ... }:
+  outputs = inputs@{ flake-parts, nixos-raspberrypi, kubenix, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } (_:
       let
         homelabModules.default = { ... }: {
@@ -55,22 +59,56 @@
       in
       {
         imports = [
+          ./scripts
           inputs.pkgs-by-name-for-flake-parts.flakeModule
+          inputs.flake-parts.flakeModules.easyOverlay
         ];
         systems = import inputs.systems;
-        perSystem = { pkgs, system, ... }: {
-          # pkgsDirectory = ./deployments;
-          _module.args = import nixos-raspberrypi.inputs.nixpkgs {
-            inherit system;
-            overlays = [ inputs.ghostty.overlays.default inputs.jupiter-secrets.overlays.default ];
+        perSystem = { pkgs, self, self', system, inputs', ... }:
+          let
+            pkgs-firefox = import inputs.chaotic-nixpkgs {
+              inherit system;
+              overlays = [ inputs.chaotic.overlays.default ];
+            };
+            extra = _: prev: {
+              inherit (pkgs-firefox) firefox_nighty;
+              writeFishScriptBin = pkgs.callPackage ./scripts/write_fish_script { };
+            };
+          in
+          {
+            # pkgsDirectory = ./deployments;
+            _module.args = import nixos-raspberrypi.inputs.nixpkgs {
+              inherit system;
+              overlays = [ inputs.ghostty.overlays.default inputs.jupiter-secrets.overlays.default extra ];
+            };
+            devShells.default = pkgs.mkShell {
+              nativeBuildInputs = [
+                inputs'.nixos-anywhere.packages.default
+                inputs'.colmena.packages.colmena
+                self'.packages.kubenix
+                self'.packages.build_session
+                self'.packages.launch_instance_on_demand
+                self'.packages.launch_instance
+              ];
+            };
+            packages =
+              let
+                prometheus = (kubenix.evalModules.${system} {
+                  module = _: {
+                    imports = [ ./deployments/prometheus.nix ];
+                  };
+                }).config;
+              in
+              {
+                prometheusDeployment = prometheus.kubernetes.result;
+                prometheusImage = prometheus.docker.images.prometheus-monitoring.image;
+                kubenix = inputs'.kubenix.packages.default.override {
+                  module = import ./deployments/prometheus.nix;
+                  # optional; pass custom values to the kubenix module
+                  specialArgs = { flake = self; };
+                };
+              };
           };
-          devShells.default = pkgs.mkShell {
-            nativeBuildInputs = [
-              nixos-anywhere.packages.${system}.default
-              colmena.packages.${system}.colmena
-            ];
-          };
-        };
         flake =
           let
             piOverride = _: prev: {

@@ -40,7 +40,7 @@
   # mounting the storage in a different system.
   services.openssh = {
     enable = true;
-    settings.PermitRootLogin = "no";
+    settings.PermitRootLogin = "prohibit-password";
   };
 
   # allow nix-copy to live system
