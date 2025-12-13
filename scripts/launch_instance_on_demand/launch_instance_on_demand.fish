@@ -9,14 +9,12 @@ set AMI_ID (aws ec2 describe-images \
 echo "Using AMI: $AMI_ID"
 
 # Launch on-demand instance
-# have to use gp2 b/c philly does not support gp3
 set INSTANCE_ID (aws ec2 run-instances \
   --image-id $AMI_ID \
-  --instance-type c7g.2xlarge \
+  --instance-type c7g.8xlarge \
   --key-name yubikey \
   --security-group-ids sg-0d988b9eb0abb6542 \
-  --block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":100,"VolumeType":"gp2","DeleteOnTermination":true}}]' \
-  --user-data file:///tmp/nixos-builder-userdata.txt \
+  --block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":100,"VolumeType":"gp3","DeleteOnTermination":true}}]' \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=nixos-builder}]' \
   --query 'Instances[0].InstanceId' \
   --output text)

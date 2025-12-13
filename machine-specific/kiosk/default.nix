@@ -1,16 +1,17 @@
 { inputs, pkgs, lib, ... }: {
   imports = with inputs.nixos-raspberrypi.nixosModules; [
-    ./kernel.nix
+    ./../rpi5/kernel.nix
     raspberry-pi-5.base
     raspberry-pi-5.page-size-16k
     raspberry-pi-5.display-vc4
     raspberry-pi-5.bluetooth
-    ./config.nix
+    ./../rpi5/config.nix
     ./../sd-filesystem.nix
   ];
   environment.systemPackages = with pkgs; [
     cage
     firefox-bin
+    wlr-randr
   ];
   users.users.kiosk = {
     isNormalUser = true;
@@ -58,7 +59,7 @@
           ${pkgs.cage}/bin/cage -- \
             ${pkgs.firefox-bin}/bin/firefox \
             --kiosk \
-            https://google.com
+            http://ganymede.jupiter.lan:30300/playlists/play/df707rhg9pukge?kiosk
         '';
         Restart = "on-failure";
         RestartSec = 5;

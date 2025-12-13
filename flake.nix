@@ -35,18 +35,15 @@
       inputs.sops-nix.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
     kubenix.url = "github:hall/kubenix";
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
   };
   nixConfig = {
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"
       "https://nix-community.cachix.org"
-      "https://chaotic-nyx.cachix.org/"
     ];
     extra-trusted-public-keys = [
       "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "chaotic-nyx.cachix.org-1:HfnXSw4pj95iI/n17rIDy40agHj12WfF+Gqk6SonIT8="
     ];
   };
 
@@ -66,12 +63,7 @@
         systems = import inputs.systems;
         perSystem = { pkgs, self, self', system, inputs', ... }:
           let
-            pkgs-firefox = import inputs.chaotic-nixpkgs {
-              inherit system;
-              overlays = [ inputs.chaotic.overlays.default ];
-            };
             extra = _: prev: {
-              inherit (pkgs-firefox) firefox_nighty;
               writeFishScriptBin = pkgs.callPackage ./scripts/write_fish_script { };
             };
           in
@@ -88,61 +80,41 @@
                 self'.packages.kubenix
                 self'.packages.build_session
                 self'.packages.launch_instance_on_demand
-                self'.packages.launch_instance
+                pkgs.kubernetes-helm
               ];
             };
-            packages =
-              let
-                prometheus = (kubenix.evalModules.${system} {
-                  module = _: {
-                    imports = [ ./deployments/prometheus.nix ];
-                  };
-                }).config;
-              in
-              {
-                prometheusDeployment = prometheus.kubernetes.result;
-                prometheusImage = prometheus.docker.images.prometheus-monitoring.image;
-                kubenix = inputs'.kubenix.packages.default.override {
-                  module = import ./deployments/prometheus.nix;
-                  # optional; pass custom values to the kubenix module
-                  specialArgs = { flake = self; };
-                };
+            packages = {
+              kubenix = inputs'.kubenix.packages.default.override {
+                module = import ./deployments/kubenix/default.nix;
+                specialArgs = { flake = self; };
               };
+            };
           };
         flake =
-          let
-            piOverride = _: prev: {
-              sdl3 = (prev.sdl3.override { testSupport = false; }).overrideAttrs { doCheck = false; };
-            };
-          in
           {
             inherit homelabModules;
-            nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystem {
+            nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystemFull {
               modules = [
                 homelabModules.default
                 inputs.disko.nixosModules.disko
-                nixos-raspberrypi.lib.inject-overlays-global # CAUSES REBUILDS (same as nixosSystemFull)
-                nixos-raspberrypi.nixosModules.trusted-nix-caches
-                nixos-raspberrypi.nixosModules.nixpkgs-rpi
                 {
                   rpiHomeLab = {
                     networking = {
-                      hostId = "00000000"; # this should be unique per-machine
-                      hostName = "generic-nixos-host"; # change before installing
-                      address = "0.0.0.0/24"; # change before installing
+                      hostId = "c3adcefb"; # this should be unique per-machine
+                      hostName = "tinyca"; # change before installing
+                      address = "10.10.69.18/24"; # change before installing
+                      interface = "end0";
                     };
                     k3s.enable = false;
                   };
                   imports = [
                     ./base
-                    ./machine-specific/rpi5
+                    ./machine-specific/tinyca
+                    # ./machine-specific/rpi5
                     # ./machine-specific/rpi4
                     # ./machine-specific/rpi3
                   ];
                 }
-                ({ lib, ... }: {
-                  nixpkgs.overlays = lib.mkAfter [ piOverride ];
-                })
               ];
               specialArgs = inputs;
             };

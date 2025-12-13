@@ -6,7 +6,6 @@
     inputs.nixos-raspberrypi.lib.inject-overlays
     inputs.disko.nixosModules.disko
     inputs.jupiter-secrets.nixosModules.default
-    inputs.chaotic.nixosModules.default
     homelabModules.default
   ];
   time.timeZone = "America/New_York";
@@ -24,6 +23,14 @@
     raspberrypi-utils
     lshw
   ];
+  services.chrony = {
+    enable = true;
+    enableNTS = true;
+    servers = [
+      "time.cloudflare.com"
+      "ohio.time.system76.com"
+    ];
+  };
   environment.enableAllTerminfo = true;
   nix = {
     settings.experimental-features = [ "nix-command" "flakes" ];

@@ -3,7 +3,7 @@
 # to use this script you must use the launch_instance script and have the instance configured as a remote builder
 # in your nixos configuration: https://nix.dev/manual/nix/2.18/advanced-topics/distributed-builds
 
-set INSTANCE_ID "i-0ed6201f332594da2"  # Your on-demand instance ID (you'll get this from the launch script)
+set INSTANCE_ID "i-0393659a48a0da9e4"  # Your on-demand instance ID (you'll get this from the launch script)
 
 switch $argv[1]
   case start

@@ -1,36 +1,27 @@
 { inputs, homelabModules }:
 let
-  piOverride = _: prev: {
-    sdl3 = (prev.sdl3.override { testSupport = false; }).overrideAttrs { doCheck = false; };
-  };
+  # example to override specific package
+  # piOverride = _: prev: {
+  #   sdl3 = (prev.sdl3.override { testSupport = false; }).overrideAttrs { doCheck = false; };
+  # };
 in
 inputs.colmena.lib.makeHive {
-  meta =
-    let
-      pkgs-firefox = import inputs.chaotic-nixpkgs {
-        system = "aarch64-linux";
-        overlays = [ inputs.chaotic.overlays.default ];
-      };
-      firefox-overlay = final: prev: {
-        inherit (pkgs-firefox) firefox_nightly;
-      };
-    in
-    {
-      nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs {
-        system = "aarch64-linux";
-        overlays = [
-          # inputs.ghostty.overlays.default
-          piOverride
-          firefox-overlay
-          #  (_: prev: {
-          #    nixosSystem = inputs.nixos-raspberrypi.lib.nixosSystemFull;
-          #  })
-        ];
-        allowUnfree = true;
-      };
-      specialArgs = { inherit inputs homelabModules; };
-      machinesFile = /etc/nix/machines;
+  meta = {
+    nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs {
+      system = "aarch64-linux";
+      overlays = [
+        # inputs.ghostty.overlays.default
+        #     (_: prev: {
+        #       nixosSystem = inputs.nixos-raspberrypi.lib.nixosSystemFull;
+        #     })
+      ];
+      allowUnfree = true;
     };
+    specialArgs = {
+      inherit inputs homelabModules;
+    };
+    machinesFile = /etc/nix/machines;
+  };
   ganymede = _: {
     imports = [
       ./../machine-specific/rpi5
@@ -38,6 +29,7 @@ inputs.colmena.lib.makeHive {
     ];
     deployment = {
       targetHost = "ganymede.jupiter.lan";
+      targetUser = "insipx";
       tags = [ "homelab" ];
     };
     rpiHomeLab = {
@@ -48,8 +40,9 @@ inputs.colmena.lib.makeHive {
         interface = "end0";
       };
     };
-    rpiHomeLab.k3s.leader = true;
+    rpiHomeLab. k3s. leader = true;
     rpiHomeLab.ks.enable = true;
+    jupiter-secrets.settings.k3s = true;
     services.k3s.extraFlags = [
       "--tls-san ganymede.jupiter.lan"
       "--tls-san ganymede"
@@ -63,8 +56,10 @@ inputs.colmena.lib.makeHive {
     ];
     deployment = {
       targetHost = "io.jupiter.lan";
+      targetUser = "insipx";
       tags = [ "workers" "homelab" ];
     };
+    jupiter-secrets.settings.k3s = true;
     rpiHomeLab.networking = {
       hostName = "io";
       hostId = "19454311";
@@ -81,6 +76,7 @@ inputs.colmena.lib.makeHive {
     deployment = {
       tags = [ "workers" "homelab" ];
       targetHost = "europa.jupiter.lan";
+      targetUser = "insipx";
     };
     rpiHomeLab.networking = {
       hostId = "29af5daa";
@@ -88,7 +84,8 @@ inputs.colmena.lib.makeHive {
       address = "10.10.69.12/24";
       interface = "end0";
     };
-    rpiHomeLabk3s.enable = true;
+    rpiHomeLab.k3s.enable = true;
+    jupiter-secrets.settings.k3s = true;
 
   };
   callisto = _: {
@@ -96,6 +93,7 @@ inputs.colmena.lib.makeHive {
       ./../machine-specific/rpi5
       ./../base
     ];
+    jupiter-secrets.settings.k3s = true;
     deployment = {
       tags = [ "workers" "homelab" ];
       targetHost = "callisto.jupiter.lan";
@@ -134,6 +132,7 @@ inputs.colmena.lib.makeHive {
       ./../machine-specific/rpi3
       ./../base
     ];
+    jupiter-secrets.settings.k3s = true;
     deployment = {
       tags = [ "lowpower" "homelab" ];
       targetHost = "sinope.jupiter.lan";
@@ -165,7 +164,32 @@ inputs.colmena.lib.makeHive {
       address = "10.10.69.17/24";
       interface = "end0";
     };
-    rpiHomeLab.k3s.agent = true;
-    rpiHomeLab.k3s.enable = false;
+    rpiHomeLab.k3s = {
+      agent = false;
+      enable = false;
+    };
+  };
+  volos = _: {
+    imports = [
+      ./../machine-specific/tinyca
+      ./../base
+    ];
+    deployment = {
+      targetUser = "insipx";
+      tags = [ "tinyca" "homelab" ];
+      targetHost = "volos";
+      buildOnTarget = false;
+    };
+    rpiHomeLab = {
+      networking = {
+        hostId = "c3adcefb";
+        hostName = "volos";
+        address = "10.10.69.18/24";
+        interface = "end0";
+      };
+      k3s = {
+        enable = false;
+      };
+    };
   };
 }
