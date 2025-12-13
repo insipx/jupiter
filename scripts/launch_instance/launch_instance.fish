@@ -15,7 +15,7 @@ aws ec2 request-spot-instances \
   --type "persistent" \
   --launch-specification "{
     \"ImageId\": \"$AMI_ID\",
-    \"InstanceType\": \"c7g.4xlarge\",
+    \"InstanceType\": \"c7g.8xlarge\",
     \"KeyName\": \"yubikey\",
     \"SecurityGroupIds\": [\"sg-0d988b9eb0abb6542\"],
     \"BlockDeviceMappings\": [{

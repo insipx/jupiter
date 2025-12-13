@@ -38,7 +38,6 @@
     '';
   };
   rpiHomeLab = {
-    k3s.enable = true;
     k3s.leaderAddress = "https://ganymede.jupiter.lan:6443";
   };
   jupiter-secrets.enable = true;

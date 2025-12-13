@@ -49,6 +49,7 @@ inputs.colmena.lib.makeHive {
       };
     };
     rpiHomeLab.k3s.leader = true;
+    rpiHomeLab.ks.enable = true;
     services.k3s.extraFlags = [
       "--tls-san ganymede.jupiter.lan"
       "--tls-san ganymede"
@@ -70,6 +71,7 @@ inputs.colmena.lib.makeHive {
       address = "10.10.69.11/24";
       interface = "end0";
     };
+    rpiHomeLab.k3s.enable = true;
   };
   europa = _: {
     imports = [
@@ -86,6 +88,8 @@ inputs.colmena.lib.makeHive {
       address = "10.10.69.12/24";
       interface = "end0";
     };
+    rpiHomeLabk3s.enable = true;
+
   };
   callisto = _: {
     imports = [
@@ -104,6 +108,7 @@ inputs.colmena.lib.makeHive {
     };
     # callisto is the only node which is a worker
     rpiHomeLab.k3s.agent = true;
+    rpiHomeLabk3s.enable = true;
   };
   amalthea = _: {
     imports = [
@@ -121,6 +126,8 @@ inputs.colmena.lib.makeHive {
       interface = "end0";
     };
     rpiHomeLab.k3s.agent = true;
+    rpiHomeLab.k3s.enable = true;
+
   };
   sinope = _: {
     imports = [
@@ -138,6 +145,8 @@ inputs.colmena.lib.makeHive {
       interface = "enu1u1";
     };
     rpiHomeLab.k3s.agent = true;
+    rpiHomeLab.k3s.enable = true;
+
   };
   carme = _: {
     imports = [
@@ -157,5 +166,6 @@ inputs.colmena.lib.makeHive {
       interface = "end0";
     };
     rpiHomeLab.k3s.agent = true;
+    rpiHomeLab.k3s.enable = false;
   };
 }
