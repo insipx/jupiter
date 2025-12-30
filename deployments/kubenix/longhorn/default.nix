@@ -1,6 +1,10 @@
 { kubenix, ... }:
+let
+  ns = "longhorn-system";
+in
 {
-  imports = with kubenix.modules; [ helm submodules ];
+  imports = with kubenix.modules;
+    [ k8s helm submodules ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.longhorn-system = {
     submodule = "namespaced";
@@ -10,10 +14,36 @@
           chart = kubenix.lib.helm.fetch {
             repo = "https://charts.longhorn.io";
             chart = "longhorn";
-            version = "1.10.1";
+            version = "v1.10.1";
             sha256 = "sha256-nkS4nvFK+K7J/sE+OxOPY0nR3lkrQF5K7JM5zbXLJ0s=";
           };
-          namespace = - "longhorn-system";
+          noHooks = true;
+          namespace = ns;
+          values = {
+            persistence = {
+              defaultClass = true;
+            };
+
+            longhornUI.replicas = 1;
+            longhornConversionWebhook.replicas = 1;
+            longhornAdmissionWebhook.replicas = 1;
+            longhornRecoveryBackend.replicas = 1;
+            longhornManager.tolerations = [{
+              key = "node-role.kubernetes.io/control-plane";
+              operator = "Exists";
+              effect = "NoSchedule";
+            }];
+          };
+        };
+      };
+      resources = {
+
+        daemonSets.longhorn-manager = {
+          metadata.namespace = ns;
+          spec.template.spec.containers.longhorn-manager.env = [{
+            name = "PATH";
+            value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/run/wrappers/bin:/run/current-system/sw/bin";
+          }];
         };
       };
     };

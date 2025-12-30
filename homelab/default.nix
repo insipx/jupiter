@@ -66,13 +66,21 @@
     networking = {
       inherit (config.rpiHomeLab.networking) hostName hostId;
     };
-    services.k3s = lib.mkIf config.rpiHomeLab.k3s.enable {
-      inherit (config.rpiHomeLab.k3s) enable;
-      role = if config.rpiHomeLab.k3s.agent then "agent" else "server";
-      serverAddr = lib.mkIf (!config.rpiHomeLab.k3s.leader) config.rpiHomeLab.k3s.leaderAddress;
-      clusterInit = lib.mkIf config.rpiHomeLab.k3s.leader true;
-      tokenFile = config.sops.secrets.k3s_token.path;
-      extraFlags = [ "--debug" ];
+    services = {
+      k3s = lib.mkIf config.rpiHomeLab.k3s.enable {
+        inherit (config.rpiHomeLab.k3s) enable;
+        role = if config.rpiHomeLab.k3s.agent then "agent" else "server";
+        serverAddr = lib.mkIf (!config.rpiHomeLab.k3s.leader) config.rpiHomeLab.k3s.leaderAddress;
+        clusterInit = lib.mkIf config.rpiHomeLab.k3s.leader true;
+        tokenFile = config.sops.secrets.k3s_token.path;
+        extraFlags = [ "--debug" ];
+      };
+      openiscsi = {
+        enable = true;
+        name = "iqn.2025-01.jupiter-homelab:${config.networking.hostName}";
+      };
+      rpcbind.enable = true;
+      multipath.enable = false;
     };
     networking.firewall.allowedTCPPorts = lib.mkIf config.rpiHomeLab.k3s.enable [
       6443 # k3s: required so that pods can reach the API server (running on port 6443 by default)

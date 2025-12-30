@@ -34,7 +34,8 @@
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
       inputs.sops-nix.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
-    kubenix.url = "github:hall/kubenix";
+    kubenix.url = "github:sheepforce/kubenix/helm-proxy"; # Includes patch to fetch helm charts with a forward proxy
+    # kubenix.url = "github:hall/kubenix";
   };
   nixConfig = {
     extra-substituters = [
@@ -66,6 +67,10 @@
             extra = _: prev: {
               writeFishScriptBin = pkgs.callPackage ./scripts/write_fish_script { };
             };
+            kubenixPkg = inputs'.kubenix.packages.default.override {
+              module = import ./deployments/kubenix/default.nix;
+              specialArgs = { flake = self; };
+            };
           in
           {
             # pkgsDirectory = ./deployments;
@@ -84,15 +89,15 @@
               ];
             };
             packages = {
-              kubenix = inputs'.kubenix.packages.default.override {
-                module = import ./deployments/kubenix/default.nix;
-                specialArgs = { flake = self; };
-              };
+              kubenix = kubenixPkg;
             };
           };
         flake =
           {
             inherit homelabModules;
+            lib = {
+              hostname = "jupiter.lan";
+            };
             nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystemFull {
               modules = [
                 homelabModules.default

@@ -30,7 +30,7 @@ inputs.colmena.lib.makeHive {
     deployment = {
       targetHost = "ganymede.jupiter.lan";
       targetUser = "insipx";
-      tags = [ "homelab" ];
+      tags = [ "homelab" "mainpi" ];
     };
     rpiHomeLab = {
       networking = {
@@ -41,7 +41,7 @@ inputs.colmena.lib.makeHive {
       };
     };
     rpiHomeLab. k3s. leader = true;
-    rpiHomeLab.ks.enable = true;
+    rpiHomeLab.k3s.enable = true;
     jupiter-secrets.settings.k3s = true;
     services.k3s.extraFlags = [
       "--tls-san ganymede.jupiter.lan"
@@ -57,9 +57,8 @@ inputs.colmena.lib.makeHive {
     deployment = {
       targetHost = "io.jupiter.lan";
       targetUser = "insipx";
-      tags = [ "workers" "homelab" ];
+      tags = [ "workers" "homelab" "mainpi" ];
     };
-    jupiter-secrets.settings.k3s = true;
     rpiHomeLab.networking = {
       hostName = "io";
       hostId = "19454311";
@@ -67,6 +66,7 @@ inputs.colmena.lib.makeHive {
       interface = "end0";
     };
     rpiHomeLab.k3s.enable = true;
+    jupiter-secrets.settings.k3s = true;
   };
   europa = _: {
     imports = [
@@ -74,7 +74,7 @@ inputs.colmena.lib.makeHive {
       ./../base
     ];
     deployment = {
-      tags = [ "workers" "homelab" ];
+      tags = [ "workers" "homelab" "mainpi" ];
       targetHost = "europa.jupiter.lan";
       targetUser = "insipx";
     };
@@ -93,40 +93,42 @@ inputs.colmena.lib.makeHive {
       ./../machine-specific/rpi5
       ./../base
     ];
-    jupiter-secrets.settings.k3s = true;
     deployment = {
-      tags = [ "workers" "homelab" ];
+      tags = [ "workers" "homelab" "mainpi" ];
       targetHost = "callisto.jupiter.lan";
+      targetUser = "insipx";
     };
-    rpiHomeLab.networking = {
-      hostId = "b0d6aebd";
-      hostName = "callisto";
-      address = "10.10.69.14/24";
-      interface = "end0";
+    rpiHomeLab = {
+      k3s.agent = true;
+      k3s.enable = true;
+      networking = {
+        hostId = "b0d6aebd";
+        hostName = "callisto";
+        address = "10.10.69.14/24";
+        interface = "end0";
+      };
     };
-    # callisto is the only node which is a worker
-    rpiHomeLab.k3s.agent = true;
-    rpiHomeLabk3s.enable = true;
+    jupiter-secrets.settings.k3s = true;
   };
-  amalthea = _: {
-    imports = [
-      ./../machine-specific/rpi4
-      ./../base
-    ];
-    deployment = {
-      tags = [ "lowpower" "homelab" ];
-      targetHost = "amalthea.jupiter.lan";
-    };
-    rpiHomeLab.networking = {
-      hostId = "0de35cfb";
-      hostName = "amalthea";
-      address = "10.10.69.15/24";
-      interface = "end0";
-    };
-    rpiHomeLab.k3s.agent = true;
-    rpiHomeLab.k3s.enable = true;
-
-  };
+  #amalthea = _: {
+  #  imports = [
+  #    ./../machine-specific/rpi4
+  #    ./../base
+  #  ];
+  #  deployment = {
+  #    tags = [ "lowpower" "homelab" ];
+  #    targetHost = "amalthea.jupiter.lan";
+  #  };
+  #  rpiHomeLab.networking = {
+  #    hostId = "0de35cfb";
+  #    hostName = "amalthea";
+  #    address = "10.10.69.15/24";
+  #    interface = "end0";
+  #  };
+  #  rpiHomeLab.k3s.agent = true;
+  #  rpiHomeLab.k3s.enable = true;
+  #
+  #};
   sinope = _: {
     imports = [
       ./../machine-specific/rpi3
@@ -137,15 +139,17 @@ inputs.colmena.lib.makeHive {
       tags = [ "lowpower" "homelab" ];
       targetHost = "sinope.jupiter.lan";
     };
-    rpiHomeLab.networking = {
-      hostId = "0c461a51";
-      hostName = "sinope";
-      address = "10.10.69.16/24";
-      interface = "enu1u1";
-    };
-    rpiHomeLab.k3s.agent = true;
-    rpiHomeLab.k3s.enable = true;
+    rpiHomeLab = {
+      networking = {
+        hostId = "0c461a51";
+        hostName = "sinope";
+        address = "10.10.69.16/24";
+        interface = "enu1u1";
+      };
+      k3s.agent = true;
+      k3s.enable = true;
 
+    };
   };
   carme = _: {
     imports = [
@@ -158,15 +162,17 @@ inputs.colmena.lib.makeHive {
       targetHost = "carme.jupiter.lan";
       buildOnTarget = false;
     };
-    rpiHomeLab.networking = {
-      hostId = "5ae157ad";
-      hostName = "carme";
-      address = "10.10.69.17/24";
-      interface = "end0";
-    };
-    rpiHomeLab.k3s = {
-      agent = false;
-      enable = false;
+    rpiHomeLab = {
+      networking = {
+        hostId = "5ae157ad";
+        hostName = "carme";
+        address = "10.10.69.17/24";
+        interface = "end0";
+      };
+      k3s = {
+        agent = false;
+        enable = false;
+      };
     };
   };
   volos = _: {

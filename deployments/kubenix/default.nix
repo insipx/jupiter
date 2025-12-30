@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ config, lib, pkgs, kubenix, ... }:
 
 {
   imports = with kubenix.modules; [
@@ -6,6 +6,7 @@
     helm
     submodules
     ./longhorn/default.nix
+    ./monitoring/default.nix
     # ./rbd-hdd-csi/default.nix
     # And all others you would like to import
   ];

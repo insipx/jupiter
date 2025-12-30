@@ -54,7 +54,7 @@ in
     fsType = "zfs";
   };
   boot = {
-    supportedFilesystems = [ "zfs" "vfat" ];
+    supportedFilesystems = [ "zfs" "vfat" "nfs" ];
     initrd.supportedFilesystems = [ "zfs" "vfat" ];
     tmp.useTmpfs = true;
     blacklistedKernelModules = [ "vc4" ];
