@@ -78,7 +78,9 @@
         serverAddr = lib.mkIf (!config.rpiHomeLab.k3s.leader) config.rpiHomeLab.k3s.leaderAddress;
         clusterInit = config.rpiHomeLab.k3s.leader;
         tokenFile = config.sops.secrets.k3s_token.path;
-        extraFlags = [ "--debug" ] ++ lib.optionals config.rpiHomeLab.k3s.longhorn [ "--node-label=longhorn-storage=enabled" ];
+        extraFlags = [ "--debug" ]
+          ++ lib.optionals config.rpiHomeLab.k3s.longhorn [ "--node-label=longhorn-storage=enabled" ]
+          ++ lib.optionals (!config.rpiHomeLab.k3s.agent) [ "--disable=servicelb" ];
         # use nodeLabel when nixpkgs is updated to 25.11 for nixos-raspberrypi
         # nodeLabel = lib.mkIf config.rpiHomeLab.k3s.longhorn.enable [ "longhorn-storage=enabled" ];
       };

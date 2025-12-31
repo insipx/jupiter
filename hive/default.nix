@@ -30,7 +30,7 @@ inputs.colmena.lib.makeHive {
     deployment = {
       targetHost = "ganymede.jupiter.lan";
       targetUser = "insipx";
-      tags = [ "homelab" "mainpi" ];
+      tags = [ "homelab" "mainpi" "k3s" ];
     };
     rpiHomeLab = {
       networking = {
@@ -58,7 +58,7 @@ inputs.colmena.lib.makeHive {
     deployment = {
       targetHost = "io.jupiter.lan";
       targetUser = "insipx";
-      tags = [ "workers" "homelab" "mainpi" ];
+      tags = [ "homelab" "mainpi" "k3s" ];
     };
     rpiHomeLab = {
       networking = {
@@ -80,7 +80,7 @@ inputs.colmena.lib.makeHive {
     ];
 
     deployment = {
-      tags = [ "workers" "homelab" "mainpi" ];
+      tags = [ "homelab" "mainpi" "k3s" ];
       targetHost = "europa.jupiter.lan";
       targetUser = "insipx";
     };
@@ -104,7 +104,7 @@ inputs.colmena.lib.makeHive {
       ./../base
     ];
     deployment = {
-      tags = [ "workers" "homelab" "mainpi" ];
+      tags = [ "workers" "homelab" "mainpi" "k3s" ];
       targetHost = "callisto.jupiter.lan";
       targetUser = "insipx";
     };
@@ -150,7 +150,7 @@ inputs.colmena.lib.makeHive {
     ];
     jupiter-secrets.settings.k3s = true;
     deployment = {
-      tags = [ "lowpower" "homelab" ];
+      tags = [ "lowpower" "homelab" "k3s" "workers" ];
       targetHost = "sinope.jupiter.lan";
     };
     rpiHomeLab = {
