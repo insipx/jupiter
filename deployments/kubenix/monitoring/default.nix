@@ -14,10 +14,11 @@ in
           chart = kubenix.lib.helm.fetch {
             repo = "https://prometheus-community.github.io/helm-charts";
             chart = "kube-prometheus-stack";
-            version = "46.4.1";
-            sha256 = "0000000000000000000000000000000000000000000=";
+            version = "80.9.1";
+            sha256 = "sha256-edZNrpeFAPOesVC+BFBbAAafFyZc/m5Dy26lJpzakG0=";
           };
           namespace = ns;
+          # includeCRDs = true; fails
           values = {
 
             kubeControllerManager.enabled = false;
@@ -34,7 +35,7 @@ in
                 storageSpec.volumeClaimTemplate.spec = {
                   storageClassName = "longhorn-static";
                   accessModes = [ "ReadWriteOnce" ];
-                  resources.requests.storage = "10Gi";
+                  resources.requests.storage = "35Gi";
                 };
               };
             };
@@ -56,6 +57,7 @@ in
                   org_role = "Viewer";
                 };
                 security.allow_embedding = true;
+                replicas = 1;
               };
               dashboardProviders."dashboardproviders.yaml" = {
                 apiVersion = 1;
@@ -84,6 +86,39 @@ in
             }];
 
           };
+        };
+      };
+
+      customTypes = {
+        servicemonitors = {
+          attrName = "servicemonitors";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "ServiceMonitor";
+        };
+        podmonitors = {
+          attrName = "podmonitors";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "PodMonitor";
+        };
+        alertmanagers = {
+          attrName = "alertmanagers";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "Alertmanager";
+        };
+        prometheus = {
+          attrName = "prometheus";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "Prometheus";
+        };
+        prometheusrule = {
+          attrName = "prometheusrule";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "PrometheusRule";
         };
       };
     };

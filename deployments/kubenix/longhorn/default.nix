@@ -28,11 +28,16 @@ in
             longhornConversionWebhook.replicas = 1;
             longhornAdmissionWebhook.replicas = 1;
             longhornRecoveryBackend.replicas = 1;
-            longhornManager.tolerations = [{
-              key = "node-role.kubernetes.io/control-plane";
-              operator = "Exists";
-              effect = "NoSchedule";
-            }];
+            longhornManager = {
+              tolerations = [{
+                key = "node-role.kubernetes.io/control-plane";
+                operator = "Exists";
+                effect = "NoSchedule";
+              }];
+              nodeSelector = {
+                "longhorn-storage" = "enabled";
+              };
+            };
           };
         };
       };

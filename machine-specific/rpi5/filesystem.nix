@@ -53,6 +53,11 @@ in
     device = "rpool/system/root";
     fsType = "zfs";
   };
+  fileSystems."/var/lib/longhorn" = {
+    device = "/dev/zvol/rpool/longhorn-ext4";
+    fsType = "ext4";
+    options = [ "noatime" "discard" ];
+  };
   boot = {
     supportedFilesystems = [ "zfs" "vfat" "nfs" ];
     initrd.supportedFilesystems = [ "zfs" "vfat" ];
@@ -186,6 +191,16 @@ in
             };
             mountpoint = "/var/lib";
           };
+          # setup the longhorn volume if needed
+          # "safe/longhorn-volume" = {
+          #   type = "zfs_volume";
+          #   size = "100G"; # adjust as needed
+          #   content = {
+          #     type = "filesystem";
+          #     format = "ext4";
+          #     mountpoint = "/var/lib/longhorn";
+          #   };
+          # };
         };
       };
     };

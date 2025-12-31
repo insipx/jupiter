@@ -41,6 +41,11 @@
           type = lib.types.nullOr lib.types.str;
           default = null;
         };
+        longhorn = lib.mkOption {
+          defaultText = "enable longhorn label for this node _note:_ does not install longhorn itself.";
+          type = lib.types.bool;
+          default = false;
+        };
       };
     };
   };
@@ -71,9 +76,11 @@
         inherit (config.rpiHomeLab.k3s) enable;
         role = if config.rpiHomeLab.k3s.agent then "agent" else "server";
         serverAddr = lib.mkIf (!config.rpiHomeLab.k3s.leader) config.rpiHomeLab.k3s.leaderAddress;
-        clusterInit = lib.mkIf config.rpiHomeLab.k3s.leader true;
+        clusterInit = config.rpiHomeLab.k3s.leader;
         tokenFile = config.sops.secrets.k3s_token.path;
-        extraFlags = [ "--debug" ];
+        extraFlags = [ "--debug" ] ++ lib.optionals config.rpiHomeLab.k3s.longhorn [ "--node-label=longhorn-storage=enabled" ];
+        # use nodeLabel when nixpkgs is updated to 25.11 for nixos-raspberrypi
+        # nodeLabel = lib.mkIf config.rpiHomeLab.k3s.longhorn.enable [ "longhorn-storage=enabled" ];
       };
       openiscsi = {
         enable = true;

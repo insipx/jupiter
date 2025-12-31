@@ -1,14 +1,13 @@
-{ config, lib, pkgs, kubenix, ... }:
+{ kubenix, ... }:
 
 {
   imports = with kubenix.modules; [
     k8s
     helm
     submodules
-    ./longhorn/default.nix
-    ./monitoring/default.nix
-    # ./rbd-hdd-csi/default.nix
-    # And all others you would like to import
+    # ./longhorn/default.nix
+    # ./monitoring/default.nix
+    ./traefik/default.nix
   ];
 
   submodules.imports = [
