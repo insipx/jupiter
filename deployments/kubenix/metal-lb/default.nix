@@ -1,12 +1,12 @@
 { kubenix, ... }:
 let
-  ns = "metalllb-system";
+  ns = "metallb-system";
 in
 {
   imports = with kubenix.modules;
     [ k8s helm submodules ];
   submodules.imports = [ ../lib/namespaced.nix ];
-  submodules.instances.lb = {
+  submodules.instances.metallb-system = {
     submodule = "namespaced";
     args.kubernetes = {
       helm.releases = {
@@ -15,15 +15,29 @@ in
             repo = "https://metallb.github.io/metallb";
             chart = "metallb";
             version = "0.15.3";
-            sha256 = "sha256-0000000000000000000000000000000000000000000=";
+            sha256 = "sha256-KWdVaF6CjFjeHQ6HT1WvkI9JnSurt9emLVCpkxma0fg=";
           };
           namespace = ns;
-
         };
       };
       resources = {
+         services.metallb-webhook-service = {
+          metadata = {
+            name = "metallb-webhook-service";
+            namespace = ns;
+          };
+          spec = {
+            ports = [{
+              port = 443;
+              targetPort = 9443;
+              protocol = "TCP";
+            }];
+         };
+        };
         IPAddressPool.default = {
-          namespace = ns;
+          metadata = {
+            namespace = ns;
+          };
           spec = {
             addresses = [
               "10.10.68.0/24"
@@ -31,8 +45,9 @@ in
           };
         };
         L2Advertisement.default = {
-          namespace = ns;
-          spec = { };
+          metadata = {
+            namespace = ns;
+          };
         };
       };
       customTypes = {
