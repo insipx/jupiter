@@ -7,21 +7,17 @@ in
   imports = with kubenix.modules;
     [ k8s submodules ];
   submodules.imports = [ ../lib/namespaced.nix ];
-  submodules.ihnstances.kube-system = {
+  submodules.instances.kube-system = {
     submodule = "namespaced";
     args.kubernetes = {
       resources = {
-        services.traefik-ingress = {
+        ingresses.traefik-ingress = {
           metadata = {
             name = "traefik-ingress";
             namespace = ns;
-            annotations = {
-              spec = {
-                ingressClassName = "traefik";
-              };
-            };
           };
           spec = {
+            ingressClassName = "traefik";
             rules = [
               {
                 host = "traefik.jupiter.lan";
