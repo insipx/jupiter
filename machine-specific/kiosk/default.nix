@@ -59,7 +59,7 @@
           ${pkgs.cage}/bin/cage -- \
             ${pkgs.firefox-bin}/bin/firefox \
             --kiosk \
-            http://ganymede.jupiter.lan:30300/playlists/play/df707rhg9pukge?kiosk
+            http://grafana.jupiter.lan/playlists/play/df707rhg9pukge?kiosk
         '';
         Restart = "on-failure";
         RestartSec = 5;

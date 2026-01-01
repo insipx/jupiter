@@ -22,13 +22,17 @@
     raspberrypi-udev-rules
     raspberrypi-utils
     lshw
+    ntp
+    cryptsetup
+    lvm2
+    nfs-utils
+    libnfs
   ];
   services.chrony = {
     enable = true;
     enableNTS = true;
     servers = [
-      "time.cloudflare.com"
-      "ohio.time.system76.com"
+      "lab_gateway.jupiter.lan"
     ];
   };
   environment.enableAllTerminfo = true;

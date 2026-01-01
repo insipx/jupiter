@@ -42,13 +42,41 @@ in
         };
       };
       resources = {
-
         daemonSets.longhorn-manager = {
           metadata.namespace = ns;
           spec.template.spec.containers.longhorn-manager.env = [{
             name = "PATH";
             value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/run/wrappers/bin:/run/current-system/sw/bin";
           }];
+        };
+        ingressroute.longhorn-dashboard = {
+          metadata = {
+            name = "longhorn-dashboard";
+            namespace = ns;
+          };
+          spec = {
+            entryPoints = [ "web" ];
+            routes = [
+              {
+                match = "Host(`longhorn.jupiter.lan`)";
+                kind = "Rule";
+                services = [
+                  {
+                    name = "longhorn-frontend";
+                    port = 80;
+                  }
+                ];
+              }
+            ];
+          };
+        };
+      };
+      customTypes = {
+        ingressroute = {
+          attrName = "ingressroute";
+          group = "traefik.io";
+          version = "v1alpha1";
+          kind = "IngressRoute";
         };
       };
     };

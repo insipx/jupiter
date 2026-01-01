@@ -33,7 +33,7 @@ in
                 serviceMonitorSelectorNilUsesHelmValues = false;
                 podMonitorSelectorNilUsesHelmValues = false;
                 storageSpec.volumeClaimTemplate.spec = {
-                  storageClassName = "longhorn-static";
+                  storageClassName = "local-path";
                   accessModes = [ "ReadWriteOnce" ];
                   resources.requests.storage = "35Gi";
                 };
@@ -88,6 +88,27 @@ in
           };
         };
       };
+      resources = {
+        ingressroute.grafana-dashboard = {
+          metadata.namespace = ns;
+          metadata.name = "grafana-dashboard";
+          spec = {
+            entryPoints = [ "web" ];
+            routes = [
+              {
+                match = "Host(`grafana.jupiter.lan`)";
+                kind = "Rule";
+                services = [
+                  {
+                    name = "kube-prometheus-stack-grafana";
+                    port = 80;
+                  }
+                ];
+              }
+            ];
+          };
+        };
+      };
 
       customTypes = {
         servicemonitors = {
@@ -119,6 +140,12 @@ in
           group = "monitoring.coreos.com";
           version = "v1";
           kind = "PrometheusRule";
+        };
+        ingressroute = {
+          attrName = "ingressroute";
+          group = "traefik.io";
+          version = "v1alpha1";
+          kind = "IngressRoute";
         };
       };
     };
