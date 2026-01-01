@@ -251,11 +251,11 @@
         "zon2nix": "zon2nix"
       },
       "locked": {
-        "lastModified": 1767129289,
-        "narHash": "sha256-AkSpEN24xA4G2bs2VmGCsOzEpWdb3Mn+5xwqDgy3bfM=",
+        "lastModified": 1767300308,
+        "narHash": "sha256-i/LUpA+DhO7Z8Ma+so3cnxHxAn4auTqpC3Z/XnPs95A=",
         "owner": "ghostty-org",
         "repo": "ghostty",
-        "rev": "f32d54bedbc772ea3ae5c5ff081ffd97aab7cf40",
+        "rev": "b3fbf11b0c5365caad011bc82e5bda824ff3b02b",
         "type": "github"
       },
       "original": {
@@ -318,16 +318,15 @@
         "treefmt": "treefmt"
       },
       "locked": {
-        "lastModified": 1767023742,
-        "narHash": "sha256-Z47GMmnI08BeE4o5bD3jPhOn7cuH0TIUTrMzrD+WfAI=",
-        "owner": "sheepforce",
+        "lastModified": 1767026126,
+        "narHash": "sha256-oJXcsoV4as4co3a1NexEd8jY4Rnr5jOxwJSLoQnl2Hc=",
+        "owner": "hall",
         "repo": "kubenix",
-        "rev": "37828f484d32a6302c26d45fc4a272f0f9225174",
+        "rev": "658bd065850216ea0304f2e1b4a5b348a1b85599",
         "type": "github"
       },
       "original": {
-        "owner": "sheepforce",
-        "ref": "helm-proxy",
+        "owner": "hall",
         "repo": "kubenix",
         "type": "github"
       }
@@ -554,11 +553,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1767026758,
-        "narHash": "sha256-7fsac/f7nh/VaKJ/qm3I338+wAJa/3J57cOGpXi0Sbg=",
+        "lastModified": 1767242400,
+        "narHash": "sha256-knFaYjeg7swqG1dljj1hOxfg39zrIy8pfGuicjm9s+o=",
         "owner": "NixOs",
         "repo": "nixpkgs",
-        "rev": "346dd96ad74dc4457a9db9de4f4f57dab2e5731d",
+        "rev": "c04833a1e584401bb63c1a63ddc51a71e6aa457a",
         "type": "github"
       },
       "original": {
