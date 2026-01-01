@@ -10,6 +10,25 @@ in
   submodules.instances.kube-system = {
     submodule = "namespaced";
     args.kubernetes = {
+      helm.releases.traefik = {
+        chart = kubenix.lib.helm.fetch {
+          repo = "https://helm.traefik.io/traefik";
+          chart = "traefik";
+          version = "38.0.1";
+          sha256 = "sha256-uq7a+/Y1KryUUebMhqQJNe2fQmUH6b+neqo31OvkYcs=";
+        };
+        includeCRDs = true;
+        noHooks = true;
+        namespace = ns;
+        values = {
+          logs.general.level = "DEBUG";
+
+          persistence = {
+            enabled = false;
+            storageClass = "longhorn-static";
+          };
+        };
+      };
       resources = {
         ingressroute.traefik-dashboard = {
           metadata = {

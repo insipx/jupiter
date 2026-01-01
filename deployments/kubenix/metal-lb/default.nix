@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ kubenix, lib, ... }:
 let
   ns = "metallb-system";
 in
@@ -22,12 +22,8 @@ in
       };
       resources = {
          services.metallb-webhook-service = {
-          metadata = {
-            name = "metallb-webhook-service";
-            namespace = ns;
-          };
           spec = {
-            ports = [{
+            ports = lib.mkForce [{
               port = 443;
               targetPort = 9443;
               protocol = "TCP";
@@ -42,6 +38,7 @@ in
             addresses = [
               "10.10.68.0/24"
             ];
+            avoidBuggyIPs = true;
           };
         };
         L2Advertisement.default = {

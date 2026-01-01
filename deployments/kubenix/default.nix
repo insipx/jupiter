@@ -7,7 +7,7 @@
     submodules
     # ./longhorn/default.nix
     # ./monitoring/default.nix
-    # ./traefik/default.nix
+    ./traefik/default.nix
     ./metal-lb/default.nix
   ];
 
