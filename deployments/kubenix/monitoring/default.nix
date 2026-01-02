@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ kubenix, lib, flake, ... }:
 let
   ns = "monitoring";
 in
@@ -52,10 +52,12 @@ in
             grafana = {
               defaultDashboardsEnabled = true;
               defaultDashboardsTimezone = "America/New_York";
+              admin = {
+                existingSecret = "grafana-admin-credentials";
+                userKey = "admin-user";
+                passwordKey = "admin-password";
+              };
               "grafana.ini" = {
-                "security" = {
-                  admin_user = "admin";
-                };
                 "auth.anonymous" = {
                   enabled = true;
                   org_name = "Main Org.";
@@ -115,6 +117,14 @@ in
                 ];
               }
             ];
+          };
+        };
+        secrets.grafana-admin-credentials = {
+          metadata.namespace = ns;
+          metadata.name = "grafana-admin-credentials";
+          stringData = {
+            admin-user = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/grafana_admin";
+            admin-password = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/grafana_password";
           };
         };
       };

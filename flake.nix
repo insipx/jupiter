@@ -48,7 +48,7 @@
     ];
   };
 
-  outputs = inputs@{ flake-parts, nixos-raspberrypi, kubenix, ... }:
+  outputs = inputs@{ self, flake-parts, nixos-raspberrypi, kubenix, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } (_:
       let
         homelabModules.default = { ... }: {
@@ -62,7 +62,7 @@
           inputs.flake-parts.flakeModules.easyOverlay
         ];
         systems = import inputs.systems;
-        perSystem = { pkgs, self, self', system, inputs', ... }:
+        perSystem = { pkgs, self', system, inputs', ... }:
           let
             extra = _: prev: {
               writeFishScriptBin = pkgs.callPackage ./scripts/write_fish_script { };
@@ -86,6 +86,8 @@
                 self'.packages.build_session
                 self'.packages.launch_instance_on_demand
                 pkgs.kubernetes-helm
+                pkgs.sops
+                pkgs.vals
               ];
             };
             packages = {
@@ -97,11 +99,10 @@
             inherit homelabModules;
             lib = {
               hostname = "jupiter.lan";
+              secrets = inputs.jupiter-secrets.outPath;
             };
             nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystemFull {
               modules = [
-                homelabModules.default
-                inputs.disko.nixosModules.disko
                 {
                   rpiHomeLab = {
                     networking = {

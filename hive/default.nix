@@ -124,25 +124,6 @@ inputs.colmena.lib.makeHive {
     };
     jupiter-secrets.settings.k3s = true;
   };
-  #amalthea = _: {
-  #  imports = [
-  #    ./../machine-specific/rpi4
-  #    ./../base
-  #  ];
-  #  deployment = {
-  #    tags = [ "lowpower" "homelab" ];
-  #    targetHost = "amalthea.jupiter.lan";
-  #  };
-  #  rpiHomeLab.networking = {
-  #    hostId = "0de35cfb";
-  #    hostName = "amalthea";
-  #    address = "10.10.69.15/24";
-  #    interface = "end0";
-  #  };
-  #  rpiHomeLab.k3s.agent = true;
-  #  rpiHomeLab.k3s.enable = true;
-  #
-  #};
   sinope = _: {
     imports = [
       ./../machine-specific/rpi3
@@ -210,6 +191,26 @@ inputs.colmena.lib.makeHive {
       k3s = {
         enable = false;
       };
+    };
+  };
+  amalthea = _: {
+    imports = [
+      ./../machine-specific/rpi4
+      ./../base
+    ];
+    deployment = {
+      tags = [ "thinkcentre" "homelab" ];
+      targetHost = "amalthea.jupiter.lan";
+    };
+    rpiHomeLab = {
+      networking = {
+        hostId = "c71acaf9";
+        hostName = "amalthea";
+        address = "10.10.69.15/24";
+        interface = "end0";
+      };
+      k3s.agent = true;
+      k3s.enable = true;
     };
   };
 }
