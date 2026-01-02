@@ -34,8 +34,8 @@
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
       inputs.sops-nix.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
-    kubenix.url = "github:sheepforce/kubenix/helm-proxy"; # Includes patch to fetch helm charts with a forward proxy
-    # kubenix.url = "github:hall/kubenix";
+    # kubenix.url = "github:sheepforce/kubenix/helm-proxy"; # Includes patch to fetch helm charts with a forward proxy
+    kubenix.url = "github:hall/kubenix";
   };
   nixConfig = {
     extra-substituters = [
@@ -48,7 +48,7 @@
     ];
   };
 
-  outputs = inputs@{ flake-parts, nixos-raspberrypi, kubenix, ... }:
+  outputs = inputs@{ flake-parts, nixos-raspberrypi, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } (_:
       let
         homelabModules.default = { ... }: {
@@ -82,7 +82,7 @@
               nativeBuildInputs = [
                 inputs'.nixos-anywhere.packages.default
                 inputs'.colmena.packages.colmena
-                self'.packages.kubenix
+                # self'.packages.kubenix
                 self'.packages.build_session
                 self'.packages.launch_instance_on_demand
                 pkgs.kubernetes-helm
