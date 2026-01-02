@@ -121,7 +121,7 @@
                   ];
                 }
               ];
-              specialArgs = inputs;
+              specialArgs = { inherit inputs; };
             };
             colmenaHive = import ./hive { inherit inputs homelabModules; };
           };

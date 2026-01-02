@@ -33,7 +33,7 @@ in
                 serviceMonitorSelectorNilUsesHelmValues = false;
                 podMonitorSelectorNilUsesHelmValues = false;
                 storageSpec.volumeClaimTemplate.spec = {
-                  storageClassName = "local-path";
+                  storageClassName = "longhorn-static";
                   accessModes = [ "ReadWriteOnce" ];
                   resources.requests.storage = "35Gi";
                 };
@@ -50,7 +50,12 @@ in
             };
 
             grafana = {
+              defaultDashboardsEnabled = true;
+              defaultDashboardsTimezone = "America/New_York";
               "grafana.ini" = {
+                "security" = {
+                  admin_user = "admin";
+                };
                 "auth.anonymous" = {
                   enabled = true;
                   org_name = "Main Org.";
@@ -80,10 +85,14 @@ in
               };
             };
 
-            prometheus-node-exporter.prometheus.monitor.relabelings = [{
-              sourceLabels = [ "__meta_kubernetes_pod_node_name" ];
-              targetLabel = "instance";
-            }];
+            prometheus-node-exporter.prometheus.monitor = {
+              enabled = true;
+              attachMetadata.node = true;
+              relabelings = [{
+                sourceLabels = [ "__meta_kubernetes_pod_node_name" ];
+                targetLabel = "instance";
+              }];
+            };
 
           };
         };

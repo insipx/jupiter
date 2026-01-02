@@ -51,22 +51,30 @@
   };
 
   config = {
-    systemd.network.networks."50-static" = lib.mkIf (config.rpiHomeLab.networking.address != null) {
-      # match the interface by name
-      matchConfig.Name = config.rpiHomeLab.networking.interface;
-      address = [
-        # configure addresses including subnet mask
-        config.rpiHomeLab.networking.address
-      ];
-      routes = [
-        {
-          Gateway = "10.10.69.1";
-          Destination = "0.0.0.0/0";
-        }
-      ];
-      # make the routes on this interface a dependency for network-online.target
-      linkConfig.RequiredForOnline = "routable";
-      dns = [ "10.10.69.1" ];
+    systemd = {
+      network.networks."50-static" = lib.mkIf (config.rpiHomeLab.networking.address != null) {
+        # match the interface by name
+        matchConfig.Name = config.rpiHomeLab.networking.interface;
+        address = [
+          # configure addresses including subnet mask
+          config.rpiHomeLab.networking.address
+        ];
+        routes = [
+          {
+            Gateway = "10.10.69.1";
+            Destination = "0.0.0.0/0";
+          }
+        ];
+        # make the routes on this interface a dependency for network-online.target
+        linkConfig.RequiredForOnline = "routable";
+        dns = [ "10.10.69.1" ];
+      };
+      # patch for nixos FHS that enables nsenter for longhorn in containers
+      services.iscsid.serviceConfig = {
+        PrivateMounts = "yes";
+        BindPaths = "/run/current-system/sw/bin:/bin";
+      };
+
     };
     networking = {
       inherit (config.rpiHomeLab.networking) hostName hostId;
@@ -79,15 +87,15 @@
         clusterInit = config.rpiHomeLab.k3s.leader;
         tokenFile = config.sops.secrets.k3s_token.path;
         extraFlags = [ "--debug" ]
-          ++ lib.optionals config.rpiHomeLab.k3s.longhorn [ "--node-label=longhorn-storage=enabled" ]
           ++ lib.optionals (!config.rpiHomeLab.k3s.agent) [ "--disable=servicelb" ];
-        # use nodeLabel when nixpkgs is updated to 25.11 for nixos-raspberrypi
-        # nodeLabel = lib.mkIf config.rpiHomeLab.k3s.longhorn.enable [ "longhorn-storage=enabled" ];
+        nodeLabel = lib.mkIf config.rpiHomeLab.k3s.longhorn [ "longhorn-storage=enabled" ];
       };
+      # longhorn related
       openiscsi = {
         enable = true;
-        name = "iqn.2025-01.jupiter-homelab:${config.networking.hostName}";
+        name = "${config.networking.hostName}-initiatorhost";
       };
+      # https://github.com/longhorn/longhorn/issues/2166#issuecomment-2994323945
       rpcbind.enable = true;
       multipath.enable = false;
     };
