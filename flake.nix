@@ -34,8 +34,7 @@
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
       inputs.sops-nix.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
-    kubenix.url = "github:sheepforce/kubenix/helm-proxy"; # Includes patch to fetch helm charts with a forward proxy
-    # kubenix.url = "github:hall/kubenix";
+    kubenix.url = "github:hall/kubenix";
   };
   nixConfig = {
     extra-substituters = [
@@ -88,6 +87,7 @@
                 pkgs.kubernetes-helm
                 pkgs.sops
                 pkgs.vals
+                pkgs.age-plugin-yubikey
               ];
             };
             packages = {
