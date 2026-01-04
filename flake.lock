@@ -319,7 +319,7 @@
       },
       "locked": {
         "lastModified": 1767530535,
-        "narHash": "sha256-dOxkjcqq6tekPt38dTbHP5N9LcFAu2XSXguGfDTf2gc=",
+        "narHash": "sha256-jTj5a3oyNzupO/VMPgg9Xypo05mhYgkBlHPQFT4Su+0=",
         "owner": "hall",
         "repo": "kubenix",
         "rev": "ad3b33a7a19ea571f6ff0cbb1ac3633678135120",

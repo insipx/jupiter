@@ -15,7 +15,7 @@ inputs.colmena.lib.makeHive {
         #       nixosSystem = inputs.nixos-raspberrypi.lib.nixosSystemFull;
         #     })
       ];
-      allowUnfree = true;
+      config.allowUnfree = true;
     };
     specialArgs = {
       inherit inputs homelabModules;
@@ -193,24 +193,24 @@ inputs.colmena.lib.makeHive {
       };
     };
   };
-  amalthea = _: {
-    imports = [
-      ./../machine-specific/rpi4
-      ./../base
-    ];
-    deployment = {
-      tags = [ "thinkcentre" "homelab" ];
-      targetHost = "amalthea.jupiter.lan";
-    };
-    rpiHomeLab = {
-      networking = {
-        hostId = "c71acaf9";
-        hostName = "amalthea";
-        address = "10.10.69.15/24";
-        interface = "end0";
-      };
-      k3s.agent = true;
-      k3s.enable = true;
-    };
-  };
+  #amalthea = _: {
+  #  imports = [
+  #    ./../machine-specific/rpi4
+  #    ./../base
+  #  ];
+  #  deployment = {
+  #    tags = [ "thinkcentre" "homelab" ];
+  #    targetHost = "amalthea.jupiter.lan";
+  #  };
+  #  rpiHomeLab = {
+  #    networking = {
+  #      hostId = "c71acaf9";
+  #      hostName = "amalthea";
+  #      address = "10.10.69.15/24";
+  #      interface = "end0";
+  #    };
+  #    k3s.agent = true;
+  #    k3s.enable = true;
+  #  };
+  #};
 }

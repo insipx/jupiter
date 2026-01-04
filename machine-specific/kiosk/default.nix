@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, ... }: {
+{ inputs, pkgs, ... }: {
   imports = with inputs.nixos-raspberrypi.nixosModules; [
     ./../rpi5/kernel.nix
     raspberry-pi-5.base
@@ -10,7 +10,7 @@
   ];
   environment.systemPackages = with pkgs; [
     cage
-    firefox-bin
+    firefox
     wlr-randr
   ];
   users.users.kiosk = {
@@ -59,8 +59,7 @@
           ${pkgs.cage}/bin/cage -- \
             ${pkgs.firefox-bin}/bin/firefox \
             --kiosk \
-            http://grafana.jupiter.lan/playlists/play/df707rhg9pukge?kiosk
-        '';
+            http://grafana.jupiter.lan/playlists/play/df95zko2qifb4a?kiosk=true&autofitpanels=true'';
         Restart = "on-failure";
         RestartSec = 5;
         TTYPath = "/dev/tty1";
