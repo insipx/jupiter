@@ -59,7 +59,7 @@ in
     options = [ "noatime" "discard" ];
   };
   boot = {
-    supportedFilesystems = [ "zfs" "vfat" "nfs" ];
+    supportedFilesystems = [ "zfs" "vfat" ];
     initrd.supportedFilesystems = [ "zfs" "vfat" ];
     tmp.useTmpfs = true;
     blacklistedKernelModules = [ "vc4" ];
@@ -192,15 +192,15 @@ in
             mountpoint = "/var/lib";
           };
           # setup the longhorn volume if needed
-          # "safe/longhorn-volume" = {
-          #   type = "zfs_volume";
-          #   size = "100G"; # adjust as needed
-          #   content = {
-          #     type = "filesystem";
-          #     format = "ext4";
-          #     mountpoint = "/var/lib/longhorn";
-          #   };
-          # };
+          "safe/var/lib/longhorn" = {
+            type = "zfs_volume";
+            size = "150G"; # adjust as needed
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/var/lib/longhorn";
+            };
+          };
         };
       };
     };

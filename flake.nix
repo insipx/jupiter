@@ -47,7 +47,7 @@
     ];
   };
 
-  outputs = inputs@{ self, flake-parts, nixos-raspberrypi, kubenix, ... }:
+  outputs = inputs@{ self, flake-parts, nixos-raspberrypi, nixpkgs, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } (_:
       let
         homelabModules.default = { ... }: {
@@ -103,22 +103,43 @@
             };
             nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystemFull {
               modules = [
+                homelabModules.default
                 {
                   rpiHomeLab = {
                     networking = {
-                      hostId = "c3adcefb"; # this should be unique per-machine
-                      hostName = "tinyca"; # change before installing
-                      address = "10.10.69.18/24"; # change before installing
+                      hostId = "c6c81d8d"; # this should be unique per-machine
+                      hostName = "elara"; # change before installing
+                      address = "10.10.69.20/24"; # change before installing
                       interface = "end0";
                     };
                     k3s.enable = false;
                   };
                   imports = [
                     ./base
-                    ./machine-specific/tinyca
+                    ./machine-specific/pihole
                     # ./machine-specific/rpi5
                     # ./machine-specific/rpi4
                     # ./machine-specific/rpi3
+                  ];
+                }
+              ];
+              specialArgs = inputs;
+            };
+            nixosConfigurations.x86Installer = nixpkgs.lib.nixosSystem {
+              modules = [
+                {
+                  rpiHomeLab = {
+                    networking = {
+                      hostId = "2df2e75d"; # this should be unique per-machine
+                      hostName = "amalthea"; # change before installing
+                      address = "10.10.69.50/24"; # change before installing
+                      interface = "end0";
+                    };
+                    k3s.enable = false;
+                  };
+                  imports = [
+                    ./base
+                    ./machine-specific/thinkcentre
                   ];
                 }
               ];

@@ -4,13 +4,12 @@
     raspberry-pi-5.base
     raspberry-pi-5.page-size-16k
     raspberry-pi-5.display-vc4
-    raspberry-pi-5.bluetooth
     ./../rpi5/config.nix
     ./../sd-filesystem.nix
   ];
   environment.systemPackages = with pkgs; [
     cage
-    firefox
+    ungoogled-chromium
     wlr-randr
   ];
   users.users.kiosk = {
@@ -57,9 +56,17 @@
         ];
         ExecStart = ''
           ${pkgs.cage}/bin/cage -- \
-            ${pkgs.firefox-bin}/bin/firefox \
+          ${pkgs.ungoogled-chromium}/bin/chromium \
             --kiosk \
-            http://grafana.jupiter.lan/playlists/play/df95zko2qifb4a?kiosk=true&autofitpanels=true'';
+            --incognito \
+            --no-sandbox \
+            --disable-dev-shm-usage \
+            --disable-pinch \
+            --disable-translate \
+            --noerrdialogs \
+            --fast-unload \
+            http://grafana.jupiter.lan/playlists/play/df95zko2qifb4a?kiosk=true&autofitpanels=true
+        '';
         Restart = "on-failure";
         RestartSec = 5;
         TTYPath = "/dev/tty1";

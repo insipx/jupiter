@@ -69,12 +69,6 @@
         linkConfig.RequiredForOnline = "routable";
         dns = [ "10.10.69.1" ];
       };
-      # patch for nixos FHS that enables nsenter for longhorn in containers
-      services.iscsid.serviceConfig = {
-        PrivateMounts = "yes";
-        BindPaths = "/run/current-system/sw/bin:/bin";
-      };
-
     };
     networking = {
       inherit (config.rpiHomeLab.networking) hostName hostId;
@@ -91,14 +85,22 @@
         nodeLabel = lib.mkIf config.rpiHomeLab.k3s.longhorn [ "longhorn-storage=enabled" ];
       };
       # longhorn related
-      openiscsi = {
+      openiscsi = lib.mkIf config.rpiHomeLab.k3s.longhorn {
         enable = true;
         name = "${config.networking.hostName}-initiatorhost";
       };
       # https://github.com/longhorn/longhorn/issues/2166#issuecomment-2994323945
-      rpcbind.enable = true;
+      rpcbind.enable = config.rpiHomeLab.k3s.longhorn;
       multipath.enable = false;
     };
+    # patch for nixos FHS that enables nsenter for longhorn in containers
+    systemd.services.iscsid.serviceConfig = lib.mkIf config.rpiHomeLab.k3s.longhorn {
+      PrivateMounts = "yes";
+      BindPaths = "/run/current-system/sw/bin:/bin";
+    };
+    boot.supportedFilesystems = lib.mkIf config.rpiHomeLab.k3s.longhorn [
+      "nfs"
+    ];
     networking.firewall.allowedTCPPorts = lib.mkIf config.rpiHomeLab.k3s.enable [
       6443 # k3s: required so that pods can reach the API server (running on port 6443 by default)
       2379 # k3s, etcd clients: required if using a "High Availability Embedded etcd" configuration
@@ -108,6 +110,7 @@
     networking.firewall.allowedUDPPorts = lib.mkIf config.rpiHomeLab.k3s.enable [
       5353
       8472 # k3s, flannel: required if using multi-node for inter-node networking
+      123 # time sync
     ];
     time.timeZone = "America/New_York";
     systemd.services.modprobe-vc4 = {

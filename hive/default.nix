@@ -18,7 +18,8 @@ inputs.colmena.lib.makeHive {
       config.allowUnfree = true;
     };
     specialArgs = {
-      inherit inputs homelabModules;
+      inherit (inputs) nixos-raspberrypi jupiter-secrets disko;
+      inherit homelabModules;
     };
     machinesFile = /etc/nix/machines;
   };
@@ -133,6 +134,7 @@ inputs.colmena.lib.makeHive {
     deployment = {
       tags = [ "lowpower" "homelab" "k3s" "workers" ];
       targetHost = "sinope.jupiter.lan";
+      targetUser = "insipx";
     };
     rpiHomeLab = {
       networking = {
@@ -193,9 +195,35 @@ inputs.colmena.lib.makeHive {
       };
     };
   };
+  # pihole runs outside of k3s
+  # but is also a k3s worker
+  elara = _: {
+    imports = [
+      ./../machine-specific/pihole
+      ./../base
+    ];
+    deployment = {
+      targetUser = "insipx";
+      tags = [ "tinyca" "homelab" ];
+      targetHost = "volos";
+      buildOnTarget = false;
+    };
+    rpiHomeLab = {
+      networking = {
+        hostId = "c6c81d8d";
+        hostName = "elara";
+        address = "10.10.69.20/24";
+        interface = "end0";
+      };
+      k3s = {
+        enable = false;
+      };
+    };
+  };
+
   #amalthea = _: {
   #  imports = [
-  #    ./../machine-specific/rpi4
+  #    ./../machine-specific/thinikcentre
   #    ./../base
   #  ];
   #  deployment = {

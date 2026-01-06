@@ -1,12 +1,12 @@
-{ inputs, homelabModules, pkgs, ... }: {
+{ disko, jupiter-secrets, nixos-raspberrypi, homelabModules, pkgs, ... }: {
   imports = [
     ./console.nix
     ./network.nix
     ./user.nix
-    inputs.nixos-raspberrypi.lib.inject-overlays
-    inputs.disko.nixosModules.disko
-    inputs.jupiter-secrets.nixosModules.default
-    homelabModules.default
+    nixos-raspberrypi.lib.inject-overlays
+    disko.nixosModules.disko
+    jupiter-secrets.nixosModules.default
+    # homelabModules.default
   ];
   time.timeZone = "America/New_York";
   environment.systemPackages = with pkgs; [
@@ -30,7 +30,7 @@
   ];
   services.chrony = {
     enable = true;
-    enableNTS = true;
+    enableNTS = false; # not enabled in opnsense
     servers = [
       "lab_gateway.jupiter.lan"
     ];
