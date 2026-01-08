@@ -1,4 +1,4 @@
-{ inputs, homelabModules }:
+{ inputs, lib, homelabModules }:
 let
   # example to override specific package
   # piOverride = _: prev: {
@@ -6,23 +6,40 @@ let
   # };
 in
 inputs.colmena.lib.makeHive {
-  meta = {
-    nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs {
-      system = "aarch64-linux";
-      overlays = [
-        # inputs.ghostty.overlays.default
-        #     (_: prev: {
-        #       nixosSystem = inputs.nixos-raspberrypi.lib.nixosSystemFull;
-        #     })
-      ];
-      config.allowUnfree = true;
+  meta =
+    let
+      nixpkgConfig = {
+        overlays = [
+          # inputs.ghostty.overlays.default
+          #     (_: prev: {
+          #       nixosSystem = inputs.nixos-raspberrypi.lib.nixosSystemFull;
+          #     })
+        ];
+        config.allowUnfree = true;
+      };
+      rpiPkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs
+        {
+          system = "aarch64-linux";
+        } // nixpkgConfig;
+      rpiPkgSet = lib.genAttrs
+        [ "ganymede" "io" "europa" "callisto" "carme" "sinope" "volos" "elara" ]
+        (_: rpiPkgs);
+
+      x86Pkgs = import inputs.nixpkgs
+        {
+          system = "x86_64-linux";
+        } // nixpkgConfig;
+      x86PkgSet = lib.genAttrs [ "amalthea" ]
+        (_: x86Pkgs);
+    in
+    {
+      nodeNixpkgs = rpiPkgSet // x86PkgSet;
+      specialArgs = {
+        inherit (inputs) nixos-raspberrypi jupiter-secrets disko;
+        inherit homelabModules;
+      };
+      machinesFile = /etc/nix/machines;
     };
-    specialArgs = {
-      inherit (inputs) nixos-raspberrypi jupiter-secrets disko;
-      inherit homelabModules;
-    };
-    machinesFile = /etc/nix/machines;
-  };
   ganymede = _: {
     imports = [
       ./../machine-specific/rpi5
@@ -221,24 +238,24 @@ inputs.colmena.lib.makeHive {
     };
   };
 
-  #amalthea = _: {
-  #  imports = [
-  #    ./../machine-specific/thinikcentre
-  #    ./../base
-  #  ];
-  #  deployment = {
-  #    tags = [ "thinkcentre" "homelab" ];
-  #    targetHost = "amalthea.jupiter.lan";
-  #  };
-  #  rpiHomeLab = {
-  #    networking = {
-  #      hostId = "c71acaf9";
-  #      hostName = "amalthea";
-  #      address = "10.10.69.15/24";
-  #      interface = "end0";
-  #    };
-  #    k3s.agent = true;
-  #    k3s.enable = true;
-  #  };
-  #};
+  amalthea = _: {
+    imports = [
+      ./../machine-specific/thinikcentre
+      ./../base
+    ];
+    deployment = {
+      tags = [ "thinkcentre" "homelab" ];
+      targetHost = "amalthea.jupiter.lan";
+    };
+    rpiHomeLab = {
+      networking = {
+        hostId = "c71acaf9";
+        hostName = "amalthea";
+        address = "10.10.69.15/24";
+        interface = "end0";
+      };
+      k3s.agent = true;
+      k3s.enable = true;
+    };
+  };
 }

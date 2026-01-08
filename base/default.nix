@@ -1,9 +1,8 @@
-{ disko, jupiter-secrets, nixos-raspberrypi, homelabModules, pkgs, ... }: {
+{ disko, jupiter-secrets, homelabModules, pkgs, ... }: {
   imports = [
     ./console.nix
     ./network.nix
     ./user.nix
-    # nixos-raspberrypi.lib.inject-overlays
     # disko.nixosModules.disko
     # jupiter-secrets.nixosModules.default
     # homelabModules.default
@@ -11,7 +10,6 @@
   time.timeZone = "America/New_York";
   environment.systemPackages = with pkgs; [
     tree
-    raspberrypi-eeprom
     neovim
     htop
     ghostty.terminfo
@@ -19,8 +17,6 @@
     sops
     efibootmgr
     cowsay
-    raspberrypi-udev-rules
-    raspberrypi-utils
     lshw
     ntp
     cryptsetup

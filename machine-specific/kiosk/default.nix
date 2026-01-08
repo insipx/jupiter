@@ -6,12 +6,14 @@
     raspberry-pi-5.display-vc4
     ./../rpi5/config.nix
     ./../sd-filesystem.nix
+    ./../rpibase.nix
   ];
   environment.systemPackages = with pkgs; [
     cage
     ungoogled-chromium
     wlr-randr
   ];
+
   users.users.kiosk = {
     isNormalUser = true;
     extraGroups = [

@@ -1,9 +1,10 @@
-{ inputs, ... }: {
+{ inputs, pkgs, ... }: {
   imports = with inputs.nixos-raspberrypi.nixosModules; [
     raspberry-pi-3.base
     ./kernel.nix
     ./config.nix
     ./../sd-filesystem.nix
+    ./../rpibase.nix
   ];
   # Automatically log in at the virtual consoles.
   services.getty.autologinUser = "insipx";
