@@ -9,6 +9,7 @@
     ./monitoring/default.nix
     ./traefik/default.nix
     ./metal-lb/default.nix
+    ./certs/default.nix
   ];
 
   submodules.imports = [
