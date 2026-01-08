@@ -192,15 +192,15 @@ in
             mountpoint = "/var/lib";
           };
           # setup the longhorn volume if needed
-          "safe/var/lib/longhorn" = {
-            type = "zfs_volume";
-            size = "150G"; # adjust as needed
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/var/lib/longhorn";
-            };
-          };
+          #"safe/var/lib/longhorn" = {
+          #  type = "zfs_volume";
+          #  size = "150G"; # adjust as needed
+          #  content = {
+          #    type = "filesystem";
+          #    format = "ext4";
+          #    mountpoint = "/var/lib/longhorn";
+          #  };
+          #};
         };
       };
     };

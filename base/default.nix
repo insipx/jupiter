@@ -3,9 +3,9 @@
     ./console.nix
     ./network.nix
     ./user.nix
-    nixos-raspberrypi.lib.inject-overlays
-    disko.nixosModules.disko
-    jupiter-secrets.nixosModules.default
+    # nixos-raspberrypi.lib.inject-overlays
+    # disko.nixosModules.disko
+    # jupiter-secrets.nixosModules.default
     # homelabModules.default
   ];
   time.timeZone = "America/New_York";

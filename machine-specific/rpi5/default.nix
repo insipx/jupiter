@@ -6,7 +6,7 @@
     raspberry-pi-5.display-vc4
     raspberry-pi-5.bluetooth
     ./config.nix
-    ./filesystem.nix
+    ./../filesystem.nix
   ];
   # Automatically log in at the virtual consoles.
   services.getty.autologinUser = "insipx";

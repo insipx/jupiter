@@ -6,7 +6,7 @@
     raspberry-pi-5.display-vc4
     raspberry-pi-5.bluetooth
     ./../rpi5/config.nix
-    ./../rpi5/filesystem.nix
+    ./../filesystem.nix
   ];
   # Automatically log in at the virtual consoles.
   environment.systemPackages = with pkgs; [

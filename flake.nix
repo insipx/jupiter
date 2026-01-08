@@ -125,19 +125,24 @@
               ];
               specialArgs = inputs;
             };
-            nixosConfigurations.x86Installer = nixpkgs.lib.nixosSystem {
+            nixosConfigurations.x86Install = nixpkgs.lib.nixosSystem {
+              system = "x86_64-linux";
               modules = [
                 {
                   rpiHomeLab = {
                     networking = {
-                      hostId = "2df2e75d"; # this should be unique per-machine
+                      hostId = "b31fd201"; # this should be unique per-machine
                       hostName = "amalthea"; # change before installing
                       address = "10.10.69.50/24"; # change before installing
-                      interface = "end0";
+                      interface = "enp0s31f6";
                     };
                     k3s.enable = false;
                   };
                   imports = [
+                    homelabModules.default
+                    inputs.disko.nixosModules.disko
+                    inputs.jupiter-secrets.nixosModules.default
+
                     ./base
                     ./machine-specific/thinkcentre
                   ];
