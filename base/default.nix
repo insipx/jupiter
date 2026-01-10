@@ -1,11 +1,8 @@
-{ disko, jupiter-secrets, homelabModules, pkgs, ... }: {
+{ pkgs, ... }: {
   imports = [
     ./console.nix
     ./network.nix
     ./user.nix
-    # disko.nixosModules.disko
-    # jupiter-secrets.nixosModules.default
-    # homelabModules.default
   ];
   time.timeZone = "America/New_York";
   environment.systemPackages = with pkgs; [

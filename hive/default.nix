@@ -1,5 +1,11 @@
-{ inputs, lib, homelabModules }:
+{ inputs, homelabModules }:
 let
+  commonImports = [
+    inputs.disko.nixosModules.disko
+    inputs.jupiter-secrets.nixosModules.default
+    homelabModules.default
+    ./../base
+  ];
   # example to override specific package
   # piOverride = _: prev: {
   #   sdl3 = (prev.sdl3.override { testSupport = false; }).overrideAttrs { doCheck = false; };
@@ -8,7 +14,9 @@ in
 inputs.colmena.lib.makeHive {
   meta =
     let
-      nixpkgConfig = {
+      inherit (inputs.nixpkgs) lib;
+      pkgConfig = {
+        system = "x86_64-linux";
         overlays = [
           # inputs.ghostty.overlays.default
           #     (_: prev: {
@@ -17,34 +25,27 @@ inputs.colmena.lib.makeHive {
         ];
         config.allowUnfree = true;
       };
-      rpiPkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs
-        {
-          system = "aarch64-linux";
-        } // nixpkgConfig;
-      rpiPkgSet = lib.genAttrs
-        [ "ganymede" "io" "europa" "callisto" "carme" "sinope" "volos" "elara" ]
-        (_: rpiPkgs);
+      #      rpiPkgSet = lib.genAttrs
+      #        [ "ganymede" "io" "europa" "callisto" "carme" "sinope" "volos" "elara" ]
+      #        (_: rpiPkgs);
 
-      x86Pkgs = import inputs.nixpkgs
-        {
-          system = "x86_64-linux";
-        } // nixpkgConfig;
-      x86PkgSet = lib.genAttrs [ "amalthea" ]
-        (_: x86Pkgs);
+      #      x86Pkgs = import inputs.nixpkgs
+      #        {
+      #          system = "x86_64-linux";
+      #        } // nixpkgConfig;
+      #      x86PkgSet = lib.genAttrs [ "amalthea" ]
+      #        (_: x86Pkgs);
     in
     {
-      nodeNixpkgs = rpiPkgSet // x86PkgSet;
-      specialArgs = {
-        inherit (inputs) nixos-raspberrypi jupiter-secrets disko;
-        inherit homelabModules;
-      };
+      nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs pkgConfig;
+      # nodeNixpkgs = rpiPkgSet // x86PkgSet;
       machinesFile = /etc/nix/machines;
     };
+
   ganymede = _: {
     imports = [
       ./../machine-specific/rpi5
-      ./../base
-    ];
+    ] ++ commonImports;
     deployment = {
       targetHost = "ganymede.jupiter.lan";
       targetUser = "insipx";
@@ -68,11 +69,11 @@ inputs.colmena.lib.makeHive {
       "--tls-san 10.10.69.10"
     ];
   };
+
   io = _: {
     imports = [
       ./../machine-specific/rpi5
-      ./../base
-    ];
+    ] ++ commonImports;
     deployment = {
       targetHost = "io.jupiter.lan";
       targetUser = "insipx";
@@ -91,11 +92,11 @@ inputs.colmena.lib.makeHive {
     jupiter-secrets.settings.k3s = true;
 
   };
+
   europa = _: {
     imports = [
       ./../machine-specific/rpi5
-      ./../base
-    ];
+    ] ++ commonImports;
 
     deployment = {
       tags = [ "homelab" "mainpi" "k3s" ];
@@ -116,11 +117,11 @@ inputs.colmena.lib.makeHive {
     jupiter-secrets.settings.k3s = true;
 
   };
+
   callisto = _: {
     imports = [
       ./../machine-specific/rpi5
-      ./../base
-    ];
+    ] ++ commonImports;
     deployment = {
       tags = [ "workers" "homelab" "mainpi" "k3s" ];
       targetHost = "callisto.jupiter.lan";
@@ -142,11 +143,11 @@ inputs.colmena.lib.makeHive {
     };
     jupiter-secrets.settings.k3s = true;
   };
+
   sinope = _: {
     imports = [
       ./../machine-specific/rpi3
-      ./../base
-    ];
+    ] ++ commonImports;
     jupiter-secrets.settings.k3s = true;
     deployment = {
       tags = [ "lowpower" "homelab" "k3s" "workers" ];
@@ -165,11 +166,11 @@ inputs.colmena.lib.makeHive {
 
     };
   };
+
   carme = _: {
     imports = [
       ./../machine-specific/kiosk
-      ./../base
-    ];
+    ] ++ commonImports;
     deployment = {
       targetUser = "insipx";
       tags = [ "gui" "homelab" ];
@@ -189,11 +190,12 @@ inputs.colmena.lib.makeHive {
       };
     };
   };
+
   volos = _: {
+
     imports = [
       ./../machine-specific/tinyca
-      ./../base
-    ];
+    ] ++ commonImports;
     deployment = {
       targetUser = "insipx";
       tags = [ "tinyca" "homelab" ];
@@ -217,8 +219,7 @@ inputs.colmena.lib.makeHive {
   elara = _: {
     imports = [
       ./../machine-specific/pihole
-      ./../base
-    ];
+    ] ++ commonImports;
     deployment = {
       targetUser = "insipx";
       tags = [ "tinyca" "homelab" ];
@@ -239,23 +240,25 @@ inputs.colmena.lib.makeHive {
   };
 
   amalthea = _: {
+    nixpkgs.system = "x86_64-linux";
     imports = [
-      ./../machine-specific/thinikcentre
-      ./../base
-    ];
+      ./../machine-specific/thinkcentre
+    ] ++ commonImports;
     deployment = {
       tags = [ "thinkcentre" "homelab" ];
       targetHost = "amalthea.jupiter.lan";
+      targetUser = "insipx";
     };
     rpiHomeLab = {
       networking = {
-        hostId = "c71acaf9";
+        hostId = "b31fd201";
         hostName = "amalthea";
-        address = "10.10.69.15/24";
+        address = "10.10.69.50/24";
         interface = "end0";
       };
       k3s.agent = true;
       k3s.enable = true;
     };
+    jupiter-secrets.settings.k3s = true;
   };
 }

@@ -83,6 +83,7 @@
                 inputs'.colmena.packages.colmena
                 self'.packages.kubenix
                 self'.packages.build_session
+                self'.packages.launch_freebsd_builder
                 self'.packages.launch_instance_on_demand
                 pkgs.kubernetes-helm
                 pkgs.sops

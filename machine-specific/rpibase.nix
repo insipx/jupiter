@@ -2,6 +2,7 @@
 , pkgs
 , ...
 }: {
+  nixpkgs.system = "aarch64-linux";
   imports = [
     nixos-raspberrypi.lib.inject-overlays
 
