@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ kubenix, lib, ... }:
 let
   ns = "cert-manager";
 in
@@ -14,12 +14,13 @@ in
             repo = "https://charts.jetstack.io";
             chart = "cert-manager";
             version = "v1.19.2";
-            sha256 = "sha256-0000000000000000000000000000000000000000000=";
+            sha256 = "sha256-SvYpSi9OQnPhSLaxdl/Z30QQyZczsxqDfiqcLl+EW/o=";
           };
           includeCRDs = true;
           namespace = ns;
         };
       };
+      # resources."rbac.authorization.k8s.io".v1.Role."cert-manager-cainjector:leaderelection".metadata.namespace = lib.mkForce ns;
     };
   };
 }

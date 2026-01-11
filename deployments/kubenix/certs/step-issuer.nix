@@ -5,7 +5,7 @@ in
 {
   imports = with kubenix.modules; [ k8s helm submodules ];
   submodules.imports = [ ../lib/namespaced.nix ];
-  submodules.instances.cert-manager = {
+  submodules.instances.step-issuer = {
     submodule = "namespaced";
     args.kubernetes = {
       helm.releases = {
