@@ -62,8 +62,7 @@ in
     supportedFilesystems = [ "zfs" "vfat" ];
     initrd.supportedFilesystems = [ "zfs" "vfat" ];
     tmp.useTmpfs = true;
-    blacklistedKernelModules = [ "vc4" ];
-    kernelModules = [ "vc4" "dm_crypt" ];
+    kernelModules = [ "dm_crypt" ];
   };
   # boot.zfs.devNodes = "/dev/disk/by-uuid/"
   # networking.hostId is set somewhere else

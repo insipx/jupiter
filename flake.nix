@@ -83,8 +83,6 @@
                 inputs'.colmena.packages.colmena
                 self'.packages.kubenix
                 self'.packages.build_session
-                self'.packages.launch_freebsd_builder
-                self'.packages.launch_instance_on_demand
                 pkgs.kubernetes-helm
                 pkgs.sops
                 pkgs.vals
@@ -132,9 +130,9 @@
                 {
                   rpiHomeLab = {
                     networking = {
-                      hostId = "b31fd201"; # this should be unique per-machine
-                      hostName = "amalthea"; # change before installing
-                      address = "10.10.69.50/24"; # change before installing
+                      hostId = "a3a7b911"; # this should be unique per-machine
+                      hostName = "lysithea"; # change before installing
+                      address = "10.10.69.51/24"; # change before installing
                       interface = "enp0s31f6";
                     };
                     k3s.enable = false;

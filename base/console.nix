@@ -30,4 +30,6 @@
       "EEEEEC"
     ];
   };
+  programs.fish.enable = true;
+  users.users.insipx.shell = pkgs.fish;
 }

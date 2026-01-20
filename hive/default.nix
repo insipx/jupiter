@@ -14,7 +14,6 @@ in
 inputs.colmena.lib.makeHive {
   meta =
     let
-      inherit (inputs.nixpkgs) lib;
       pkgConfig = {
         system = "x86_64-linux";
         overlays = [
@@ -25,16 +24,6 @@ inputs.colmena.lib.makeHive {
         ];
         config.allowUnfree = true;
       };
-      #      rpiPkgSet = lib.genAttrs
-      #        [ "ganymede" "io" "europa" "callisto" "carme" "sinope" "volos" "elara" ]
-      #        (_: rpiPkgs);
-
-      #      x86Pkgs = import inputs.nixpkgs
-      #        {
-      #          system = "x86_64-linux";
-      #        } // nixpkgConfig;
-      #      x86PkgSet = lib.genAttrs [ "amalthea" ]
-      #        (_: x86Pkgs);
     in
     {
       nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs pkgConfig;
@@ -254,10 +243,37 @@ inputs.colmena.lib.makeHive {
         hostId = "b31fd201";
         hostName = "amalthea";
         address = "10.10.69.50/24";
-        interface = "end0";
+        interface = "enp0s31f6";
       };
-      k3s.agent = true;
-      k3s.enable = true;
+      k3s = {
+        enable = true;
+        agent = true;
+      };
+    };
+    jupiter-secrets.settings.k3s = true;
+  };
+  lysithea = _: {
+    nixpkgs.system = "x86_64-linux";
+    imports = [
+      ./../machine-specific/thinkcentre
+    ] ++ commonImports;
+    deployment = {
+      tags = [ "thinkcentre" "homelab" ];
+      targetHost = "10.10.69.52";
+      # targetHost = "lysithea.jupiter.lan";
+      targetUser = "insipx";
+    };
+    rpiHomeLab = {
+      networking = {
+        hostId = "a3a7b911";
+        hostName = "lysithea";
+        address = "10.10.69.51/24";
+        interface = "enp0s31f6";
+      };
+      k3s = {
+        enable = true;
+        agent = true;
+      };
     };
     jupiter-secrets.settings.k3s = true;
   };

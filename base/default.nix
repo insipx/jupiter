@@ -20,6 +20,7 @@
     lvm2
     nfs-utils
     libnfs
+    lnav
   ];
   services.chrony = {
     enable = true;

@@ -3,7 +3,7 @@
 # Manage multiple build servers on AWS
 
 set ARM64_INSTANCE_ID "i-0393659a48a0da9e4"
-set FREEBSD_INSTANCE_ID ""  # Set this after launching FreeBSD instance with launch_freebsd_builder
+set FREEBSD_INSTANCE_ID "i-00a0f633e025bb07c"  # Set this after launching FreeBSD instance with launch_freebsd_builder
 
 function show_usage
     echo "Usage: build-session {start|stop|status} [arm64|freebsd|all]"

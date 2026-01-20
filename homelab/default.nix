@@ -113,14 +113,5 @@
       123 # time sync
     ];
     time.timeZone = "America/New_York";
-    systemd.services.modprobe-vc4 = {
-      serviceConfig = {
-        Type = "oneshot";
-        User = "root";
-      };
-      before = [ "multi-user.target" ];
-      wantedBy = [ "multi-user.target" ];
-      script = "/run/current-system/sw/bin/modprobe vc4";
-    };
   };
 }
