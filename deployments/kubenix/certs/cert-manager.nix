@@ -18,9 +18,11 @@ in
           };
           includeCRDs = true;
           namespace = ns;
+          values = {
+            global.leaderElection.namespace = ns;
+          };
         };
       };
-      # resources."rbac.authorization.k8s.io".v1.Role."cert-manager-cainjector:leaderelection".metadata.namespace = lib.mkForce ns;
     };
   };
 }

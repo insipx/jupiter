@@ -13,11 +13,25 @@ in
           chart = kubenix.lib.helm.fetch {
             repo = "https://smallstep.github.io/helm-charts";
             chart = "step-issuer";
-            version = "v1.9.11";
-            sha256 = "sha256-0000000000000000000000000000000000000000000=";
+            version = "1.9.11";
+            sha256 = "sha256-r6U2PxdNmcArIPdKHfP97S5w8P5yOyEswnW2l+uwIUc=";
           };
           includeCRDs = true;
           namespace = ns;
+        };
+      };
+      customTypes = {
+        stepissuer = {
+          attrName = "stepissuer";
+          group = "certmanager.step.sm";
+          version = "v1beta1";
+          kind = "StepIssuer";
+        };
+        stepclusterissuer = {
+          attrName = "stepclusterissuer";
+          group = "certmanager.step.sm";
+          version = "v1beta1";
+          kind = "StepClusterIssuer";
         };
       };
     };
