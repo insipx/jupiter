@@ -21,14 +21,14 @@ in
         };
       };
       resources = {
-         services.metallb-webhook-service = {
+        services.metallb-webhook-service = {
           spec = {
             ports = lib.mkForce [{
               port = 443;
               targetPort = 9443;
               protocol = "TCP";
             }];
-         };
+          };
         };
         IPAddressPool.default = {
           metadata = {
@@ -38,6 +38,7 @@ in
             addresses = [
               "10.10.68.0/24"
             ];
+            autoAssign = true;
             avoidBuggyIPs = true;
           };
         };

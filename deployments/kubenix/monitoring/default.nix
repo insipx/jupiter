@@ -1,4 +1,4 @@
-{ kubenix, lib, flake, ... }:
+{ kubenix, flake, ... }:
 let
   ns = "monitoring";
 in

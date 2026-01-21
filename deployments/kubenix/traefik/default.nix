@@ -27,6 +27,8 @@ in
             enabled = false;
             storageClass = "longhorn-static";
           };
+          # enable metal lb
+          service.type = "LoadBalancer";
         };
       };
       resources = {
