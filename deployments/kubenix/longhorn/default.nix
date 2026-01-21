@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ kubenix, flake, ... }:
 let
   ns = "longhorn-system";
 in
@@ -55,10 +55,10 @@ in
             namespace = ns;
           };
           spec = {
-            entryPoints = [ "web" ];
+            entryPoints = [ "websecure" ];
             routes = [
               {
-                match = "Host(`longhorn.jupiter.lan`)";
+                match = "Host(`longhorn.${flake.lib.hostname}`)";
                 kind = "Rule";
                 services = [
                   {

@@ -1,4 +1,4 @@
-{ kubenix, lib, ... }:
+{ kubenix, ... }:
 let
   ns = "cert-manager";
 in
@@ -21,6 +21,20 @@ in
           values = {
             global.leaderElection.namespace = ns;
           };
+        };
+      };
+      customTypes = {
+        certificate = {
+          attrName = "certificate";
+          group = "cert-manager.io";
+          version = "v1";
+          kind = "Certificate";
+        };
+        certificateRequest = {
+          attrName = "certificaterequest";
+          group = "cert-manager.io";
+          version = "v1";
+          kind = "CertificateRequest";
         };
       };
     };

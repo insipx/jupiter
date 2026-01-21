@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ kubenix, flake, ... }:
 let
   ns = "kube-system";
 in
@@ -29,19 +29,76 @@ in
           };
           # enable metal lb
           service.type = "LoadBalancer";
+          ports = {
+            web = {
+              port = 80;
+              protocol = "TCP";
+              targetPort = "web";
+            };
+            websecure = {
+              port = 443;
+              protocol = "TCP";
+              targetPort = "websecure";
+            };
+          };
         };
       };
       resources = {
-        ingressroute.traefik-dashboard = {
+        # services.traefik = {
+        #   # spec = { };
+        # };
+        middleware.traefik-https-redirect = {
           metadata = {
-            name = "traefik-dashboard";
+            name = "traefik-https-redirect";
+            namespace = ns;
+          };
+          spec = {
+            redirectScheme = {
+              scheme = "https";
+              permanent = true;
+            };
+          };
+        };
+        ingressroute.https-redirect = {
+          metadata = {
+            name = "https-redirect";
             namespace = ns;
           };
           spec = {
             entryPoints = [ "web" ];
             routes = [
               {
-                match = "Host(`traefik.jupiter.lan`)";
+                match = "HostRegexp(`.+`)";
+                kind = "Rule";
+                priority = 1;
+                middlewares = [
+                  {
+                    name = "traefik-https-redirect";
+                    namespace = ns;
+                  }
+                ];
+                # dummy service
+                services = [
+                  {
+                    name = "noop@internal";
+                    kind = "TraefikService";
+                  }
+                ];
+              }
+            ];
+          };
+        };
+        ingressroute.traefik-dashboard = {
+          metadata = {
+            name = "traefik-dashboard";
+            namespace = ns;
+          };
+          spec = {
+            entryPoints = [ "websecure" ];
+            routes = [
+              {
+                match = "Host(`traefik.${flake.lib.hostname}`)";
+
                 kind = "Rule";
                 services = [
                   {
@@ -51,6 +108,45 @@ in
                 ];
               }
             ];
+            tls = {
+              secretName = "traefik-wildcard-tls-secret";
+            };
+          };
+        };
+        certificate.traefik-tls = {
+          metadata = {
+            name = "traefik-tls";
+            namespace = ns;
+          };
+          spec = {
+            secretName = "traefik-wildcard-tls-secret";
+            commonName = "traefik.${flake.lib.hostname}";
+            dnsNames = [
+              "traefik.${flake.lib.hostname}"
+              "*.${flake.lib.hostname}"
+            ];
+            ipAddresses = [
+              "10.10.68.1"
+            ];
+            duration = "24h";
+            renewBefore = "8h";
+            issuerRef = {
+              group = "certmanager.step.sm";
+              kind = "StepClusterIssuer";
+              name = "step-issuer";
+            };
+          };
+        };
+        # Default TLS store - provides wildcard cert for all IngressRoutes
+        tlsstore.default = {
+          metadata = {
+            name = "default";
+            namespace = ns;
+          };
+          spec = {
+            defaultCertificate = {
+              secretName = "traefik-wildcard-tls-secret";
+            };
           };
         };
       };
@@ -60,6 +156,24 @@ in
           group = "traefik.io";
           version = "v1alpha1";
           kind = "IngressRoute";
+        };
+        certificate = {
+          attrName = "certificate";
+          group = "cert-manager.io";
+          version = "v1";
+          kind = "Certificate";
+        };
+        middleware = {
+          attrName = "middleware";
+          group = "traefik.io";
+          version = "v1alpha1";
+          kind = "Middleware";
+        };
+        tlsstore = {
+          attrName = "tlsstore";
+          group = "traefik.io";
+          version = "v1alpha1";
+          kind = "TLSStore";
         };
       };
     };

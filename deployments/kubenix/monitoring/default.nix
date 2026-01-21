@@ -104,10 +104,10 @@ in
           metadata.namespace = ns;
           metadata.name = "grafana-dashboard";
           spec = {
-            entryPoints = [ "web" ];
+            entryPoints = [ "websecure" ];
             routes = [
               {
-                match = "Host(`grafana.jupiter.lan`)";
+                match = "Host(`grafana.${flake.lib.hostname}`)";
                 kind = "Rule";
                 services = [
                   {
@@ -117,6 +117,7 @@ in
                 ];
               }
             ];
+            tls = { };
           };
         };
         secrets.grafana-admin-credentials = {
