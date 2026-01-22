@@ -29,6 +29,7 @@ inputs.colmena.lib.makeHive {
       nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs pkgConfig;
       # nodeNixpkgs = rpiPkgSet // x86PkgSet;
       machinesFile = /etc/nix/machines;
+      specialArgs = { inherit inputs; };
     };
 
   ganymede = _: {
@@ -248,6 +249,7 @@ inputs.colmena.lib.makeHive {
       k3s = {
         enable = true;
         agent = true;
+        longhorn = true;
       };
     };
     jupiter-secrets.settings.k3s = true;
@@ -259,8 +261,7 @@ inputs.colmena.lib.makeHive {
     ] ++ commonImports;
     deployment = {
       tags = [ "thinkcentre" "homelab" ];
-      targetHost = "10.10.69.52";
-      # targetHost = "lysithea.jupiter.lan";
+      targetHost = "lysithea.jupiter.lan";
       targetUser = "insipx";
     };
     rpiHomeLab = {
@@ -273,6 +274,7 @@ inputs.colmena.lib.makeHive {
       k3s = {
         enable = true;
         agent = true;
+        longhorn = true;
       };
     };
     jupiter-secrets.settings.k3s = true;
