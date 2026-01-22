@@ -37,6 +37,17 @@ in
                   accessModes = [ "ReadWriteOnce" ];
                   resources.requests.storage = "35Gi";
                 };
+                additionalScrapeConfigs = [
+                  {
+                    job_name = "opnsense-firewall";
+                    static_configs = [{
+                      targets = [ "opnsense.${flake.lib.hostname}:9100" ];
+                      labels = {
+                        instance = "opnsense";
+                      };
+                    }];
+                  }
+                ];
               };
             };
 
