@@ -30,6 +30,7 @@ in
         };
       };
       resources = {
+        # Internal IngressRoute - accessible from jupiter.lan network without client cert
         ingressroute.actualbudget = {
           metadata.namespace = ns;
           spec = {
@@ -43,6 +44,33 @@ in
               }];
             }];
             tls = { };
+          };
+        };
+        # External IngressRoute - accessible via Rathole with mTLS (client cert required)
+        # Rathole on Fly.io should forward to 10.10.68.1:8443
+        # Client certificates can be generated using: step ca certificate user@jupiter.lan user.crt user.key
+        ingressroute.actualbudget-external = {
+          metadata = {
+            name = "actualbudget-external";
+            namespace = ns;
+          };
+          spec = {
+            entryPoints = [ "websecure-external" ];
+            routes = [{
+              match = "Host(`budget.${flake.lib.hostname}`)";
+              kind = "Rule";
+              services = [{
+                name = "actualbudget";
+                port = 5006;
+              }];
+            }];
+            tls = {
+              # Apply mTLS configuration - requires valid client certificate
+              options = {
+                name = "mtls-required";
+                namespace = "kube-system";
+              };
+            };
           };
         };
       };
