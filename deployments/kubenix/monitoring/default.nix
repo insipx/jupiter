@@ -4,7 +4,7 @@ let
 in
 {
   imports = with kubenix.modules;
-    [ k8s helm submodules ];
+    [ k8s helm submodules ./opnsense-exporter.nix ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.monitoring = {
     submodule = "namespaced";
@@ -44,6 +44,15 @@ in
                       targets = [ "opnsense.${flake.lib.hostname}:9100" ];
                       labels = {
                         instance = "opnsense";
+                      };
+                    }];
+                  }
+                  {
+                    job_name = "traefik";
+                    static_configs = [{
+                      targets = [ "traefik.kube-system.svc.cluster.local:9100" ];
+                      labels = {
+                        instance = "traefik";
                       };
                     }];
                   }
@@ -129,6 +138,28 @@ in
               }
             ];
             tls = { };
+          };
+        };
+        ingressroute.prometheus-web = {
+          metadata = {
+            namespace = ns;
+            name = "prometheus-web";
+          };
+          spec = {
+            entryPoints = [ "websecure" ];
+            routes = [
+              {
+                match = "Host(`prometheus.${flake.lib.hostname}`)";
+                kind = "Rule";
+                services = [
+                  {
+                    name = "kube-prometheus-stack-prometheus";
+                    port = 9090;
+                  }
+                ];
+              }
+
+            ];
           };
         };
         secrets.grafana-admin-credentials = {

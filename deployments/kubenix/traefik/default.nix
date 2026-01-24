@@ -75,6 +75,11 @@ in
               protocol = "TCP";
               targetPort = "websecure-external";
             };
+            metrics = {
+              port = 9100;
+              protocol = "TCP";
+              targetPort = "metrics";
+            };
           };
         };
       };

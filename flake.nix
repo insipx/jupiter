@@ -98,6 +98,7 @@
             inherit homelabModules;
             lib = {
               hostname = "jupiter.lan";
+              external-hostname = "insipx.xyz";
               secrets = inputs.jupiter-secrets.outPath;
             };
             nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystemFull {
