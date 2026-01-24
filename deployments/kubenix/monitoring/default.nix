@@ -4,7 +4,14 @@ let
 
 in
 {
-  imports = with kubenix.modules; [ k8s docker submodules helm ];
+  imports = with kubenix.modules; [
+    k8s
+    docker
+    submodules
+    helm
+    ./opnsense-exporter.nix
+    ./kube-stack.nix
+  ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.${ns} = {
     submodule = "namespaced";
