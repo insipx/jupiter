@@ -1,9 +1,63 @@
-{ ... }: {
-  imports = [
-    ./kube-stack.nix.nix
-    ./opnsense-exporter.nix
-  ];
+{ kubenix, ... }:
+let
+  ns = "monitoring";
+
+in
+{
+  imports = with kubenix.modules; [ k8s docker submodules helm ];
+  submodules.imports = [ ../lib/namespaced.nix ];
+  submodules.instances.${ns} = {
+    submodule = "namespaced";
+  };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
