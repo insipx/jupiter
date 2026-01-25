@@ -1,5 +1,5 @@
-{ nixos-raspberrypi, pkgs, ... }: {
-  imports = with nixos-raspberrypi.nixosModules; [
+{ inputs, pkgs, ... }: {
+  imports = with inputs.nixos-raspberrypi.nixosModules; [
     ./../rpi5/kernel.nix
     raspberry-pi-5.base
     raspberry-pi-5.page-size-16k
@@ -31,8 +31,8 @@
   };
   systemd.services."step-ca" = {
     description = "step-ca";
-    bindsTo = [ "dev-yubikey.device" ];
-    after = [ "dev-yubikey.device" ];
+    # bindsTo = [ "dev-yubikey.device" ];
+    # after = [ "dev-yubikey.device" ];
     serviceConfig = {
       User = "step";
       Group = "step";
@@ -51,10 +51,10 @@
       SecureBits = "keep-caps";
       NoNewPrivileges = true;
     };
-    wantedBy = [ "multi-user.target" "dev-yubikey.device" ];
+    wantedBy = [ "multi-user.target" ];
   };
   services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/*", TAG+="systemd", SYMLINK+="yubikey", ENV{SYSTEMD_ALIAS}="/dev/yubikey"
+    ACTION=="add", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/*", TAG+="systemd", SYMLINK+="yubikey"
     ACTION=="remove", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/*", TAG+="systemd"
   '';
 

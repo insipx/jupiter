@@ -4,7 +4,7 @@
 }: {
   nixpkgs.system = "aarch64-linux";
   imports = [
-    inputs.nixos-raspberrypi.lib.inject-overlays-global
+    inputs.nixos-raspberrypi.lib.inject-overlays
 
   ];
 
