@@ -1,8 +1,9 @@
 { flake, ... }:
 let
   ns = "monitoring";
-  opnsenseExporter = {
+  exporter = {
     label = "opnsense-exporter";
+    version = "0.0.11";
     port = 8080;
     imagePolicy = "IfNotPresent";
     # recuires rec (recursive attr)
@@ -27,19 +28,19 @@ in
 
       };
     };
-    deployments."${opnsenseExporter.label}" = {
-      metadata.labels.app = opnsenseExporter.label;
+    deployments."${exporter.label}" = {
+      metadata.labels.app = exporter.label;
       metadata.namespace = ns;
       spec = {
         replicas = 1;
-        selector.matchLabels.app = opnsenseExporter.label;
+        selector.matchLabels.app = exporter.label;
         template = {
-          metadata.labels.app = opnsenseExporter.label;
+          metadata.labels.app = exporter.label;
           spec = {
-            containers."${opnsenseExporter.label}" = {
-              name = "${opnsenseExporter.label}";
-              image = "ghcr.io/athennamind/opnsense-exporter:0.0.11";
-              imagePullPolicy = opnsenseExporter.imagePolicy;
+            containers."${exporter.label}" = {
+              name = "${exporter.label}";
+              image = "ghcr.io/athennamind/${exporter.label}:${exporter.label}";
+              imagePullPolicy = exporter.imagePolicy;
               args = [
                 "--opnsense.protocol=https"
                 "--opnsense.address=opnsense.${flake.lib.hostname}"
@@ -71,20 +72,20 @@ in
                 containerPort = 8080;
                 protocol = "TCP";
               };
-              # resources.requests.cpu = opnsenseExporter.cpu;
-              # ports."${toString opnsenseExporter.port}" = { };
+              # resources.requests.cpu = exporter.cpu;
+              # ports."${toString exporter.port}" = { };
             };
           };
         };
       };
     };
-    services."${opnsenseExporter.label}" = {
+    services."${exporter.label}" = {
       metadata.namespace = ns;
       metadata.annotations = {
         "metallb.universe.tf/loadBalancerIPs" = "10.10.68.2";
       };
       spec = {
-        selector.app = "${opnsenseExporter.label}";
+        selector.app = "${exporter.label}";
         ports = [
           {
             name = "opnsense-exporter";
@@ -92,8 +93,7 @@ in
           }
         ];
         type = "LoadBalancer";
-        externalTrafficPolicy = "Local";
-        # ports."${toString opnsenseExporter.port}".targetPort = opnsenseExporter.port;
+        # ports."${toString exporter.port}".targetPort = exporter.port;
       };
     };
   };
