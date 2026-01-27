@@ -1,7 +1,9 @@
-{ kubenix, ... }:
+{ kubenix, lib, flake, ... }:
 let
   ns = "monitoring";
 
+  alloy = import ./alloy.nix { inherit flake; };
+  opnsense-exporter = import ./opnsense-exporter.nix { inherit flake; };
 in
 {
   imports = with kubenix.modules; [
@@ -9,13 +11,12 @@ in
     docker
     submodules
     helm
-    ./alloy.nix
-    ./opnsense-exporter.nix
     ./kube-stack.nix
   ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.${ns} = {
     submodule = "namespaced";
+    args.kubernetes.resources = lib.recursiveUpdate alloy opnsense-exporter;
   };
 }
 

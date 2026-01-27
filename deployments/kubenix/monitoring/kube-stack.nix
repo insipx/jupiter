@@ -27,6 +27,7 @@ in
               # externalUrl = "https://prometheus.${flake.lib.hostname}";
               serviceMonitorSelectorNilUsesHelmValues = false;
               podMonitorSelectorNilUsesHelmValues = false;
+              enableRemoteWriteReceiver = true;
               storageSpec.volumeClaimTemplate.spec = {
                 storageClassName = "longhorn-static";
                 accessModes = [ "ReadWriteOnce" ];
