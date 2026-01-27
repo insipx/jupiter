@@ -9,9 +9,9 @@ in
     docker
     submodules
     helm
+    ./alloy.nix
     ./opnsense-exporter.nix
     ./kube-stack.nix
-    ./alloy.nix
   ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.${ns} = {

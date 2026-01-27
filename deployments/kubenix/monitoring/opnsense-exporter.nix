@@ -39,7 +39,7 @@ in
           spec = {
             containers."${exporter.label}" = {
               name = "${exporter.label}";
-              image = "ghcr.io/athennamind/${exporter.label}:${exporter.label}";
+              image = "ghcr.io/athennamind/${exporter.label}:${exporter.version}";
               imagePullPolicy = exporter.imagePolicy;
               args = [
                 "--opnsense.protocol=https"

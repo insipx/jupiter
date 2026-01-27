@@ -1,7 +1,7 @@
 { flake, ... }:
 let
   ns = "monitoring";
-  exporterImg = {
+  alloyImg = {
     label = "alloy";
     version = "v1.12.2";
     port = 12345;
@@ -12,38 +12,42 @@ in
 {
   # Merge resources into the existing monitoring submodule instance
   submodules.instances.${ns}.args.kubernetes.resources = {
-    secrets.opnsense-api-credentials = {
-      metadata.namespace = ns;
-      metadata.name = "opnsense-api-credentials";
-      stringData = {
-        opnsense-api-key = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/opnsense_api_key";
-        opnsense-api-secret = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/opnsense_secret_key";
+    # secrets.opnsense-api-credentials = {
+    #   metadata.namespace = ns;
+    #   metadata.name = "opnsense-api-credentials";
+    #   stringData = {
+    #     opnsense-api-key = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/opnsense_api_key";
+    #     opnsense-api-secret = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/opnsense_secret_key";
 
-      };
-    };
-    statefulSets."${exporterImg.label}" = {
-      metadata.labels.app = exporterImg.label;
+    #   };
+    # };
+    statefulSets."${alloyImg.label}" = {
+      metadata.labels.app = alloyImg.label;
       metadata.namespace = ns;
       spec = {
         replicas = 1;
-        selector.matchLabels.app = exporterImg.label;
+        selector.matchLabels.app = alloyImg.label;
         template = {
-          metadata.labels.app = exporterImg.label;
+          metadata.labels.app = alloyImg.label;
           spec = {
-            containers."${exporterImg.label}" = {
-              name = "${exporterImg.label}";
-              image = "ghcr.io/athennamind/${exporterImg.label}:${exporterImg.label}";
-              imagePullPolicy = exporterImg.imagePolicy;
-              args = [ ];
-              env = [ ];
+            containers."${alloyImg.label}" = {
+              name = "${alloyImg.label}";
+              image = "docker.io/grafana/${alloyImg.label}:${alloyImg.version}";
+              imagePullPolicy = alloyImg.imagePolicy;
               ports."http" = {
-                containerPort = 8080;
+                containerPort = alloyImg.port;
                 protocol = "TCP";
               };
-              volumeMounts = [{
-                name = "alloy-data-pvc";
-                mountPath = "/data";
-              }];
+              volumeMounts = [
+                {
+                  name = "alloy-config";
+                  mountPath = "/etc/alloy/config.alloy";
+                }
+                {
+                  name = "alloy-data-pvc";
+                  mountPath = "/data";
+                }
+              ];
               resources = {
                 requests = {
                   memory = "128Mi";
@@ -54,33 +58,65 @@ in
                   cpu = "500m";
                 };
               };
-              # resources.requests.cpu = exporterImg.cpu;
-              # ports."${toString exporterImg.port}" = { };
             };
-            volumes = {
-              config.configMap.name = "alloy-config";
-              persistentVolumeClaim.claimName = "alloy-data-pvc";
-            };
+            volumes = [
+              {
+                name = "alloy-config";
+                configMap.name = "alloy-config";
+              }
+              {
+                name = "alloy-data-pvc";
+                persistentVolumeClaim.claimName = "alloy-data-pvc";
+              }
+            ];
           };
         };
       };
     };
-    persistentVolumeClaims.alloy-data-pvc.spec = {
-      accessModes = [ "ReadWriteMany" ];
-      storageClassName = "longhorn-static";
-      resources.requests.storage = "128Gi";
+    persistentVolumeClaims.alloy-data-pvc = {
+      metadata = {
+        name = "alloy-data-pvc";
+        namespace = ns;
+      };
+      spec = {
+        accessModes = [ "ReadWriteOnce" ];
+        storageClassName = "longhorn-static";
+        resources.requests.storage = "128Gi";
+      };
     };
     configMaps = {
       alloy-config.data."config.alloy" = ''
+        prometheus.remote_write "default" {
+          endpoint {
+            url = "http://prometheus-operated.monitoring.svc.cluster.local:9090/api/v1/write"
+          }
+        }
+
+        prometheus.scrape "opnsense_node" {
+          targets = [{
+            __address__ = "10.10.69.1:9100",
+            instance    = "fw-opnsense",
+            job         = "node_exporter",
+            group       = "firewall",
+            host        = "opnsense.jupiter.lan",
+          }]
+
+          forward_to [prometheus.remote_write.default.receiver_id]
+          scrape_interval = "15s"
+          scrape_timeout = "10s"
+        }
       '';
     };
-    services."${exporterImg.label}" = {
+    services."${alloyImg.label}" = {
       metadata.namespace = ns;
       spec = {
-        selector.app = "${exporterImg.label}";
-        ports = [ ];
+        selector.app = "${alloyImg.label}";
+        ports = [{
+          name = "alloy";
+          inherit (alloyImg) port;
+        }];
         type = "ClusterIP";
-        # ports."${toString exporterImg.port}".targetPort = exporterImg.port;
+        # ports."${toString alloyImg.port}".targetPort = exporterImg.port;
       };
     };
   };
