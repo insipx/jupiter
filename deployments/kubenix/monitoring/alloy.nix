@@ -84,7 +84,7 @@ in
     alloy-config.data."config.alloy" = ''
       prometheus.remote_write "default" {
         endpoint {
-          url = "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+          url = "http://kube-prometheus-stack-prometheus:9090/api/v1/write"
         }
       }
 
@@ -94,12 +94,26 @@ in
           instance    = "fw-opnsense",
           job         = "node_exporter",
           group       = "firewall",
-          host        = "opnsense.jupiter.lan",
+          host        = "fw-opnsense",
         }]
 
         forward_to = [prometheus.remote_write.default.receiver]
         scrape_interval = "15s"
         scrape_timeout = "10s"
+      }
+      prometheus.scrape "opnsense_exporter" {
+        targets = [{
+          __address__ = "opnsense-exporter:8080",
+          instance    = "fw-opnsense",
+          job         = "node_exporter",
+          group       = "firewall",
+          host        = "fw-opnsense",
+        }]
+
+        forward_to = [prometheus.remote_write.default.receiver]
+        scrape_interval = "15s"
+        scrape_timeout = "10s"
+
       }
     '';
   };

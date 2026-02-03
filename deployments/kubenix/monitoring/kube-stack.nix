@@ -35,29 +35,11 @@ in
               };
               additionalScrapeConfigs = [
                 {
-                  job_name = "opnsense-firewall";
-                  static_configs = [{
-                    targets = [ "opnsense.${flake.lib.hostname}:9100" ];
-                    labels = {
-                      instance = "opnsense";
-                    };
-                  }];
-                }
-                {
                   job_name = "traefik";
                   static_configs = [{
                     targets = [ "traefik.kube-system.svc.cluster.local:9100" ];
                     labels = {
                       instance = "traefik";
-                    };
-                  }];
-                }
-                {
-                  job_name = "opnsense";
-                  static_configs = [{
-                    targets = [ "opnsense-exporter.monitoring.svc.cluster.local:8080" ];
-                    labels = {
-                      instance = "opnsense-exporter";
                     };
                   }];
                 }
