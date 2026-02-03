@@ -8,6 +8,7 @@ let
     imagePolicy = "IfNotPresent";
     # recuires rec (recursive attr)
   };
+  lokiPort = 1514;
 in
 {
   statefulSets."${alloyImg.label}" = {
@@ -31,6 +32,14 @@ in
             ];
             ports."http" = {
               containerPort = alloyImg.port;
+              protocol = "TCP";
+            };
+            ports."ingest-udp" = {
+              containerPort = lokiPort;
+              protocol = "UDP";
+            };
+            ports."ingest-tcp" = {
+              containerPort = lokiPort;
               protocol = "TCP";
             };
             volumeMounts = [
@@ -77,11 +86,15 @@ in
     spec = {
       accessModes = [ "ReadWriteOnce" ];
       storageClassName = "longhorn-static";
-      resources.requests.storage = "10Gi";
+      resources.requests.storage = "35Gi";
     };
   };
   configMaps = {
+    # https://grafana.com/docs/loki/latest/get-started/labels/
     alloy-config.data."config.alloy" = ''
+      logging {
+        level = "debug"
+      }
       prometheus.remote_write "default" {
         endpoint {
           url = "http://kube-prometheus-stack-prometheus:9090/api/v1/write"
@@ -115,6 +128,25 @@ in
         scrape_timeout = "10s"
 
       }
+
+      loki.source.syslog "opnsense" {
+        listener {
+          address = "0.0.0.0:1514"
+          protocol = "udp"
+          labels = {service = "opnsense", job = "opnsense-syslog", protocol = "udp"}
+        }
+        listener {
+          address = "0.0.0.0:1514"
+          protocol = "tcp"
+          labels = {service = "opnsense", job = "opnsense-syslog", protocol = "tcp"}
+        }
+        forward_to = [loki.write.default.receiver]
+      }
+      loki.write "default" {
+        endpoint {
+          url = "http://loki-gateway:80/loki/api/v1/push"
+        }
+      }
     '';
   };
   services."${alloyImg.label}" = {
@@ -128,6 +160,26 @@ in
       }];
       type = "ClusterIP";
       # ports."${toString alloyImg.port}".targetPort = exporterImg.port;
+    };
+  };
+  services.alloy-loki-ingest = {
+    metadata.namespace = ns;
+    spec = {
+      selector.app = "${alloyImg.label}";
+      ports = [{
+        name = "ingest-udp";
+        port = lokiPort;
+        targetPort = lokiPort;
+        protocol = "UDP";
+      }
+        {
+          name = "ingest-tcp";
+          port = lokiPort;
+          targetPort = lokiPort;
+          protocol = "TCP";
+        }];
+      type = "LoadBalancer";
+      loadBalancerIP = "10.10.68.100";
     };
   };
   ingressroute.alloy-dashboard = {

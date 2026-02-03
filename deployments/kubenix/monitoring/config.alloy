@@ -1,0 +1,33 @@
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://kube-prometheus-stack-prometheus:9090/api/v1/write"
+        }
+      }
+
+      prometheus.scrape "opnsense_node" {
+        targets = [{
+          __address__ = "10.10.69.1:9100",
+          instance    = "fw-opnsense",
+          job         = "node_exporter",
+          group       = "firewall",
+          host        = "fw-opnsense",
+        }]
+
+        forward_to = [prometheus.remote_write.default.receiver]
+        scrape_interval = "15s"
+        scrape_timeout = "10s"
+      }
+      prometheus.scrape "opnsense_exporter" {
+        targets = [{
+          __address__ = "opnsense-exporter:8080",
+          instance    = "fw-opnsense",
+          job         = "node_exporter",
+          group       = "firewall",
+          host        = "fw-opnsense",
+        }]
+
+        forward_to = [prometheus.remote_write.default.receiver]
+        scrape_interval = "15s"
+        scrape_timeout = "10s"
+
+      }
