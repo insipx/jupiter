@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["\\.nix$"],
+      "matchStrings": [
+        "repo\\s*=\\s*\"(?<registryUrl>[^\"]+)\"[\\s\\S]*?chart\\s*=\\s*\"(?<depName>[^\"]+)\"[\\s\\S]*?version\\s*=\\s*\"v?(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "helm"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["helm"],
+      "commitMessagePrefix": "chore(helm):"
+    }
+  ]
+}

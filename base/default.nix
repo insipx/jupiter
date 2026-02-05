@@ -21,6 +21,7 @@
     nfs-utils
     libnfs
     lnav
+    traceroute
   ];
   # Volos cert
   security.pki.certificates = [

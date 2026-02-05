@@ -18,6 +18,11 @@ let
         metadata.labels."grafana_dashboard" = "1";
         data."opnsense-firewall.json" = builtins.readFile ./dashboards/opnsense-firewall.json;
       };
+      grafana-dashboard-opnsense-geomap = {
+        metadata.namespace = ns;
+        metadata.labels."grafana_dashboard" = "1";
+        data."opnsense-geomap.json" = builtins.readFile ./dashboards/opnsense-geomap.json;
+      };
       grafana-dashboard-suricata = {
         metadata.namespace = ns;
         metadata.labels."grafana_dashboard" = "1";

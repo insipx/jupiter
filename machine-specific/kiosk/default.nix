@@ -67,7 +67,7 @@
             --disable-translate \
             --noerrdialogs \
             --fast-unload \
-            http://grafana.jupiter.lan/playlists/play/df95zko2qifb4a?kiosk=true&autofitpanels=true
+            https://grafana.jupiter.lan/playlists/play/afccjeleouq68d?kiosk=true&autofitpanels=true
         '';
         Restart = "on-failure";
         RestartSec = 5;

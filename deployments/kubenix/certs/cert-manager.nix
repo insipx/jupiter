@@ -20,6 +20,8 @@ in
           namespace = ns;
           values = {
             global.leaderElection.namespace = ns;
+            prometheus.enabled = true;
+            prometheus.podmonitor.enabled = true;
           };
         };
       };
@@ -35,6 +37,12 @@ in
           group = "cert-manager.io";
           version = "v1";
           kind = "CertificateRequest";
+        };
+        podmonitors = {
+          attrName = "podmonitors";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "PodMonitor";
         };
       };
     };

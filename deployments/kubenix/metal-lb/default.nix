@@ -18,6 +18,14 @@ in
             sha256 = "sha256-KWdVaF6CjFjeHQ6HT1WvkI9JnSurt9emLVCpkxma0fg=";
           };
           namespace = ns;
+          values = {
+            controller.serviceMonitor = {
+              enabled = true;
+            };
+            speaker.serviceMonitor = {
+              enabled = true;
+            };
+          };
         };
       };
       resources = {
@@ -60,6 +68,12 @@ in
           group = "metallb.io";
           version = "v1beta1";
           kind = "L2Advertisement";
+        };
+        servicemonitors = {
+          attrName = "servicemonitors";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "ServiceMonitor";
         };
       };
     };

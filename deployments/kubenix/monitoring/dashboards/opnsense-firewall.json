@@ -18,6 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "id": 26,
   "links": [],
   "panels": [
     {
@@ -43,7 +44,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           }
@@ -61,6 +62,7 @@
         "basemap": {
           "config": {},
           "name": "Layer 0",
+          "noRepeat": false,
           "type": "default"
         },
         "controls": {
@@ -84,11 +86,16 @@
                 "field": "Value",
                 "max": 20,
                 "min": 5
+              },
+              "style": {
+                "color": {
+                  "fixed": "dark-red"
+                }
               }
             },
             "filterData": {
               "id": "byRefId",
-              "options": "Blocked"
+              "options": "A"
             },
             "location": {
               "latitude": "geoip_location_latitude",
@@ -115,7 +122,7 @@
             },
             "filterData": {
               "id": "byRefId",
-              "options": "Allowed"
+              "options": "B"
             },
             "location": {
               "latitude": "geoip_location_latitude",
@@ -132,12 +139,40 @@
         },
         "view": {
           "allLayers": true,
-          "id": "zero",
-          "lat": 20,
+          "id": "fit",
+          "lat": 0,
           "lon": 0,
-          "zoom": 2
+          "noRepeat": false,
+          "zoom": 1
         }
       },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum by (geoip_location_latitude, geoip_location_longitude, geoip_country_name) (count_over_time({app=\"filterlog\", action=\"block\"} | geoip_location_latitude != \"\" [$__range]))",
+          "legendFormat": "{{geoip_country_name}}",
+          "queryType": "instant",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum by (geoip_location_latitude, geoip_location_longitude, geoip_country_name) (count_over_time({app=\"filterlog\", action=\"pass\"} | geoip_location_latitude != \"\" [$__range]))",
+          "legendFormat": "{{geoip_country_name}}",
+          "queryType": "instant",
+          "refId": "B"
+        }
+      ],
       "title": "Firewall Events - World Map",
       "transformations": [
         {
@@ -155,30 +190,6 @@
             ],
             "fields": {}
           }
-        }
-      ],
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum by (geoip_location_latitude, geoip_location_longitude, geoip_country_name) (count_over_time({app=\"filterlog\", action=\"block\"} | geoip_location_latitude != \"\" [$__range]))",
-          "legendFormat": "{{geoip_country_name}}",
-          "queryType": "instant",
-          "refId": "Blocked"
-        },
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum by (geoip_location_latitude, geoip_location_longitude, geoip_country_name) (count_over_time({app=\"filterlog\", action=\"pass\"} | geoip_location_latitude != \"\" [$__range]))",
-          "legendFormat": "{{geoip_country_name}}",
-          "queryType": "instant",
-          "refId": "Allowed"
         }
       ],
       "type": "geomap"
@@ -200,6 +211,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "none",
@@ -216,6 +228,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -231,7 +244,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -279,17 +292,20 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": ["sum"],
+          "calcs": [
+            "sum"
+          ],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "title": "Blocks vs Allows Over Time",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -303,6 +319,7 @@
           "refId": "A"
         }
       ],
+      "title": "Blocks vs Allows Over Time",
       "type": "timeseries"
     },
     {
@@ -321,7 +338,7 @@
             "steps": [
               {
                 "color": "#F2495C",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -341,14 +358,19 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["sum"],
+          "calcs": [
+            "sum"
+          ],
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "title": "Total Blocked",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -356,11 +378,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "count_over_time({app=\"filterlog\", action=\"block\"} [$__range])",
+          "expr": "sum(count_over_time({app=\"filterlog\", action=\"block\"} [$__range]))",
           "queryType": "instant",
           "refId": "A"
         }
       ],
+      "title": "Total Blocked",
       "type": "stat"
     },
     {
@@ -379,7 +402,7 @@
             "steps": [
               {
                 "color": "#73BF69",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -399,14 +422,19 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["sum"],
+          "calcs": [
+            "sum"
+          ],
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "title": "Total Allowed",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -414,11 +442,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "count_over_time({app=\"filterlog\", action=\"pass\"} [$__range])",
+          "expr": "sum(count_over_time({app=\"filterlog\", action=\"pass\"} [$__range]))",
           "queryType": "instant",
           "refId": "A"
         }
       ],
+      "title": "Total Allowed",
       "type": "stat"
     },
     {
@@ -437,7 +466,7 @@
             "steps": [
               {
                 "color": "blue",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -457,14 +486,19 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["sum"],
+          "calcs": [
+            "sum"
+          ],
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "title": "Total Events",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -472,11 +506,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "count_over_time({app=\"filterlog\"} [$__range])",
+          "expr": "sum(count_over_time({app=\"filterlog\"} [$__range]))",
           "queryType": "instant",
           "refId": "A"
         }
       ],
+      "title": "Total Events",
       "type": "stat"
     },
     {
@@ -495,7 +530,7 @@
             "steps": [
               {
                 "color": "orange",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -515,14 +550,19 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["sum"],
+          "calcs": [
+            "sum"
+          ],
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "title": "Unique Source IPs",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -535,6 +575,7 @@
           "refId": "A"
         }
       ],
+      "title": "Unique Source IPs",
       "type": "stat"
     },
     {
@@ -553,7 +594,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -569,25 +610,37 @@
       },
       "id": 7,
       "options": {
-        "displayMode": "gradient",
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
-          "values": false
+          "values": true
         },
         "showUnfilled": true,
+        "sizing": "auto",
         "valueMode": "color"
       },
-      "title": "Top 10 Blocked Source IPs",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
             "type": "loki",
             "uid": "${datasource}"
           },
+          "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (source_ip) (count_over_time({app=\"filterlog\", action=\"block\"} | source_ip != \"\" [$__range])))",
           "legendFormat": "{{source_ip}}",
@@ -595,6 +648,7 @@
           "refId": "A"
         }
       ],
+      "title": "Top 10 Blocked Source IPs",
       "type": "bargauge"
     },
     {
@@ -613,7 +667,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -629,25 +683,37 @@
       },
       "id": 8,
       "options": {
-        "displayMode": "gradient",
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
-          "values": false
+          "values": true
         },
         "showUnfilled": true,
+        "sizing": "auto",
         "valueMode": "color"
       },
-      "title": "Top 10 Blocked Destination Ports",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
             "type": "loki",
             "uid": "${datasource}"
           },
+          "direction": "backward",
           "editorMode": "code",
           "expr": "topk(10, sum by (dest_port) (count_over_time({app=\"filterlog\", action=\"block\"} | dest_port != \"\" [$__range])))",
           "legendFormat": "{{dest_port}}",
@@ -655,6 +721,7 @@
           "refId": "A"
         }
       ],
+      "title": "Top 10 Blocked Destination Ports",
       "type": "bargauge"
     },
     {
@@ -667,22 +734,20 @@
           "color": {
             "mode": "palette-classic"
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 34
       },
@@ -695,16 +760,20 @@
         },
         "pieType": "pie",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "sum"
+          ],
           "fields": "",
-          "values": false
+          "values": true
         },
+        "sort": "desc",
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "title": "Traffic by Interface",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -712,12 +781,13 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by (interface) (count_over_time({app=\"filterlog\"} [$__range]))",
+          "expr": "sum by (interface) (count_over_time({app=\"filterlog\", interface!=\"\"} [$__range]))",
           "legendFormat": "{{interface}}",
           "queryType": "instant",
           "refId": "A"
         }
       ],
+      "title": "Traffic by Interface",
       "type": "piechart"
     },
     {
@@ -730,23 +800,21 @@
           "color": {
             "mode": "palette-classic"
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 8,
+        "w": 6,
+        "x": 6,
         "y": 34
       },
       "id": 10,
@@ -758,16 +826,20 @@
         },
         "pieType": "pie",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "sum"
+          ],
           "fields": "",
-          "values": false
+          "values": true
         },
+        "sort": "desc",
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "title": "Traffic by Protocol",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -775,12 +847,13 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum by (proto) (count_over_time({app=\"filterlog\"} | proto != \"\" [$__range]))",
+          "expr": "sum by (proto) (count_over_time({app=\"filterlog\", proto!=\"\"} [$__range]))",
           "legendFormat": "{{proto}}",
           "queryType": "instant",
           "refId": "A"
         }
       ],
+      "title": "Traffic by Protocol",
       "type": "piechart"
     },
     {
@@ -793,23 +866,21 @@
           "color": {
             "mode": "palette-classic"
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
+        "w": 6,
+        "x": 12,
         "y": 34
       },
       "id": 11,
@@ -821,16 +892,20 @@
         },
         "pieType": "pie",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "sum"
+          ],
           "fields": "",
-          "values": false
+          "values": true
         },
+        "sort": "desc",
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "title": "Top Blocked Countries",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -838,12 +913,79 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "topk(10, sum by (geoip_country_name) (count_over_time({app=\"filterlog\", action=\"block\"} | geoip_country_name != \"\" [$__range])))",
+          "expr": "topk(10, sum by (geoip_country_name) (count_over_time({app=\"filterlog\", action=\"block\"} | geoip_country_name!=\"\" [$__range])))",
           "legendFormat": "{{geoip_country_name}}",
           "queryType": "instant",
           "refId": "A"
         }
       ],
+      "title": "Top Blocked Countries",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 34
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (vlan) (count_over_time({app=\"filterlog\", vlan!=\"\"} [$__range]))",
+          "legendFormat": "VLAN {{vlan}}",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Traffic by VLAN",
       "type": "piechart"
     },
     {
@@ -861,6 +1003,9 @@
             "cellOptions": {
               "type": "auto"
             },
+            "footer": {
+              "reducers": []
+            },
             "inspect": false
           },
           "mappings": [],
@@ -869,7 +1014,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           }
@@ -919,12 +1064,6 @@
       "id": 12,
       "options": {
         "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
-        },
         "showHeader": true,
         "sortBy": [
           {
@@ -933,7 +1072,7 @@
           }
         ]
       },
-      "title": "Recent Firewall Events",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -946,6 +1085,7 @@
           "refId": "A"
         }
       ],
+      "title": "Recent Firewall Events",
       "transformations": [
         {
           "id": "extractFields",
@@ -967,14 +1107,14 @@
             "indexByName": {
               "Time": 0,
               "action": 1,
+              "dest_ip": 7,
+              "dest_port": 8,
               "direction": 2,
+              "geoip_country_name": 9,
               "interface": 3,
               "proto": 4,
               "source_ip": 5,
-              "source_port": 6,
-              "dest_ip": 7,
-              "dest_port": 8,
-              "geoip_country_name": 9
+              "source_port": 6
             },
             "renameByName": {}
           }
@@ -983,42 +1123,45 @@
       "type": "table"
     }
   ],
+  "preload": false,
   "refresh": "30s",
-  "schemaVersion": 39,
-  "tags": ["opnsense", "firewall", "filterlog", "security"],
+  "schemaVersion": 42,
+  "tags": [
+    "opnsense",
+    "firewall",
+    "filterlog",
+    "security"
+  ],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
           "text": "Loki",
           "value": "Loki"
         },
-        "hide": 0,
         "includeAll": false,
         "label": "Datasource",
-        "multi": false,
         "name": "datasource",
         "options": [],
         "query": "loki",
-        "queryValue": "",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "type": "datasource"
       },
       {
         "current": {
-          "selected": true,
-          "text": ["All"],
-          "value": ["$__all"]
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
         },
         "datasource": {
           "type": "loki",
           "uid": "${datasource}"
         },
         "definition": "",
-        "hide": 0,
         "includeAll": true,
         "label": "Interface",
         "multi": true,
@@ -1032,22 +1175,23 @@
         },
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
       {
         "current": {
-          "selected": true,
-          "text": ["All"],
-          "value": ["$__all"]
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
         },
         "datasource": {
           "type": "loki",
           "uid": "${datasource}"
         },
         "definition": "",
-        "hide": 0,
         "includeAll": true,
         "label": "Action",
         "multi": true,
@@ -1061,7 +1205,6 @@
         },
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       }
@@ -1075,6 +1218,5 @@
   "timezone": "",
   "title": "OPNsense Firewall",
   "uid": "opnsense-firewall",
-  "version": 1,
-  "weekStart": ""
+  "version": 2
 }

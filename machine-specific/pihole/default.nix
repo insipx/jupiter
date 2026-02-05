@@ -1,5 +1,5 @@
-{ nixos-raspberrypi, pkgs, ... }: {
-  imports = with nixos-raspberrypi.nixosModules; [
+{ inputs, pkgs, ... }: {
+  imports = with inputs.nixos-raspberrypi.nixosModules; [
     ./../rpi5/kernel.nix
     raspberry-pi-5.base
     raspberry-pi-5.page-size-16k

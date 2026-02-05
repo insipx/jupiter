@@ -59,7 +59,7 @@ in
           };
           # minio.enabled = true;
           deploymentMode = "SimpleScalable";
-          querier.max_concurrent = 4;
+          querier.max_concurrent = 8;
         };
         read.extraEnvFrom = [{ secretRef.name = "s3-loki-bucket"; }];
         write.extraEnvFrom = [{ secretRef.name = "s3-loki-bucket"; }];
@@ -86,6 +86,11 @@ in
           storageClass = "longhorn-static";
           accessModes = [ "ReadWriteOnce" ];
           size = "50Gi";
+        };
+
+        # Enable Prometheus ServiceMonitor
+        serviceMonitor = {
+          enabled = true;
         };
       };
     };

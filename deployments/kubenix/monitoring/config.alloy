@@ -40,7 +40,34 @@ prometheus.scrape "opnsense_exporter" {
 }
 
 // ============================================================
-// SYSLOG SOURCE - receives all OPNsense syslog messages (RFC 5424)
+// RELABEL RULES - Promote syslog internal labels
+// ============================================================
+loki.relabel "syslog_labels" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__syslog_message_app_name"]
+    target_label  = "app"
+  }
+
+  rule {
+    source_labels = ["__syslog_message_severity"]
+    target_label  = "severity"
+  }
+
+  rule {
+    source_labels = ["__syslog_message_facility"]
+    target_label  = "facility"
+  }
+
+  rule {
+    source_labels = ["__syslog_message_hostname"]
+    target_label  = "host"
+  }
+}
+
+// ============================================================
+// SYSLOG SOURCE - receives all OPNsense syslog messages
 // ============================================================
 loki.source.syslog "opnsense" {
   listener {
@@ -53,67 +80,57 @@ loki.source.syslog "opnsense" {
     protocol = "tcp"
     labels = {service = "opnsense", job = "opnsense-syslog", protocol = "tcp"}
   }
+
+  relabel_rules = loki.relabel.syslog_labels.rules
   forward_to = [loki.process.opnsense.receiver]
 }
 
 // ============================================================
 // LOG PROCESSING PIPELINE
-// Parses filterlog (firewall) and suricata (IDS) messages
-// Adds GeoIP data for source IPs
 // ============================================================
 loki.process "opnsense" {
   forward_to = [loki.write.default.receiver]
 
-  // Promote syslog app name to a label for routing
-  stage.labels {
-    values = {
-      app = "__syslog_message_app_name",
-    }
-  }
-
   // --------------------------------------------------------
-  // FILTERLOG PARSING - OPNsense firewall logs
-  // Format: rule,subrule,anchor,tracker,interface,reason,action,direction,ip_version,...
+  // FILTERLOG IPv4 PARSING
+  // Use regex filter in selector to only match IPv4 lines
   // --------------------------------------------------------
   stage.match {
-    selector = "{app=\"filterlog\"}"
+    selector = "{app=\"filterlog\"} |~ \"^[0-9]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,4,\""
+    pipeline_name = "filterlog_ipv4"
 
-    // Extract common fields (first 9 CSV positions)
+    // Match IPv4 filterlog and extract all fields in one regex
+    // Format: rule,subrule,anchor,tracker,interface,reason,action,direction,4,tos,ecn,ttl,id,offset,flags,proto_id,proto,length,src_ip,dst_ip,src_port,dst_port,...
     stage.regex {
-      expression = "^(?P<rule>[^,]*),(?P<subrule>[^,]*),(?P<anchor>[^,]*),(?P<tracker>[^,]*),(?P<interface>[^,]*),(?P<reason>[^,]*),(?P<action>[^,]*),(?P<direction>[^,]*),(?P<ip_version>[^,]*),(?P<remainder>.*)$"
+      expression = "^(?P<rule>\\d*),(?P<subrule>[^,]*),(?P<anchor>[^,]*),(?P<tracker>[^,]*),(?P<interface>[^,]*),(?P<reason>[^,]*),(?P<action>[^,]*),(?P<direction>[^,]*),4,(?P<tos>[^,]*),(?P<ecn>[^,]*),(?P<ttl>[^,]*),(?P<id>[^,]*),(?P<offset>[^,]*),(?P<flags>[^,]*),(?P<proto_id>[^,]*),(?P<proto>[^,]*),(?P<length>[^,]*),(?P<source_ip>[^,]*),(?P<dest_ip>[^,]*),(?P<source_port>[^,]*),(?P<dest_port>[^,]*).*$"
     }
 
-    // Promote low-cardinality fields to labels
-    stage.labels {
+    // Set ip_version label for IPv4
+    stage.static_labels {
       values = {
-        action     = "",
-        direction  = "",
-        interface  = "",
-        ip_version = "",
+        ip_version = "4",
       }
-    }
-  }
-
-  // IPv4 filterlog parsing
-  stage.match {
-    selector = "{app=\"filterlog\", ip_version=\"4\"}"
-
-    // IPv4 format: tos,ecn,ttl,id,offset,flags,proto_id,proto,length,src_ip,dst_ip,...
-    stage.regex {
-      source     = "remainder"
-      expression = "^(?P<tos>[^,]*),(?P<ecn>[^,]*),(?P<ttl>[^,]*),(?P<id>[^,]*),(?P<offset>[^,]*),(?P<flags>[^,]*),(?P<proto_id>[^,]*),(?P<proto>[^,]*),(?P<length>[^,]*),(?P<source_ip>[^,]*),(?P<dest_ip>[^,]*),(?P<port_remainder>.*)$"
     }
 
     stage.labels {
       values = {
-        proto = "",
+        action    = "",
+        direction = "",
+        interface = "",
+        proto     = "",
       }
     }
 
-    // Extract ports for TCP/UDP (format: src_port,dst_port,...)
+    // Extract VLAN ID from interface name (e.g., igc0_vlan10 -> 10, igc0.10 -> 10)
     stage.regex {
-      source     = "port_remainder"
-      expression = "^(?P<source_port>[^,]*),(?P<dest_port>[^,]*)"
+      source     = "interface"
+      expression = "^(?P<base_interface>[^_\\.]+)(?:[_\\.]vlan?(?P<vlan>\\d+))?$"
+    }
+
+    stage.labels {
+      values = {
+        vlan = "",
+      }
     }
 
     // GeoIP enrichment for source IP
@@ -123,7 +140,6 @@ loki.process "opnsense" {
       db_type = "city"
     }
 
-    // Store high-cardinality fields as structured metadata
     stage.structured_metadata {
       values = {
         source_ip                = "",
@@ -142,25 +158,45 @@ loki.process "opnsense" {
     }
   }
 
-  // IPv6 filterlog parsing
+  // --------------------------------------------------------
+  // FILTERLOG IPv6 PARSING
+  // Use regex filter in selector to only match IPv6 lines
+  // --------------------------------------------------------
   stage.match {
-    selector = "{app=\"filterlog\", ip_version=\"6\"}"
+    selector = "{app=\"filterlog\"} |~ \"^[0-9]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,6,\""
+    pipeline_name = "filterlog_ipv6"
 
-    // IPv6 format: class,flow_label,hop_limit,proto,proto_id,length,src_ip,dst_ip,...
+    // Match IPv6 filterlog
+    // Format: rule,subrule,anchor,tracker,interface,reason,action,direction,6,class,flow_label,hop_limit,proto,proto_id,length,src_ip,dst_ip,src_port,dst_port,...
     stage.regex {
-      source     = "remainder"
-      expression = "^(?P<class>[^,]*),(?P<flow_label>[^,]*),(?P<hop_limit>[^,]*),(?P<proto>[^,]*),(?P<proto_id>[^,]*),(?P<length>[^,]*),(?P<source_ip>[^,]*),(?P<dest_ip>[^,]*),(?P<port_remainder>.*)$"
+      expression = "^(?P<rule>\\d*),(?P<subrule>[^,]*),(?P<anchor>[^,]*),(?P<tracker>[^,]*),(?P<interface>[^,]*),(?P<reason>[^,]*),(?P<action>[^,]*),(?P<direction>[^,]*),6,(?P<class>[^,]*),(?P<flow_label>[^,]*),(?P<hop_limit>[^,]*),(?P<proto>[^,]*),(?P<proto_id>[^,]*),(?P<length>[^,]*),(?P<source_ip>[^,]*),(?P<dest_ip>[^,]*),(?P<source_port>[^,]*),(?P<dest_port>[^,]*).*$"
+    }
+
+    stage.static_labels {
+      values = {
+        ip_version = "6",
+      }
     }
 
     stage.labels {
       values = {
-        proto = "",
+        action    = "",
+        direction = "",
+        interface = "",
+        proto     = "",
       }
     }
 
+    // Extract VLAN ID from interface name (e.g., igc0_vlan10 -> 10, igc0.10 -> 10)
     stage.regex {
-      source     = "port_remainder"
-      expression = "^(?P<source_port>[^,]*),(?P<dest_port>[^,]*)"
+      source     = "interface"
+      expression = "^(?P<base_interface>[^_\\.]+)(?:[_\\.]vlan?(?P<vlan>\\d+))?$"
+    }
+
+    stage.labels {
+      values = {
+        vlan = "",
+      }
     }
 
     stage.geoip {
@@ -193,7 +229,6 @@ loki.process "opnsense" {
   stage.match {
     selector = "{app=\"suricata\"}"
 
-    // Suricata EVE JSON is embedded in the syslog message
     stage.json {
       expressions = {
         event_type   = "event_type",
@@ -241,5 +276,6 @@ loki.process "opnsense" {
 loki.write "default" {
   endpoint {
     url = "http://loki-gateway:80/loki/api/v1/push"
+    tenant_id = "fake"
   }
 }

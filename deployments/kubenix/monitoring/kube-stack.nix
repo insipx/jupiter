@@ -32,17 +32,8 @@ in
               accessModes = [ "ReadWriteOnce" ];
               resources.requests.storage = "35Gi";
             };
-            additionalScrapeConfigs = [
-              {
-                job_name = "traefik";
-                static_configs = [{
-                  targets = [ "traefik.kube-system.svc.cluster.local:9100" ];
-                  labels = {
-                    instance = "traefik";
-                  };
-                }];
-              }
-            ];
+            # Traefik now uses ServiceMonitor instead of static config
+            # additionalScrapeConfigs can be used for external targets not in k8s
           };
         };
 
@@ -94,7 +85,7 @@ in
                 httpHeaderName1 = "X-Scope-OrgID";
               };
               secureJsonData = {
-                httpHeaderValue1 = "jupiter-homelab";
+                httpHeaderValue1 = "fake";
               };
             }
           ];

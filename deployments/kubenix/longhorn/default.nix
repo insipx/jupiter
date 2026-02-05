@@ -24,6 +24,10 @@ in
               defaultClass = true;
             };
 
+            metrics.serviceMonitor = {
+              enabled = true;
+            };
+
             longhornUI.replicas = 1;
             longhornConversionWebhook.replicas = 1;
             longhornAdmissionWebhook.replicas = 1;
@@ -77,6 +81,12 @@ in
           group = "traefik.io";
           version = "v1alpha1";
           kind = "IngressRoute";
+        };
+        servicemonitors = {
+          attrName = "servicemonitors";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "ServiceMonitor";
         };
       };
     };

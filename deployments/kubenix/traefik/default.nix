@@ -51,6 +51,9 @@ in
             entrypoint = "metrics";
             addRoutersLabels = true;
             addServicesLabels = true;
+            serviceMonitor = {
+              enabled = true;
+            };
           };
           persistence = {
             enabled = false;
@@ -217,6 +220,12 @@ in
           group = "traefik.io";
           version = "v1alpha1";
           kind = "TLSOption";
+        };
+        servicemonitors = {
+          attrName = "servicemonitors";
+          group = "monitoring.coreos.com";
+          version = "v1";
+          kind = "ServiceMonitor";
         };
       };
     };

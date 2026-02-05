@@ -39,13 +39,13 @@ inputs.colmena.lib.makeHive {
     deployment = {
       targetHost = "ganymede.jupiter.lan";
       targetUser = "insipx";
-      tags = [ "homelab" "mainpi" "k3s" ];
+      tags = [ "homelab" "k3s" "control" ];
     };
     rpiHomeLab = {
       networking = {
         hostId = "445ba108";
         hostName = "ganymede";
-        address = "10.10.69.10/24";
+        address = "10.10.69.10/23";
         interface = "end0";
       };
     };
@@ -67,13 +67,13 @@ inputs.colmena.lib.makeHive {
     deployment = {
       targetHost = "io.jupiter.lan";
       targetUser = "insipx";
-      tags = [ "homelab" "mainpi" "k3s" ];
+      tags = [ "homelab" "k3s" "control" ];
     };
     rpiHomeLab = {
       networking = {
         hostName = "io";
         hostId = "19454311";
-        address = "10.10.69.11/24";
+        address = "10.10.69.11/23";
         interface = "end0";
       };
       k3s.longhorn = true;
@@ -89,7 +89,7 @@ inputs.colmena.lib.makeHive {
     ] ++ commonImports;
 
     deployment = {
-      tags = [ "homelab" "mainpi" "k3s" ];
+      tags = [ "homelab" "k3s" "control" ];
       targetHost = "europa.jupiter.lan";
       targetUser = "insipx";
     };
@@ -97,7 +97,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "29af5daa";
         hostName = "europa";
-        address = "10.10.69.12/24";
+        address = "10.10.69.12/23";
         interface = "end0";
       };
       k3s.enable = true;
@@ -113,7 +113,7 @@ inputs.colmena.lib.makeHive {
       ./../machine-specific/rpi5
     ] ++ commonImports;
     deployment = {
-      tags = [ "workers" "homelab" "mainpi" "k3s" ];
+      tags = [ "workers" "homelab" "k3s" "control" ];
       targetHost = "callisto.jupiter.lan";
       targetUser = "insipx";
     };
@@ -127,7 +127,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "b0d6aebd";
         hostName = "callisto";
-        address = "10.10.69.14/24";
+        address = "10.10.69.14/23";
         interface = "end0";
       };
     };
@@ -148,7 +148,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "0c461a51";
         hostName = "sinope";
-        address = "10.10.69.16/24";
+        address = "10.10.69.16/23";
         interface = "enu1u1";
       };
       k3s.agent = true;
@@ -171,7 +171,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "5ae157ad";
         hostName = "carme";
-        address = "10.10.69.17/24";
+        address = "10.10.69.17/23";
         interface = "end0";
       };
       k3s = {
@@ -196,7 +196,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "c3adcefb";
         hostName = "volos";
-        address = "10.10.69.18/24";
+        address = "10.10.69.18/23";
         interface = "end0";
       };
       k3s = {
@@ -206,28 +206,29 @@ inputs.colmena.lib.makeHive {
   };
   # pihole runs outside of k3s
   # but is also a k3s worker
-  elara = _: {
-    imports = [
-      ./../machine-specific/pihole
-    ] ++ commonImports;
-    deployment = {
-      targetUser = "insipx";
-      tags = [ "tinyca" "homelab" ];
-      targetHost = "volos";
-      buildOnTarget = false;
-    };
-    rpiHomeLab = {
-      networking = {
-        hostId = "c6c81d8d";
-        hostName = "elara";
-        address = "10.10.69.20/24";
-        interface = "end0";
-      };
-      k3s = {
-        enable = false;
-      };
-    };
-  };
+  #elara = _: {
+  #  imports = [
+  #    ./../machine-specific/rpi5
+  #  ] ++ commonImports;
+  #  deployment = {
+  #    targetUser = "insipx";
+  #    tags = [ "tinyca" "homelab" "workers" ];
+  #    targetHost = "elara";
+  #    buildOnTarget = false;
+  #  };
+  #  rpiHomeLab = {
+  #    networking = {
+  #      hostId = "c6c81d8d";
+  #      hostName = "elara";
+  #      address = "10.10.69.20/23";
+  #      interface = "end0";
+  #    };
+  #    k3s = {
+  #      enable = false;
+  #    };
+  #  };
+  #  jupiter-secrets.settings.k3s = true;
+  #};
 
   amalthea = _: {
     nixpkgs.system = "x86_64-linux";
@@ -235,7 +236,7 @@ inputs.colmena.lib.makeHive {
       ./../machine-specific/thinkcentre
     ] ++ commonImports;
     deployment = {
-      tags = [ "thinkcentre" "homelab" ];
+      tags = [ "thinkcentre" "homelab" "workers" ];
       targetHost = "amalthea.jupiter.lan";
       targetUser = "insipx";
     };
@@ -243,7 +244,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "b31fd201";
         hostName = "amalthea";
-        address = "10.10.69.50/24";
+        address = "10.10.69.50/23";
         interface = "enp0s31f6";
       };
       k3s = {
@@ -260,7 +261,7 @@ inputs.colmena.lib.makeHive {
       ./../machine-specific/thinkcentre
     ] ++ commonImports;
     deployment = {
-      tags = [ "thinkcentre" "homelab" ];
+      tags = [ "thinkcentre" "homelab" "workers" ];
       targetHost = "lysithea.jupiter.lan";
       targetUser = "insipx";
     };
@@ -268,7 +269,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "a3a7b911";
         hostName = "lysithea";
-        address = "10.10.69.51/24";
+        address = "10.10.69.51/23";
         interface = "enp0s31f6";
       };
       k3s = {

@@ -109,7 +109,7 @@
                     networking = {
                       hostId = "c6c81d8d"; # this should be unique per-machine
                       hostName = "elara"; # change before installing
-                      address = "10.10.69.20/24"; # change before installing
+                      address = "10.10.69.20/23"; # change before installing
                       interface = "end0";
                     };
                     k3s.enable = false;
@@ -133,7 +133,7 @@
                     networking = {
                       hostId = "a3a7b911"; # this should be unique per-machine
                       hostName = "lysithea"; # change before installing
-                      address = "10.10.69.51/24"; # change before installing
+                      address = "10.10.69.51/23"; # change before installing
                       interface = "enp0s31f6";
                     };
                     k3s.enable = false;

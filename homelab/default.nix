@@ -106,6 +106,7 @@
       2379 # k3s, etcd clients: required if using a "High Availability Embedded etcd" configuration
       2380 # k3s, etcd peers: required if using a "High Availability Embedded etcd" configuration
       9100 # node exporter
+      10250
     ];
     networking.firewall.allowedUDPPorts = lib.mkIf config.rpiHomeLab.k3s.enable [
       5353
