@@ -17,6 +17,12 @@
       "matchManagers": ["custom.regex"],
       "matchDatasources": ["helm"],
       "commitMessagePrefix": "chore(helm):"
+    },
+    {
+      "description": "Ignore pre-release versions",
+      "matchPackagePatterns": ["*"],
+      "ignoreUnstable": true,
+      "stabilityDays": 0
     }
   ]
 }
