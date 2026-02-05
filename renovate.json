@@ -6,9 +6,10 @@
       "customType": "regex",
       "fileMatch": ["\\.nix$"],
       "matchStrings": [
-        "repo\\s*=\\s*\"(?<registryUrl>[^\"]+)\"[\\s\\S]*?chart\\s*=\\s*\"(?<depName>[^\"]+)\"[\\s\\S]*?version\\s*=\\s*\"v?(?<currentValue>[^\"]+)\""
+        "repo\\s*=\\s*\"(?<registryUrl>[^\"]+)\"[\\s\\S]*?chart\\s*=\\s*\"(?<depName>[^\"]+)\"[\\s\\S]*?version\\s*=\\s*\"(?<currentValue>[^\"]+)\""
       ],
-      "datasourceTemplate": "helm"
+      "datasourceTemplate": "helm",
+      "versioningTemplate": "loose"
     }
   ],
   "packageRules": [
