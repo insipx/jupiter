@@ -6,7 +6,6 @@ let
     version = "v1.12.2";
     port = 12345;
     imagePolicy = "IfNotPresent";
-    # recuires rec (recursive attr)
   };
   lokiPort = 1514;
 in
@@ -20,6 +19,36 @@ in
       template = {
         metadata.labels.app = alloyImg.label;
         spec = {
+          # Init container to download GeoIP database
+          initContainers.geoip-download = {
+            name = "geoip-download";
+            image = "curlimages/curl:8.11.0";
+            command = [ "/bin/sh" "-c" ];
+            args = [
+              ''
+                for i in 1 2 3 4 5; do
+                  curl -sSL "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" \
+                    -o /geoip/GeoLite2-City.tar.gz && break
+                  echo "Attempt $i failed, retrying..."
+                  sleep 10
+                done
+                cd /geoip && tar xzf GeoLite2-City.tar.gz --strip-components=1
+                rm -f GeoLite2-City.tar.gz
+                ls -la /geoip/
+              ''
+            ];
+            env = [{
+              name = "MAXMIND_LICENSE_KEY";
+              valueFrom.secretKeyRef = {
+                name = "maxmind-license";
+                key = "license-key";
+              };
+            }];
+            volumeMounts = [{
+              name = "geoip-data";
+              mountPath = "/geoip";
+            }];
+          };
           containers."${alloyImg.label}" = {
             name = "${alloyImg.label}";
             image = "docker.io/grafana/${alloyImg.label}:${alloyImg.version}";
@@ -52,15 +81,19 @@ in
                 name = "alloy-data-pvc";
                 mountPath = "/data";
               }
+              {
+                name = "geoip-data";
+                mountPath = "/etc/alloy/geoip";
+              }
             ];
             resources = {
               requests = {
-                memory = "128Mi";
-                cpu = "100m";
+                memory = "256Mi";
+                cpu = "200m";
               };
               limits = {
-                memory = "256Mi";
-                cpu = "500m";
+                memory = "512Mi";
+                cpu = "1000m";
               };
             };
           };
@@ -72,6 +105,10 @@ in
             {
               name = "alloy-data-pvc";
               persistentVolumeClaim.claimName = "alloy-data-pvc";
+            }
+            {
+              name = "geoip-data";
+              emptyDir = { };
             }
           ];
         };
@@ -91,63 +128,14 @@ in
   };
   configMaps = {
     # https://grafana.com/docs/loki/latest/get-started/labels/
-    alloy-config.data."config.alloy" = ''
-      logging {
-        level = "debug"
-      }
-      prometheus.remote_write "default" {
-        endpoint {
-          url = "http://kube-prometheus-stack-prometheus:9090/api/v1/write"
-        }
-      }
-
-      prometheus.scrape "opnsense_node" {
-        targets = [{
-          __address__ = "10.10.69.1:9100",
-          instance    = "fw-opnsense",
-          job         = "node_exporter",
-          group       = "firewall",
-          host        = "fw-opnsense",
-        }]
-
-        forward_to = [prometheus.remote_write.default.receiver]
-        scrape_interval = "15s"
-        scrape_timeout = "10s"
-      }
-      prometheus.scrape "opnsense_exporter" {
-        targets = [{
-          __address__ = "opnsense-exporter:8080",
-          instance    = "fw-opnsense",
-          job         = "node_exporter",
-          group       = "firewall",
-          host        = "fw-opnsense",
-        }]
-
-        forward_to = [prometheus.remote_write.default.receiver]
-        scrape_interval = "15s"
-        scrape_timeout = "10s"
-
-      }
-
-      loki.source.syslog "opnsense" {
-        listener {
-          address = "0.0.0.0:1514"
-          protocol = "udp"
-          labels = {service = "opnsense", job = "opnsense-syslog", protocol = "udp"}
-        }
-        listener {
-          address = "0.0.0.0:1514"
-          protocol = "tcp"
-          labels = {service = "opnsense", job = "opnsense-syslog", protocol = "tcp"}
-        }
-        forward_to = [loki.write.default.receiver]
-      }
-      loki.write "default" {
-        endpoint {
-          url = "http://loki-gateway:80/loki/api/v1/push"
-        }
-      }
-    '';
+    alloy-config.data."config.alloy" = builtins.readFile ./config.alloy;
+  };
+  secrets.maxmind-license = {
+    metadata.namespace = ns;
+    metadata.name = "maxmind-license";
+    stringData = {
+      license-key = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/maxmind_license_key";
+    };
   };
   services."${alloyImg.label}" = {
     metadata.namespace = ns;
@@ -159,7 +147,6 @@ in
         targetPort = alloyImg.port;
       }];
       type = "ClusterIP";
-      # ports."${toString alloyImg.port}".targetPort = exporterImg.port;
     };
   };
   services.alloy-loki-ingest = {

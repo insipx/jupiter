@@ -1,33 +1,245 @@
+logging {
+  level = "debug"
+}
+
+// ============================================================
+// PROMETHEUS REMOTE WRITE
+// ============================================================
 prometheus.remote_write "default" {
   endpoint {
     url = "http://kube-prometheus-stack-prometheus:9090/api/v1/write"
-        }
+  }
+}
+
+prometheus.scrape "opnsense_node" {
+  targets = [{
+    __address__ = "10.10.69.1:9100",
+    instance    = "fw-opnsense",
+    job         = "node_exporter",
+    group       = "firewall",
+    host        = "fw-opnsense",
+  }]
+
+  forward_to = [prometheus.remote_write.default.receiver]
+  scrape_interval = "15s"
+  scrape_timeout = "10s"
+}
+
+prometheus.scrape "opnsense_exporter" {
+  targets = [{
+    __address__ = "opnsense-exporter:8080",
+    instance    = "fw-opnsense",
+    job         = "node_exporter",
+    group       = "firewall",
+    host        = "fw-opnsense",
+  }]
+
+  forward_to = [prometheus.remote_write.default.receiver]
+  scrape_interval = "15s"
+  scrape_timeout = "10s"
+}
+
+// ============================================================
+// SYSLOG SOURCE - receives all OPNsense syslog messages (RFC 5424)
+// ============================================================
+loki.source.syslog "opnsense" {
+  listener {
+    address = "0.0.0.0:1514"
+    protocol = "udp"
+    labels = {service = "opnsense", job = "opnsense-syslog", protocol = "udp"}
+  }
+  listener {
+    address = "0.0.0.0:1514"
+    protocol = "tcp"
+    labels = {service = "opnsense", job = "opnsense-syslog", protocol = "tcp"}
+  }
+  forward_to = [loki.process.opnsense.receiver]
+}
+
+// ============================================================
+// LOG PROCESSING PIPELINE
+// Parses filterlog (firewall) and suricata (IDS) messages
+// Adds GeoIP data for source IPs
+// ============================================================
+loki.process "opnsense" {
+  forward_to = [loki.write.default.receiver]
+
+  // Promote syslog app name to a label for routing
+  stage.labels {
+    values = {
+      app = "__syslog_message_app_name",
+    }
+  }
+
+  // --------------------------------------------------------
+  // FILTERLOG PARSING - OPNsense firewall logs
+  // Format: rule,subrule,anchor,tracker,interface,reason,action,direction,ip_version,...
+  // --------------------------------------------------------
+  stage.match {
+    selector = "{app=\"filterlog\"}"
+
+    // Extract common fields (first 9 CSV positions)
+    stage.regex {
+      expression = "^(?P<rule>[^,]*),(?P<subrule>[^,]*),(?P<anchor>[^,]*),(?P<tracker>[^,]*),(?P<interface>[^,]*),(?P<reason>[^,]*),(?P<action>[^,]*),(?P<direction>[^,]*),(?P<ip_version>[^,]*),(?P<remainder>.*)$"
+    }
+
+    // Promote low-cardinality fields to labels
+    stage.labels {
+      values = {
+        action     = "",
+        direction  = "",
+        interface  = "",
+        ip_version = "",
       }
+    }
+  }
 
-      prometheus.scrape "opnsense_node" {
-        targets = [{
-          __address__ = "10.10.69.1:9100",
-          instance    = "fw-opnsense",
-          job         = "node_exporter",
-          group       = "firewall",
-          host        = "fw-opnsense",
-        }]
+  // IPv4 filterlog parsing
+  stage.match {
+    selector = "{app=\"filterlog\", ip_version=\"4\"}"
 
-        forward_to = [prometheus.remote_write.default.receiver]
-        scrape_interval = "15s"
-        scrape_timeout = "10s"
+    // IPv4 format: tos,ecn,ttl,id,offset,flags,proto_id,proto,length,src_ip,dst_ip,...
+    stage.regex {
+      source     = "remainder"
+      expression = "^(?P<tos>[^,]*),(?P<ecn>[^,]*),(?P<ttl>[^,]*),(?P<id>[^,]*),(?P<offset>[^,]*),(?P<flags>[^,]*),(?P<proto_id>[^,]*),(?P<proto>[^,]*),(?P<length>[^,]*),(?P<source_ip>[^,]*),(?P<dest_ip>[^,]*),(?P<port_remainder>.*)$"
+    }
+
+    stage.labels {
+      values = {
+        proto = "",
       }
-      prometheus.scrape "opnsense_exporter" {
-        targets = [{
-          __address__ = "opnsense-exporter:8080",
-          instance    = "fw-opnsense",
-          job         = "node_exporter",
-          group       = "firewall",
-          host        = "fw-opnsense",
-        }]
+    }
 
-        forward_to = [prometheus.remote_write.default.receiver]
-        scrape_interval = "15s"
-        scrape_timeout = "10s"
+    // Extract ports for TCP/UDP (format: src_port,dst_port,...)
+    stage.regex {
+      source     = "port_remainder"
+      expression = "^(?P<source_port>[^,]*),(?P<dest_port>[^,]*)"
+    }
 
+    // GeoIP enrichment for source IP
+    stage.geoip {
+      db      = "/etc/alloy/geoip/GeoLite2-City.mmdb"
+      source  = "source_ip"
+      db_type = "city"
+    }
+
+    // Store high-cardinality fields as structured metadata
+    stage.structured_metadata {
+      values = {
+        source_ip                = "",
+        dest_ip                  = "",
+        source_port              = "",
+        dest_port                = "",
+        rule                     = "",
+        tracker                  = "",
+        geoip_country_name       = "",
+        geoip_country_code       = "",
+        geoip_city_name          = "",
+        geoip_location_latitude  = "",
+        geoip_location_longitude = "",
+        geoip_continent_name     = "",
       }
+    }
+  }
+
+  // IPv6 filterlog parsing
+  stage.match {
+    selector = "{app=\"filterlog\", ip_version=\"6\"}"
+
+    // IPv6 format: class,flow_label,hop_limit,proto,proto_id,length,src_ip,dst_ip,...
+    stage.regex {
+      source     = "remainder"
+      expression = "^(?P<class>[^,]*),(?P<flow_label>[^,]*),(?P<hop_limit>[^,]*),(?P<proto>[^,]*),(?P<proto_id>[^,]*),(?P<length>[^,]*),(?P<source_ip>[^,]*),(?P<dest_ip>[^,]*),(?P<port_remainder>.*)$"
+    }
+
+    stage.labels {
+      values = {
+        proto = "",
+      }
+    }
+
+    stage.regex {
+      source     = "port_remainder"
+      expression = "^(?P<source_port>[^,]*),(?P<dest_port>[^,]*)"
+    }
+
+    stage.geoip {
+      db      = "/etc/alloy/geoip/GeoLite2-City.mmdb"
+      source  = "source_ip"
+      db_type = "city"
+    }
+
+    stage.structured_metadata {
+      values = {
+        source_ip                = "",
+        dest_ip                  = "",
+        source_port              = "",
+        dest_port                = "",
+        rule                     = "",
+        tracker                  = "",
+        geoip_country_name       = "",
+        geoip_country_code       = "",
+        geoip_city_name          = "",
+        geoip_location_latitude  = "",
+        geoip_location_longitude = "",
+        geoip_continent_name     = "",
+      }
+    }
+  }
+
+  // --------------------------------------------------------
+  // SURICATA PARSING - IDS/IPS alerts (EVE JSON via syslog)
+  // --------------------------------------------------------
+  stage.match {
+    selector = "{app=\"suricata\"}"
+
+    // Suricata EVE JSON is embedded in the syslog message
+    stage.json {
+      expressions = {
+        event_type   = "event_type",
+        src_ip       = "src_ip",
+        src_port     = "src_port",
+        dest_ip      = "dest_ip",
+        dest_port    = "dest_port",
+        proto        = "proto",
+        alert_action = "alert.action",
+        alert_sig    = "alert.signature",
+        alert_sig_id = "alert.signature_id",
+        alert_cat    = "alert.category",
+        alert_sev    = "alert.severity",
+        flow_id      = "flow_id",
+      }
+    }
+
+    stage.labels {
+      values = {
+        event_type = "",
+        proto      = "",
+        alert_sev  = "",
+        alert_cat  = "",
+      }
+    }
+
+    stage.structured_metadata {
+      values = {
+        src_ip       = "",
+        src_port     = "",
+        dest_ip      = "",
+        dest_port    = "",
+        alert_sig    = "",
+        alert_sig_id = "",
+        alert_action = "",
+        flow_id      = "",
+      }
+    }
+  }
+}
+
+// ============================================================
+// LOKI WRITE ENDPOINT
+// ============================================================
+loki.write "default" {
+  endpoint {
+    url = "http://loki-gateway:80/loki/api/v1/push"
+  }
+}
