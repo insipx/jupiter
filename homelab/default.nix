@@ -67,7 +67,7 @@
         ];
         # make the routes on this interface a dependency for network-online.target
         linkConfig.RequiredForOnline = "routable";
-        dns = [ "10.10.69.1" ];
+        dns = [ "10.10.69.1:5335" ];
       };
     };
     networking = {

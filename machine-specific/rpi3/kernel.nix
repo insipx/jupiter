@@ -5,7 +5,7 @@ let
 in
 {
   boot = {
-    loader.raspberryPi = {
+    loader.raspberry-pi = {
       variant = "3";
       bootloader = "kernel";
       firmwarePackage = kernelBundle.raspberrypifw;

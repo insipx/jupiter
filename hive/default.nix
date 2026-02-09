@@ -113,7 +113,7 @@ inputs.colmena.lib.makeHive {
       ./../machine-specific/rpi5
     ] ++ commonImports;
     deployment = {
-      tags = [ "workers" "homelab" "k3s" "control" ];
+      tags = [ "workers" "homelab" "k3s" ];
       targetHost = "callisto.jupiter.lan";
       targetUser = "insipx";
     };

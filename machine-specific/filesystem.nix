@@ -59,7 +59,7 @@ in
     options = [ "noatime" "discard" ];
   };
   boot = {
-    supportedFilesystems = [ "zfs" "vfat" "nfs" ];
+    supportedFilesystems = [ "zfs" "vfat" ];
     initrd.supportedFilesystems = [ "zfs" "vfat" ];
     tmp.useTmpfs = true;
     kernelModules = [ "dm_crypt" ];
