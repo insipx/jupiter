@@ -8,7 +8,7 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://grafana.github.io/helm-charts";
         chart = "loki";
-        version = "6.51.0";
+        version = "6.53.0";
         sha256 = "sha256-zKHqCE6ffaC3+IfHyQXiEHNVHCRtLEqKBHPon/v8ZG4=";
       };
       namespace = ns;
