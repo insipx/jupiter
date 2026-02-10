@@ -24,7 +24,7 @@
           chart = kubenix.lib.helm.fetch {
             repo = "https://ceph.github.io/csi-charts";
             chart = "ceph-csi-rbd";
-            version = "3.15.0";
+            version = "3.16.1";
             sha256 = "sha256-jsYqhYKoWjaGzPott9aCrBGPNprllPOSu5Dmlnsg7Kk=";
           };
 
