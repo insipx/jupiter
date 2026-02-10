@@ -39,6 +39,18 @@ prometheus.scrape "opnsense_exporter" {
   scrape_timeout = "10s"
 }
 
+prometheus.scrape "unbound" {
+  targets = [{
+    __address__ = "10.10.69.1:9167",
+    instance    = "unbound-dns",
+    job         = "unbound",
+  }]
+
+  forward_to = [prometheus.remote_write.default.receiver]
+  scrape_interval = "15s"
+  scrape_timeout = "10s"
+}
+
 // ============================================================
 // RELABEL RULES - Promote syslog internal labels
 // ============================================================
@@ -265,6 +277,89 @@ loki.process "opnsense" {
         alert_sig_id = "",
         alert_action = "",
         flow_id      = "",
+      }
+    }
+  }
+
+  // --------------------------------------------------------
+  // UNBOUND DNS QUERY PARSING - handles query, reply, and info logs
+  // --------------------------------------------------------
+
+  // Parse query logs: [thread:id] query: CLIENT_IP DOMAIN TYPE CLASS
+  stage.match {
+    selector = "{app=\"unbound\"} |~ \"query:\""
+    pipeline_name = "unbound_query"
+
+    stage.regex {
+      expression = "\\[(?P<thread>\\d+:\\d+)\\]\\s+query:\\s+(?P<client_ip>[\\d\\.a-fA-F:]+)\\s+(?P<query_domain>[^\\s]+)\\s+(?P<query_type>[A-Z0-9]+)\\s+(?P<query_class>\\w+)"
+    }
+
+    stage.labels {
+      values = {
+        query_type = "",
+      }
+    }
+
+    stage.structured_metadata {
+      values = {
+        client_ip    = "",
+        query_domain = "",
+        query_type   = "",
+      }
+    }
+  }
+
+  // Parse reply logs: [thread:id] reply: CLIENT_IP DOMAIN TYPE CLASS RCODE TIME CACHE TTL
+  stage.match {
+    selector = "{app=\"unbound\"} |~ \"reply:\""
+    pipeline_name = "unbound_reply"
+
+    stage.regex {
+      expression = "\\[(?P<thread>\\d+:\\d+)\\]\\s+reply:\\s+(?P<client_ip>[\\d\\.a-fA-F:]+)\\s+(?P<query_domain>[^\\s]+)\\s+(?P<query_type>[A-Z0-9]+)\\s+(?P<query_class>\\w+)\\s+(?P<rcode>\\w+)\\s+(?P<response_time>[\\d\\.]+)\\s+(?P<cache_status>\\d+)\\s+(?P<ttl>\\d+)"
+    }
+
+    stage.labels {
+      values = {
+        query_type = "",
+        rcode      = "",
+      }
+    }
+
+    stage.structured_metadata {
+      values = {
+        client_ip     = "",
+        query_domain  = "",
+        query_type    = "",
+        rcode         = "",
+        response_time = "",
+        cache_status  = "",
+      }
+    }
+  }
+
+  // Parse info logs (redirects, transparent): [thread:id] info: ZONE ACTION CLIENT@PORT DOMAIN TYPE CLASS
+  stage.match {
+    selector = "{app=\"unbound\"} |~ \"info:\""
+    pipeline_name = "unbound_info"
+
+    stage.regex {
+      expression = "\\[(?P<thread>\\d+:\\d+)\\]\\s+info:\\s+(?P<zone>[^\\s]+)\\s+(?P<action>\\w+)\\s+(?P<client_ip>[\\d\\.a-fA-F:]+)@(?P<client_port>\\d+)\\s+(?P<query_domain>[^\\s]+)\\s+(?P<query_type>[A-Z0-9]+)\\s+(?P<query_class>\\w+)"
+    }
+
+    stage.labels {
+      values = {
+        query_type = "",
+        action     = "",
+      }
+    }
+
+    stage.structured_metadata {
+      values = {
+        client_ip    = "",
+        query_domain = "",
+        query_type   = "",
+        action       = "",
+        zone         = "",
       }
     }
   }

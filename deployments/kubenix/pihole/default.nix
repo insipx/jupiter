@@ -35,8 +35,8 @@ in
               existingSecret = "web-admin-creds";
               passwordKey = "admin-pass";
             };
-            DNS1 = "10.10.69.1#5335";
-            DNS2 = "10.10.69.1#5335";
+            DNS1 = "10.10.69.1#53";
+            DNS2 = "10.10.69.1#53";
             monitoring.podMonitor.enabled = true;
           };
         };

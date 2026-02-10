@@ -4,8 +4,8 @@ let
 in
 {
   boot = {
-    loader.raspberryPi.firmwarePackage = kernelBundle.raspberrypifw;
-    loader.raspberryPi.bootloader = "kernel";
+    loader.raspberry-pi.firmwarePackage = kernelBundle.raspberrypifw;
+    loader.raspberry-pi.bootloader = "kernel";
     kernelPackages = kernelBundle.linuxPackages_rpi5;
     kernelParams = [
       "cgroup_enable=memory"

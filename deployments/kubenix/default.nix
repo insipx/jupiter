@@ -11,7 +11,7 @@
     ./metal-lb/default.nix
     ./certs
     ./personal-apps
-    ./pihole
+    # ./pihole
   ];
 
   submodules.imports = [

@@ -62,16 +62,7 @@ in
           # enable metal lb
           service.type = "LoadBalancer";
           ports = {
-            web = {
-              port = 80;
-              protocol = "TCP";
-              targetPort = "web";
-            };
-            websecure = {
-              port = 443;
-              protocol = "TCP";
-              targetPort = "websecure";
-            };
+            # web and websecure are defaults in traefik
             # Rathole on Fly.io should forward to 10.10.68.1:8443
             websecure-external = {
               port = 8443;

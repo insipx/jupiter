@@ -9,27 +9,6 @@ let
 
   loki-helm = (import ./loki.nix { inherit kubenix flake; }).helm.releases;
   loki-res = (import ./loki.nix { inherit kubenix flake; }).resources;
-
-  # Dashboard ConfigMaps (picked up by Grafana sidecar via grafana_dashboard label)
-  dashboards = {
-    configMaps = {
-      grafana-dashboard-opnsense-firewall = {
-        metadata.namespace = ns;
-        metadata.labels."grafana_dashboard" = "1";
-        data."opnsense-firewall.json" = builtins.readFile ./dashboards/opnsense-firewall.json;
-      };
-      grafana-dashboard-opnsense-geomap = {
-        metadata.namespace = ns;
-        metadata.labels."grafana_dashboard" = "1";
-        data."opnsense-geomap.json" = builtins.readFile ./dashboards/opnsense-geomap.json;
-      };
-      grafana-dashboard-suricata = {
-        metadata.namespace = ns;
-        metadata.labels."grafana_dashboard" = "1";
-        data."suricata.json" = builtins.readFile ./dashboards/suricata.json;
-      };
-    };
-  };
 in
 {
   imports = with kubenix.modules; [
@@ -41,7 +20,7 @@ in
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.${ns} = {
     submodule = "namespaced";
-    args.kubernetes.resources = lib.foldl' lib.recursiveUpdate { } [ ks-res alloy opnsense-exporter loki-res dashboards ];
+    args.kubernetes.resources = lib.foldl' lib.recursiveUpdate { } [ ks-res alloy opnsense-exporter loki-res ];
     args.kubernetes.helm.releases = lib.recursiveUpdate ks-helm loki-helm;
     args.kubernetes.customTypes = {
       servicemonitors = {
