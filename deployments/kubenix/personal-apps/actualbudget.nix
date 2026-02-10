@@ -15,7 +15,7 @@ in
             repo = "https://community-charts.github.io/helm-charts";
             chart = "actualbudget";
             version = "1.8.7";
-            sha256 = "sha256-D/bQVuVN26EOvZNSwMwOGksqLsVMEspPvdTDkX8bJnU=";
+            sha256 = "sha256-nzBAH+joPO7j2LIlNhuG6Q0riv3exbMbfGR0k24P+7o=";
           };
           includeCRDs = true;
           namespace = ns;

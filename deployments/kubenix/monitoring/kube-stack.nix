@@ -9,7 +9,7 @@ in
         repo = "https://prometheus-community.github.io/helm-charts";
         chart = "kube-prometheus-stack";
         version = "81.6.1";
-        sha256 = "sha256-edZNrpeFAPOesVC+BFBbAAafFyZc/m5Dy26lJpzakG0=";
+        sha256 = "sha256-myNBv1Iia1c+YriK5hJWS4CU+2NBK/nSnPHPO2mVcf0=";
       };
       namespace = ns;
       # includeCRDs = true; fails

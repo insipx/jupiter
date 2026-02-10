@@ -15,7 +15,7 @@ in
             repo = "https://charts.longhorn.io";
             chart = "longhorn";
             version = "1.11.0";
-            sha256 = "sha256-nkS4nvFK+K7J/sE+OxOPY0nR3lkrQF5K7JM5zbXLJ0s=";
+            sha256 = "sha256-s1UBZTlU/AW6ZQmqN9wiQOA76uoWgCBGhenn9Hx3DCQ=";
           };
           noHooks = true;
           namespace = ns;

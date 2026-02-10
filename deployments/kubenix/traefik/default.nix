@@ -39,7 +39,7 @@ in
           repo = "https://helm.traefik.io/traefik";
           chart = "traefik";
           version = "39.1.0-ea.1";
-          sha256 = "sha256-uq7a+/Y1KryUUebMhqQJNe2fQmUH6b+neqo31OvkYcs=";
+          sha256 = "sha256-7MVT4menBVU8QQBYgvBZeFcBEY2PGw3D9bGuMn0YgtA=";
         };
         includeCRDs = true;
         noHooks = true;
