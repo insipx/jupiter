@@ -29,7 +29,7 @@
     ghostty.url = "github:ghostty-org/ghostty";
     ghostty.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     jupiter-secrets = {
-      url = "github:garnix-io/jupiter-secrets";
+      url = "github:insipx/jupiter-secrets";
       # url = "git+ssh://git@github.com/insipx/jupiter-secrets";
       # url = "path:/Users/andrewplaza/code/insipx/jupiter-secrets";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
