@@ -8,7 +8,7 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://prometheus-community.github.io/helm-charts";
         chart = "kube-prometheus-stack";
-        version = "81.6.1";
+        version = "81.6.9";
         sha256 = "sha256-myNBv1Iia1c+YriK5hJWS4CU+2NBK/nSnPHPO2mVcf0=";
       };
       namespace = ns;
