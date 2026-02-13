@@ -35,11 +35,16 @@ inputs.colmena.lib.makeHive {
   ganymede = _: {
     imports = [
       ./../machine-specific/rpi5
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
     deployment = {
       targetHost = "ganymede.jupiter.lan";
       targetUser = "insipx";
-      tags = [ "homelab" "k3s" "control" ];
+      tags = [
+        "homelab"
+        "k3s"
+        "control"
+      ];
     };
     rpiHomeLab = {
       networking = {
@@ -49,7 +54,7 @@ inputs.colmena.lib.makeHive {
         interface = "end0";
       };
     };
-    rpiHomeLab.k3s. leader = true;
+    rpiHomeLab.k3s.leader = true;
     rpiHomeLab.k3s.enable = true;
     rpiHomeLab.k3s.longhorn = true;
     jupiter-secrets.settings.k3s = true;
@@ -63,11 +68,16 @@ inputs.colmena.lib.makeHive {
   io = _: {
     imports = [
       ./../machine-specific/rpi5
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
     deployment = {
       targetHost = "io.jupiter.lan";
       targetUser = "insipx";
-      tags = [ "homelab" "k3s" "control" ];
+      tags = [
+        "homelab"
+        "k3s"
+        "control"
+      ];
     };
     rpiHomeLab = {
       networking = {
@@ -86,10 +96,15 @@ inputs.colmena.lib.makeHive {
   europa = _: {
     imports = [
       ./../machine-specific/rpi5
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
 
     deployment = {
-      tags = [ "homelab" "k3s" "control" ];
+      tags = [
+        "homelab"
+        "k3s"
+        "control"
+      ];
       targetHost = "europa.jupiter.lan";
       targetUser = "insipx";
     };
@@ -111,9 +126,14 @@ inputs.colmena.lib.makeHive {
   callisto = _: {
     imports = [
       ./../machine-specific/rpi5
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
     deployment = {
-      tags = [ "workers" "homelab" "k3s" ];
+      tags = [
+        "workers"
+        "homelab"
+        "k3s"
+      ];
       targetHost = "callisto.jupiter.lan";
       targetUser = "insipx";
     };
@@ -137,10 +157,16 @@ inputs.colmena.lib.makeHive {
   sinope = _: {
     imports = [
       ./../machine-specific/rpi3
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
     jupiter-secrets.settings.k3s = true;
     deployment = {
-      tags = [ "lowpower" "homelab" "k3s" "workers" ];
+      tags = [
+        "lowpower"
+        "homelab"
+        "k3s"
+        "workers"
+      ];
       targetHost = "sinope.jupiter.lan";
       targetUser = "insipx";
     };
@@ -160,10 +186,14 @@ inputs.colmena.lib.makeHive {
   carme = _: {
     imports = [
       ./../machine-specific/kiosk
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
     deployment = {
       targetUser = "insipx";
-      tags = [ "gui" "homelab" ];
+      tags = [
+        "gui"
+        "homelab"
+      ];
       targetHost = "carme.jupiter.lan";
       buildOnTarget = false;
     };
@@ -185,10 +215,14 @@ inputs.colmena.lib.makeHive {
 
     imports = [
       ./../machine-specific/tinyca
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
     deployment = {
       targetUser = "insipx";
-      tags = [ "tinyca" "homelab" ];
+      tags = [
+        "tinyca"
+        "homelab"
+      ];
       targetHost = "volos";
       buildOnTarget = false;
     };
@@ -234,9 +268,14 @@ inputs.colmena.lib.makeHive {
     nixpkgs.system = "x86_64-linux";
     imports = [
       ./../machine-specific/thinkcentre
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
     deployment = {
-      tags = [ "thinkcentre" "homelab" "workers" ];
+      tags = [
+        "thinkcentre"
+        "homelab"
+        "workers"
+      ];
       targetHost = "amalthea.jupiter.lan";
       targetUser = "insipx";
     };
@@ -259,9 +298,14 @@ inputs.colmena.lib.makeHive {
     nixpkgs.system = "x86_64-linux";
     imports = [
       ./../machine-specific/thinkcentre
-    ] ++ commonImports;
+    ]
+    ++ commonImports;
     deployment = {
-      tags = [ "thinkcentre" "homelab" "workers" ];
+      tags = [
+        "thinkcentre"
+        "homelab"
+        "workers"
+      ];
       targetHost = "lysithea.jupiter.lan";
       targetUser = "insipx";
     };

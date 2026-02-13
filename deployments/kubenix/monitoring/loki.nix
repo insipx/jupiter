@@ -61,9 +61,9 @@ in
           deploymentMode = "SimpleScalable";
           querier.max_concurrent = 8;
         };
-        read.extraEnvFrom = [{ secretRef.name = "s3-loki-bucket"; }];
-        write.extraEnvFrom = [{ secretRef.name = "s3-loki-bucket"; }];
-        backend.extraEnvFrom = [{ secretRef.name = "s3-loki-bucket"; }];
+        read.extraEnvFrom = [ { secretRef.name = "s3-loki-bucket"; } ];
+        write.extraEnvFrom = [ { secretRef.name = "s3-loki-bucket"; } ];
+        backend.extraEnvFrom = [ { secretRef.name = "s3-loki-bucket"; } ];
         # Enable env var expansion in Loki config
         read.extraArgs = [ "-config.expand-env=true" ];
         write.extraArgs = [ "-config.expand-env=true" ];

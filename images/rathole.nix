@@ -1,4 +1,8 @@
-{ dockerTools, rathole, writers }:
+{
+  dockerTools,
+  rathole,
+  writers,
+}:
 let
   ratholeConfig = writers.writeTOML "rathole-config.toml" {
     server = {
@@ -17,7 +21,10 @@ dockerTools.buildLayeredImage {
   tag = "latest";
   contents = [ rathole ];
   config = {
-    Entrypoint = [ "${rathole}/bin/rathole" "${ratholeConfig}" ];
+    Entrypoint = [
+      "${rathole}/bin/rathole"
+      "${ratholeConfig}"
+    ];
     ExposedPorts = {
       "443/tcp" = { };
     };

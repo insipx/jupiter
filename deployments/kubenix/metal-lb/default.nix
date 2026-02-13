@@ -3,8 +3,11 @@ let
   ns = "metallb-system";
 in
 {
-  imports = with kubenix.modules;
-    [ k8s helm submodules ];
+  imports = with kubenix.modules; [
+    k8s
+    helm
+    submodules
+  ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.metallb-system = {
     submodule = "namespaced";
@@ -31,11 +34,13 @@ in
       resources = {
         services.metallb-webhook-service = {
           spec = {
-            ports = lib.mkForce [{
-              port = 443;
-              targetPort = 9443;
-              protocol = "TCP";
-            }];
+            ports = lib.mkForce [
+              {
+                port = 443;
+                targetPort = 9443;
+                protocol = "TCP";
+              }
+            ];
           };
         };
         IPAddressPool.default = {

@@ -1,4 +1,9 @@
-{ kubenix, config, pkgs, ... }:
+{
+  kubenix,
+  config,
+  pkgs,
+  ...
+}:
 let
   prometheusApp = {
     label = "prometheus-server";
@@ -19,7 +24,10 @@ let
   '';
 in
 {
-  imports = with kubenix.modules; [ k8s docker ];
+  imports = with kubenix.modules; [
+    k8s
+    docker
+  ];
   docker = {
     registry.url = "ghcr.io/insipx";
     images.prometheus-monitoring.image = pkgs.callPackage ./../images/prometheus.nix { };

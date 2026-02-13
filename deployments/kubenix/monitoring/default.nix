@@ -1,4 +1,9 @@
-{ kubenix, lib, flake, ... }:
+{
+  kubenix,
+  lib,
+  flake,
+  ...
+}:
 let
   ns = "monitoring";
 
@@ -20,7 +25,12 @@ in
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.${ns} = {
     submodule = "namespaced";
-    args.kubernetes.resources = lib.foldl' lib.recursiveUpdate { } [ ks-res alloy opnsense-exporter loki-res ];
+    args.kubernetes.resources = lib.foldl' lib.recursiveUpdate { } [
+      ks-res
+      alloy
+      opnsense-exporter
+      loki-res
+    ];
     args.kubernetes.helm.releases = lib.recursiveUpdate ks-helm loki-helm;
     args.kubernetes.customTypes = {
       servicemonitors = {
@@ -62,4 +72,3 @@ in
     };
   };
 }
-

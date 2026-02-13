@@ -28,8 +28,10 @@ in
   # Rathole Configuration:
   #   Configure Rathole on Fly.io to forward to: 10.10.68.1:8443
 
-  imports = with kubenix.modules;
-    [ k8s submodules ];
+  imports = with kubenix.modules; [
+    k8s
+    submodules
+  ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.kube-system = {
     submodule = "namespaced";
@@ -222,5 +224,3 @@ in
     };
   };
 }
-
-

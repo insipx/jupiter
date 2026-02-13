@@ -65,15 +65,17 @@ in
           };
           dashboardProviders."dashboardproviders.yaml" = {
             apiVersion = 1;
-            providers = [{
-              name = "default";
-              orgId = 1;
-              folder = "";
-              type = "file";
-              disableDeletion = true;
-              editable = true;
-              options.path = "/var/lib/grafana/dashboards/default";
-            }];
+            providers = [
+              {
+                name = "default";
+                orgId = 1;
+                folder = "";
+                type = "file";
+                disableDeletion = true;
+                editable = true;
+                options.path = "/var/lib/grafana/dashboards/default";
+              }
+            ];
           };
           additionalDataSources = [
             {
@@ -101,10 +103,12 @@ in
         prometheus-node-exporter.prometheus.monitor = {
           enabled = true;
           attachMetadata.node = true;
-          relabelings = [{
-            sourceLabels = [ "__meta_kubernetes_pod_node_name" ];
-            targetLabel = "instance";
-          }];
+          relabelings = [
+            {
+              sourceLabels = [ "__meta_kubernetes_pod_node_name" ];
+              targetLabel = "instance";
+            }
+          ];
         };
 
       };
@@ -192,51 +196,53 @@ in
       metadata.namespace = ns;
       metadata.name = "unbound-alerts";
       metadata.labels."prometheus" = "kube-prometheus-stack-prometheus";
-      spec.groups = [{
-        name = "unbound";
-        rules = [
-          {
-            alert = "UnboundExporterDown";
-            expr = "up{job=\"unbound\"} == 0";
-            "for" = "5m";
-            labels.severity = "critical";
-            annotations = {
-              summary = "Unbound exporter is down";
-              description = "Unbound exporter on {{ $labels.instance }} has been down for more than 5 minutes.";
-            };
-          }
-          {
-            alert = "UnboundDown";
-            expr = "unbound_up == 0";
-            "for" = "2m";
-            labels.severity = "critical";
-            annotations = {
-              summary = "Unbound DNS resolver is down";
-              description = "Unbound DNS resolver is not responding to the exporter.";
-            };
-          }
-          {
-            alert = "UnboundHighRecursionTime";
-            expr = "histogram_quantile(0.95, rate(unbound_response_time_seconds_bucket[5m])) > 2";
-            "for" = "10m";
-            labels.severity = "warning";
-            annotations = {
-              summary = "Unbound DNS high recursion time";
-              description = "95th percentile DNS recursion time is above 2 seconds for 10 minutes.";
-            };
-          }
-          {
-            alert = "UnboundCacheHitRateLow";
-            expr = "rate(unbound_cache_hits_total[5m]) / (rate(unbound_cache_hits_total[5m]) + rate(unbound_cache_misses_total[5m])) < 0.5";
-            "for" = "15m";
-            labels.severity = "warning";
-            annotations = {
-              summary = "Unbound cache hit rate is low";
-              description = "Unbound cache hit rate has dropped below 50% for 15 minutes.";
-            };
-          }
-        ];
-      }];
+      spec.groups = [
+        {
+          name = "unbound";
+          rules = [
+            {
+              alert = "UnboundExporterDown";
+              expr = "up{job=\"unbound\"} == 0";
+              "for" = "5m";
+              labels.severity = "critical";
+              annotations = {
+                summary = "Unbound exporter is down";
+                description = "Unbound exporter on {{ $labels.instance }} has been down for more than 5 minutes.";
+              };
+            }
+            {
+              alert = "UnboundDown";
+              expr = "unbound_up == 0";
+              "for" = "2m";
+              labels.severity = "critical";
+              annotations = {
+                summary = "Unbound DNS resolver is down";
+                description = "Unbound DNS resolver is not responding to the exporter.";
+              };
+            }
+            {
+              alert = "UnboundHighRecursionTime";
+              expr = "histogram_quantile(0.95, rate(unbound_response_time_seconds_bucket[5m])) > 2";
+              "for" = "10m";
+              labels.severity = "warning";
+              annotations = {
+                summary = "Unbound DNS high recursion time";
+                description = "95th percentile DNS recursion time is above 2 seconds for 10 minutes.";
+              };
+            }
+            {
+              alert = "UnboundCacheHitRateLow";
+              expr = "rate(unbound_cache_hits_total[5m]) / (rate(unbound_cache_hits_total[5m]) + rate(unbound_cache_misses_total[5m])) < 0.5";
+              "for" = "15m";
+              labels.severity = "warning";
+              annotations = {
+                summary = "Unbound cache hit rate is low";
+                description = "Unbound cache hit rate has dropped below 50% for 15 minutes.";
+              };
+            }
+          ];
+        }
+      ];
     };
   };
 }

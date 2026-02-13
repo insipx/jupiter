@@ -1,10 +1,12 @@
-{ config
-, kubenix
-, lib
-, name
-, args
-, ...
-}: {
+{
+  config,
+  kubenix,
+  lib,
+  name,
+  args,
+  ...
+}:
+{
   imports = with kubenix.modules; [
     submodule
     k8s

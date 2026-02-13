@@ -1,4 +1,5 @@
-{ lib, config, ... }: {
+{ lib, config, ... }:
+{
   options = {
     rpiHomeLab = {
       networking = {
@@ -80,8 +81,10 @@
         serverAddr = lib.mkIf (!config.rpiHomeLab.k3s.leader) config.rpiHomeLab.k3s.leaderAddress;
         clusterInit = config.rpiHomeLab.k3s.leader;
         tokenFile = config.sops.secrets.k3s_token.path;
-        extraFlags = [ "--debug" ]
-          ++ lib.optionals (!config.rpiHomeLab.k3s.agent) [ "--disable=servicelb" ];
+        extraFlags = [
+          "--debug"
+        ]
+        ++ lib.optionals (!config.rpiHomeLab.k3s.agent) [ "--disable=servicelb" ];
         nodeLabel = lib.mkIf config.rpiHomeLab.k3s.longhorn [ "longhorn-storage=enabled" ];
       };
       # longhorn related

@@ -3,8 +3,11 @@ let
   ns = "longhorn-system";
 in
 {
-  imports = with kubenix.modules;
-    [ k8s helm submodules ];
+  imports = with kubenix.modules; [
+    k8s
+    helm
+    submodules
+  ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.longhorn-system = {
     submodule = "namespaced";
@@ -33,11 +36,13 @@ in
             longhornAdmissionWebhook.replicas = 1;
             longhornRecoveryBackend.replicas = 1;
             longhornManager = {
-              tolerations = [{
-                key = "node-role.kubernetes.io/control-plane";
-                operator = "Exists";
-                effect = "NoSchedule";
-              }];
+              tolerations = [
+                {
+                  key = "node-role.kubernetes.io/control-plane";
+                  operator = "Exists";
+                  effect = "NoSchedule";
+                }
+              ];
               nodeSelector = {
                 "longhorn-storage" = "enabled";
               };
@@ -48,10 +53,12 @@ in
       resources = {
         daemonSets.longhorn-manager = {
           metadata.namespace = ns;
-          spec.template.spec.containers.longhorn-manager.env = [{
-            name = "PATH";
-            value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/run/wrappers/bin:/run/current-system/sw/bin";
-          }];
+          spec.template.spec.containers.longhorn-manager.env = [
+            {
+              name = "PATH";
+              value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/run/wrappers/bin:/run/current-system/sw/bin";
+            }
+          ];
         };
         ingressroute.longhorn-dashboard = {
           metadata = {

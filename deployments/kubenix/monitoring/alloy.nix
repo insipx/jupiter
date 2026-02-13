@@ -23,7 +23,10 @@ in
           initContainers.geoip-download = {
             name = "geoip-download";
             image = "curlimages/curl:8.11.0";
-            command = [ "/bin/sh" "-c" ];
+            command = [
+              "/bin/sh"
+              "-c"
+            ];
             args = [
               ''
                 for i in 1 2 3 4 5; do
@@ -37,17 +40,21 @@ in
                 ls -la /geoip/
               ''
             ];
-            env = [{
-              name = "MAXMIND_LICENSE_KEY";
-              valueFrom.secretKeyRef = {
-                name = "maxmind-license";
-                key = "license-key";
-              };
-            }];
-            volumeMounts = [{
-              name = "geoip-data";
-              mountPath = "/geoip";
-            }];
+            env = [
+              {
+                name = "MAXMIND_LICENSE_KEY";
+                valueFrom.secretKeyRef = {
+                  name = "maxmind-license";
+                  key = "license-key";
+                };
+              }
+            ];
+            volumeMounts = [
+              {
+                name = "geoip-data";
+                mountPath = "/geoip";
+              }
+            ];
           };
           containers."${alloyImg.label}" = {
             name = "${alloyImg.label}";
@@ -141,11 +148,13 @@ in
     metadata.namespace = ns;
     spec = {
       selector.app = "${alloyImg.label}";
-      ports = [{
-        name = "http";
-        inherit (alloyImg) port;
-        targetPort = alloyImg.port;
-      }];
+      ports = [
+        {
+          name = "http";
+          inherit (alloyImg) port;
+          targetPort = alloyImg.port;
+        }
+      ];
       type = "ClusterIP";
     };
   };
@@ -153,18 +162,20 @@ in
     metadata.namespace = ns;
     spec = {
       selector.app = "${alloyImg.label}";
-      ports = [{
-        name = "ingest-udp";
-        port = lokiPort;
-        targetPort = lokiPort;
-        protocol = "UDP";
-      }
+      ports = [
+        {
+          name = "ingest-udp";
+          port = lokiPort;
+          targetPort = lokiPort;
+          protocol = "UDP";
+        }
         {
           name = "ingest-tcp";
           port = lokiPort;
           targetPort = lokiPort;
           protocol = "TCP";
-        }];
+        }
+      ];
       type = "LoadBalancer";
       loadBalancerIP = "10.10.68.100";
     };

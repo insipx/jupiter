@@ -1,5 +1,7 @@
 # internal helper to write a fish script
-{ writeTextFile, fish, ... }: name: text: writeTextFile {
+{ writeTextFile, fish, ... }:
+name: text:
+writeTextFile {
   inherit name;
   executable = true;
   destination = "/bin/${name}";

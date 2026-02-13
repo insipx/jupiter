@@ -1,4 +1,5 @@
-{ inputs, pkgs, ... }: {
+{ inputs, pkgs, ... }:
+{
   imports = with inputs.nixos-raspberrypi.nixosModules; [
     ./../rpi5/kernel.nix
     raspberry-pi-5.base
@@ -36,7 +37,12 @@
     services.cage-kiosk = {
       description = "jupiter homelab monitoring kiosk";
       documentation = [ "man:cage(1)" ];
-      after = [ "systemd-user-sessions.service" "network-online.target" "sound.target" "systemd-logind.service" ];
+      after = [
+        "systemd-user-sessions.service"
+        "network-online.target"
+        "sound.target"
+        "systemd-logind.service"
+      ];
       before = [ "getty@tty1.service" ];
       conflicts = [ "getty@tty1.service" ];
       wants = [ "network-online.target" ];
@@ -94,12 +100,3 @@
     };
   };
 }
-
-
-
-
-
-
-
-
-

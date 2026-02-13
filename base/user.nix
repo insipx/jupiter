@@ -1,4 +1,5 @@
-{ config, ... }: {
+{ config, ... }:
+{
   # Use less privileged nixos user
   users.users.insipx = {
     isNormalUser = true;
@@ -49,7 +50,10 @@
   };
 
   # allow nix-copy to live system
-  nix.settings.trusted-users = [ "root" "insipx" ];
+  nix.settings.trusted-users = [
+    "root"
+    "insipx"
+  ];
 
   # We are stateless, so just default to latest.
   system.stateVersion = config.system.nixos.release;

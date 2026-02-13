@@ -47,12 +47,22 @@
     ];
   };
 
-  outputs = inputs@{ self, flake-parts, nixos-raspberrypi, nixpkgs, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } (_:
+  outputs =
+    inputs@{
+      self,
+      flake-parts,
+      nixos-raspberrypi,
+      nixpkgs,
+      ...
+    }:
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      _:
       let
-        homelabModules.default = { ... }: {
-          imports = [ ./homelab ];
-        };
+        homelabModules.default =
+          { ... }:
+          {
+            imports = [ ./homelab ];
+          };
       in
       {
         imports = [
@@ -61,21 +71,34 @@
           inputs.flake-parts.flakeModules.easyOverlay
         ];
         systems = import inputs.systems;
-        perSystem = { pkgs, self', system, inputs', ... }:
+        perSystem =
+          {
+            pkgs,
+            self',
+            system,
+            inputs',
+            ...
+          }:
           let
             extra = _: prev: {
               writeFishScriptBin = pkgs.callPackage ./scripts/write_fish_script { };
             };
             kubenixPkg = inputs'.kubenix.packages.default.override {
               module = import ./deployments/kubenix/default.nix;
-              specialArgs = { flake = self; };
+              specialArgs = {
+                flake = self;
+              };
             };
           in
           {
             # pkgsDirectory = ./deployments;
             _module.args = import nixos-raspberrypi.inputs.nixpkgs {
               inherit system;
-              overlays = [ inputs.ghostty.overlays.default inputs.jupiter-secrets.overlays.default extra ];
+              overlays = [
+                inputs.ghostty.overlays.default
+                inputs.jupiter-secrets.overlays.default
+                extra
+              ];
             };
             devShells.default = pkgs.mkShell {
               nativeBuildInputs = [
@@ -93,64 +116,64 @@
               kubenix = kubenixPkg;
             };
           };
-        flake =
-          {
-            inherit homelabModules;
-            lib = {
-              hostname = "jupiter.lan";
-              external-hostname = "insipx.xyz";
-              secrets = inputs.jupiter-secrets.outPath;
-            };
-            nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystemFull {
-              modules = [
-                homelabModules.default
-                {
-                  rpiHomeLab = {
-                    networking = {
-                      hostId = "c6c81d8d"; # this should be unique per-machine
-                      hostName = "elara"; # change before installing
-                      address = "10.10.69.20/23"; # change before installing
-                      interface = "end0";
-                    };
-                    k3s.enable = false;
-                  };
-                  imports = [
-                    ./base
-                    ./machine-specific/pihole
-                    # ./machine-specific/rpi5
-                    # ./machine-specific/rpi4
-                    # ./machine-specific/rpi3
-                  ];
-                }
-              ];
-              specialArgs = inputs;
-            };
-            nixosConfigurations.x86Install = nixpkgs.lib.nixosSystem {
-              system = "x86_64-linux";
-              modules = [
-                {
-                  rpiHomeLab = {
-                    networking = {
-                      hostId = "a3a7b911"; # this should be unique per-machine
-                      hostName = "lysithea"; # change before installing
-                      address = "10.10.69.51/23"; # change before installing
-                      interface = "enp0s31f6";
-                    };
-                    k3s.enable = false;
-                  };
-                  imports = [
-                    homelabModules.default
-                    inputs.disko.nixosModules.disko
-                    inputs.jupiter-secrets.nixosModules.default
-
-                    ./base
-                    ./machine-specific/thinkcentre
-                  ];
-                }
-              ];
-              specialArgs = { inherit inputs; };
-            };
-            colmenaHive = import ./hive { inherit inputs homelabModules; };
+        flake = {
+          inherit homelabModules;
+          lib = {
+            hostname = "jupiter.lan";
+            external-hostname = "insipx.xyz";
+            secrets = inputs.jupiter-secrets.outPath;
           };
-      });
+          nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystemFull {
+            modules = [
+              homelabModules.default
+              {
+                rpiHomeLab = {
+                  networking = {
+                    hostId = "c6c81d8d"; # this should be unique per-machine
+                    hostName = "elara"; # change before installing
+                    address = "10.10.69.20/23"; # change before installing
+                    interface = "end0";
+                  };
+                  k3s.enable = false;
+                };
+                imports = [
+                  ./base
+                  ./machine-specific/pihole
+                  # ./machine-specific/rpi5
+                  # ./machine-specific/rpi4
+                  # ./machine-specific/rpi3
+                ];
+              }
+            ];
+            specialArgs = inputs;
+          };
+          nixosConfigurations.x86Install = nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            modules = [
+              {
+                rpiHomeLab = {
+                  networking = {
+                    hostId = "a3a7b911"; # this should be unique per-machine
+                    hostName = "lysithea"; # change before installing
+                    address = "10.10.69.51/23"; # change before installing
+                    interface = "enp0s31f6";
+                  };
+                  k3s.enable = false;
+                };
+                imports = [
+                  homelabModules.default
+                  inputs.disko.nixosModules.disko
+                  inputs.jupiter-secrets.nixosModules.default
+
+                  ./base
+                  ./machine-specific/thinkcentre
+                ];
+              }
+            ];
+            specialArgs = { inherit inputs; };
+          };
+          colmenaHive = import ./hive { inherit inputs homelabModules; };
+        };
+      }
+    );
 }

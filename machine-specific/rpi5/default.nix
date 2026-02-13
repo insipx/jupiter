@@ -1,4 +1,5 @@
-{ inputs, ... }: {
+{ inputs, ... }:
+{
   imports = with inputs.nixos-raspberrypi.nixosModules; [
     ./kernel.nix
     ./config.nix
@@ -12,4 +13,3 @@
   ];
   services.getty.autologinUser = "insipx";
 }
-

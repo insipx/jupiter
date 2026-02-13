@@ -3,8 +3,11 @@ let
   ns = "pihole-sys";
 in
 {
-  imports = with kubenix.modules;
-    [ k8s helm submodules ];
+  imports = with kubenix.modules; [
+    k8s
+    helm
+    submodules
+  ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.${ns} = {
     submodule = "namespaced";
@@ -47,14 +50,18 @@ in
           metadata.namespace = ns;
           spec = {
             entryPoints = [ "websecure" ];
-            routes = [{
-              match = "Host(`pihole.${flake.lib.hostname}`)";
-              kind = "Rule";
-              services = [{
-                name = "pihole-web"; # check the service name the chart creates
-                port = 80; # default pihole port
-              }];
-            }];
+            routes = [
+              {
+                match = "Host(`pihole.${flake.lib.hostname}`)";
+                kind = "Rule";
+                services = [
+                  {
+                    name = "pihole-web"; # check the service name the chart creates
+                    port = 80; # default pihole port
+                  }
+                ];
+              }
+            ];
             tls = { };
           };
         };

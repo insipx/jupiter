@@ -24,9 +24,8 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": null,
+  "id": 30,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "datasource": {
@@ -44,7 +43,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -95,6 +94,7 @@
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -102,6 +102,7 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "titleSize": 16,
           "valueSize": 32
@@ -109,7 +110,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -117,7 +118,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(increase(node_network_receive_bytes_total{job=\"opnsense\", device=~\"$interface\"}[$__range]))",
+          "expr": "sum(increase(node_network_receive_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[$__range]))",
           "instant": true,
           "legendFormat": "Total In",
           "range": false,
@@ -129,7 +130,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(increase(node_network_transmit_bytes_total{job=\"opnsense\", device=~\"$interface\"}[$__range]))",
+          "expr": "sum(increase(node_network_transmit_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[$__range]))",
           "hide": false,
           "instant": true,
           "legendFormat": "Total Out",
@@ -156,7 +157,7 @@
             "steps": [
               {
                 "color": "blue",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -207,6 +208,7 @@
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -214,6 +216,7 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "titleSize": 16,
           "valueSize": 32
@@ -221,7 +224,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -229,7 +232,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_network_receive_bytes_total{job=\"opnsense\", device=~\"$interface\"}[1m])) * 8",
+          "expr": "sum(rate(node_network_receive_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[1m])) * 8",
           "instant": true,
           "legendFormat": "Current In",
           "range": false,
@@ -241,7 +244,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_network_transmit_bytes_total{job=\"opnsense\", device=~\"$interface\"}[1m])) * 8",
+          "expr": "sum(rate(node_network_transmit_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[1m])) * 8",
           "hide": false,
           "instant": true,
           "legendFormat": "Current Out",
@@ -269,6 +272,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "opacity",
@@ -285,6 +289,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -300,7 +305,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -362,11 +367,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -374,7 +380,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_network_receive_bytes_total{job=\"opnsense\", device=~\"$interface\"}[1m])) * 8",
+          "expr": "sum(rate(node_network_receive_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[1m])) * 8",
           "legendFormat": "Total In",
           "range": true,
           "refId": "A"
@@ -385,7 +391,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_network_transmit_bytes_total{job=\"opnsense\", device=~\"$interface\"}[1m])) * 8",
+          "expr": "sum(rate(node_network_transmit_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[1m])) * 8",
           "hide": false,
           "legendFormat": "Total Out",
           "range": true,
@@ -412,6 +418,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "opacity",
@@ -428,6 +435,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -443,7 +451,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -505,11 +513,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -517,7 +526,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total{job=\"opnsense\", device=~\"$interface\"}[1m]) * 8",
+          "expr": "rate(node_network_receive_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[1m]) * 8",
           "legendFormat": "{{device}} In",
           "range": true,
           "refId": "A"
@@ -528,7 +537,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total{job=\"opnsense\", device=~\"$interface\"}[1m]) * 8",
+          "expr": "rate(node_network_transmit_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[1m]) * 8",
           "hide": false,
           "legendFormat": "{{device}} Out",
           "range": true,
@@ -554,7 +563,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -579,6 +588,12 @@
       "id": 5,
       "options": {
         "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
         "maxVizHeight": 300,
         "minVizHeight": 16,
         "minVizWidth": 8,
@@ -595,7 +610,7 @@
         "sizing": "auto",
         "valueMode": "color"
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -603,7 +618,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "topk(10, increase(node_network_receive_bytes_total{job=\"opnsense\", device=~\"$interface\"}[$__range]))",
+          "expr": "topk(10, increase(node_network_receive_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[$__range]))",
           "instant": true,
           "legendFormat": "{{device}}",
           "range": false,
@@ -629,7 +644,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -654,6 +669,12 @@
       "id": 6,
       "options": {
         "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
         "maxVizHeight": 300,
         "minVizHeight": 16,
         "minVizWidth": 8,
@@ -670,7 +691,7 @@
         "sizing": "auto",
         "valueMode": "color"
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -678,7 +699,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "topk(10, increase(node_network_transmit_bytes_total{job=\"opnsense\", device=~\"$interface\"}[$__range]))",
+          "expr": "topk(10, increase(node_network_transmit_bytes_total{job=\"node_exporter\", device=~\"$interface\"}[$__range]))",
           "instant": true,
           "legendFormat": "{{device}}",
           "range": false,
@@ -704,7 +725,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -755,6 +776,7 @@
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -762,6 +784,7 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "titleSize": 16,
           "valueSize": 32
@@ -769,7 +792,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -777,7 +800,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_network_receive_packets_total{job=\"opnsense\", device=~\"$interface\"}[1m]))",
+          "expr": "sum(rate(node_network_receive_packets_total{job=\"node_exporter\", device=~\"$interface\"}[1m]))",
           "instant": true,
           "legendFormat": "Packets In",
           "range": false,
@@ -789,7 +812,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_network_transmit_packets_total{job=\"opnsense\", device=~\"$interface\"}[1m]))",
+          "expr": "sum(rate(node_network_transmit_packets_total{job=\"node_exporter\", device=~\"$interface\"}[1m]))",
           "hide": false,
           "instant": true,
           "legendFormat": "Packets Out",
@@ -816,7 +839,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -905,6 +928,7 @@
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -912,6 +936,7 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "titleSize": 16,
           "valueSize": 32
@@ -919,7 +944,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -927,7 +952,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(increase(node_network_receive_errs_total{job=\"opnsense\", device=~\"$interface\"}[$__range]))",
+          "expr": "sum(increase(node_network_receive_errs_total{job=\"node_exporter\", device=~\"$interface\"}[$__range]))",
           "instant": true,
           "legendFormat": "RX Errors",
           "range": false,
@@ -939,7 +964,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(increase(node_network_transmit_errs_total{job=\"opnsense\", device=~\"$interface\"}[$__range]))",
+          "expr": "sum(increase(node_network_transmit_errs_total{job=\"node_exporter\", device=~\"$interface\"}[$__range]))",
           "hide": false,
           "instant": true,
           "legendFormat": "TX Errors",
@@ -952,7 +977,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(increase(node_network_receive_drop_total{job=\"opnsense\", device=~\"$interface\"}[$__range]))",
+          "expr": "sum(increase(node_network_receive_drop_total{job=\"node_exporter\", device=~\"$interface\"}[$__range]))",
           "hide": false,
           "instant": true,
           "legendFormat": "RX Drops",
@@ -965,7 +990,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(increase(node_network_transmit_drop_total{job=\"opnsense\", device=~\"$interface\"}[$__range]))",
+          "expr": "sum(increase(node_network_transmit_drop_total{job=\"node_exporter\", device=~\"$interface\"}[$__range]))",
           "hide": false,
           "instant": true,
           "legendFormat": "TX Drops",
@@ -993,6 +1018,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "opacity",
@@ -1009,6 +1035,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1024,7 +1051,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -1086,11 +1113,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.2",
       "targets": [
         {
           "datasource": {
@@ -1098,7 +1126,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_network_receive_packets_total{job=\"opnsense\", device=~\"$interface\"}[1m]))",
+          "expr": "sum(rate(node_network_receive_packets_total{job=\"node_exporter\", device=~\"$interface\"}[1m]))",
           "legendFormat": "Total In",
           "range": true,
           "refId": "A"
@@ -1109,7 +1137,7 @@
             "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(node_network_transmit_packets_total{job=\"opnsense\", device=~\"$interface\"}[1m]))",
+          "expr": "sum(rate(node_network_transmit_packets_total{job=\"node_exporter\", device=~\"$interface\"}[1m]))",
           "hide": false,
           "legendFormat": "Total Out",
           "range": true,
@@ -1120,8 +1148,9 @@
       "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "30s",
-  "schemaVersion": 39,
+  "schemaVersion": 42,
   "tags": [
     "network",
     "traffic",
@@ -1131,27 +1160,21 @@
     "list": [
       {
         "current": {
-          "selected": false,
           "text": "Prometheus",
           "value": "prometheus"
         },
-        "hide": 0,
         "includeAll": false,
         "label": "Prometheus",
-        "multi": false,
         "name": "prometheus_datasource",
         "options": [],
         "query": "prometheus",
-        "queryValue": "",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "type": "datasource"
       },
       {
         "allValue": ".*",
         "current": {
-          "selected": true,
           "text": [
             "All"
           ],
@@ -1163,20 +1186,18 @@
           "type": "prometheus",
           "uid": "${prometheus_datasource}"
         },
-        "definition": "label_values(node_network_receive_bytes_total{job=\"opnsense\"},device)",
-        "hide": 0,
+        "definition": "label_values(node_network_receive_bytes_total{job=\"node_exporter\"},device)",
         "includeAll": true,
         "label": "Interface",
         "multi": true,
         "name": "interface",
         "options": [],
         "query": {
-          "query": "label_values(node_network_receive_bytes_total{job=\"opnsense\"},device)",
+          "query": "label_values(node_network_receive_bytes_total{job=\"node_exporter\"},device)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       }
@@ -1190,6 +1211,5 @@
   "timezone": "browser",
   "title": "Network Traffic",
   "uid": "network-traffic-overview",
-  "version": 1,
-  "weekStart": ""
+  "version": 2
 }

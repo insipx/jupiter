@@ -1,7 +1,9 @@
-{ inputs
-, pkgs
-, ...
-}: {
+{
+  inputs,
+  pkgs,
+  ...
+}:
+{
   nixpkgs.system = "aarch64-linux";
   imports = [
     inputs.nixos-raspberrypi.lib.inject-overlays
@@ -14,7 +16,10 @@
     raspberrypi-utils
   ];
   boot.blacklistedKernelModules = [ "vc4" ];
-  boot.kernelModules = [ "vc4" "dm_crypt" ];
+  boot.kernelModules = [
+    "vc4"
+    "dm_crypt"
+  ];
   systemd.services.modprobe-vc4 = {
     serviceConfig = {
       Type = "oneshot";

@@ -3,7 +3,11 @@ let
   ns = "step-issuer";
 in
 {
-  imports = with kubenix.modules; [ k8s helm submodules ];
+  imports = with kubenix.modules; [
+    k8s
+    helm
+    submodules
+  ];
   submodules.imports = [ ../lib/namespaced.nix ];
   submodules.instances.step-issuer = {
     submodule = "namespaced";

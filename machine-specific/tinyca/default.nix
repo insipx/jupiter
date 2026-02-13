@@ -1,4 +1,5 @@
-{ inputs, pkgs, ... }: {
+{ inputs, pkgs, ... }:
+{
   imports = with inputs.nixos-raspberrypi.nixosModules; [
     ./../rpi5/kernel.nix
     raspberry-pi-5.base

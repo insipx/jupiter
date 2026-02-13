@@ -56,11 +56,20 @@ in
   fileSystems."/var/lib/longhorn" = {
     device = "/dev/zvol/rpool/longhorn-ext4";
     fsType = "ext4";
-    options = [ "noatime" "discard" ];
+    options = [
+      "noatime"
+      "discard"
+    ];
   };
   boot = {
-    supportedFilesystems = [ "zfs" "vfat" ];
-    initrd.supportedFilesystems = [ "zfs" "vfat" ];
+    supportedFilesystems = [
+      "zfs"
+      "vfat"
+    ];
+    initrd.supportedFilesystems = [
+      "zfs"
+      "vfat"
+    ];
     tmp.useTmpfs = true;
     kernelModules = [ "dm_crypt" ];
   };
@@ -97,7 +106,7 @@ in
 
         };
       };
-    }; #nvme0
+    }; # nvme0
 
     zpool = {
       rpool = {
