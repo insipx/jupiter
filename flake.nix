@@ -33,7 +33,6 @@
       # url = "git+ssh://git@github.com/insipx/jupiter-secrets";
       # url = "path:/Users/andrewplaza/code/insipx/jupiter-secrets";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
-      inputs.sops-nix.inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
     kubenix.url = "github:hall/kubenix";
   };
