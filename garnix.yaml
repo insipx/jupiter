@@ -1,0 +1,11 @@
+builds:
+  exclude:
+    - "nixosConfigurations.rpi5Install.*"
+    - "nixosConfigurations.x86Install.*"
+  include:
+    - "*.x86_64-linux.*"
+    - defaultPackage.x86_64-linux
+    - devShell.x86_64-linux
+    - homeConfigurations.*
+    - darwinConfigurations.*
+    - nixosConfigurations.*

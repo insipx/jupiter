@@ -34,6 +34,11 @@
       # url = "path:/Users/andrewplaza/code/insipx/jupiter-secrets";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
+    crane.url = "github:ipetkov/crane";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     kubenix.url = "github:hall/kubenix";
   };
   nixConfig = {
@@ -67,6 +72,7 @@
       {
         imports = [
           ./scripts
+          ./pkgs
           inputs.pkgs-by-name-for-flake-parts.flakeModule
           inputs.flake-parts.flakeModules.easyOverlay
         ];
@@ -98,6 +104,7 @@
                 inputs.ghostty.overlays.default
                 inputs.jupiter-secrets.overlays.default
                 extra
+                (import inputs.rust-overlay)
               ];
             };
             devShells.default = pkgs.mkShell {
