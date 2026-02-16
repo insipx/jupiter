@@ -3,12 +3,13 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+
 jobs:
   checks:
     uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v24
     secrets:
       nixbuild_token: ${{ secrets.nixbuild_token }}
+      github_access_token: ${{ secrets.GH_PAT }}
     with:
       filter_builds: '.top_attr == "checks" or .top_attr == "packages"'
 
