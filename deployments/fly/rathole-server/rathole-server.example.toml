@@ -1,0 +1,27 @@
+# Rathole Server Configuration Example
+# Copy this to rathole-server.toml and configure with your values
+# Deploy secrets using: fly secrets set RATHOLE_CONFIG="$(cat rathole-server.toml)"
+
+[server]
+bind_addr = "0.0.0.0:2333" # Bind to all interfaces on port 2333
+default_token = "YOUR_SECRET_TOKEN_HERE" # Replace with a secure token
+
+# Optional: Enable heartbeat to detect dead connections
+# heartbeat_interval = 30
+
+# Optional: Enable noise protocol for encryption
+# [server.transport]
+# type = "noise"
+
+# Define services that clients can forward
+[server.services.web]
+bind_addr = "0.0.0.0:8080" # The address rathole will listen on for this service
+# token = "service_specific_token" # Optional: override default token
+
+# Example: SSH service
+# [server.services.ssh]
+# bind_addr = "0.0.0.0:2222"
+
+# Example: Custom service
+# [server.services.myapp]
+# bind_addr = "0.0.0.0:3000"
