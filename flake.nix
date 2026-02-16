@@ -21,7 +21,6 @@
       # inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
     pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
-    systems.url = "github:nix-systems/default";
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
@@ -45,10 +44,12 @@
     extra-substituters = [
       "https://nixos-raspberrypi.cachix.org"
       "https://nix-community.cachix.org"
+      "https://insipx.cachix.org"
     ];
     extra-trusted-public-keys = [
       "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "insipx.cachix.org-1:JMvQq3zItXN5AO7VfPUAILAwMXQrzQ78rLoQTktWs14="
     ];
   };
 
@@ -76,7 +77,11 @@
           inputs.pkgs-by-name-for-flake-parts.flakeModule
           inputs.flake-parts.flakeModules.easyOverlay
         ];
-        systems = import inputs.systems;
+        systems = [
+          "aarch64-darwin"
+          "aarch64-linux"
+          "x86_64-linux"
+        ];
         perSystem =
           {
             pkgs,
