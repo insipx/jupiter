@@ -2,7 +2,7 @@ name: Build & Push Images
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   checks:
