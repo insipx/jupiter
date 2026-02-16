@@ -8,7 +8,7 @@ jobs:
   checks:
     uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v24
     secrets:
-      nixbuild_token: ${{ secrets.nixbuild_token }}
+      nixbuild_token: ${{ secrets.NIXBUILD_SECRET }}
       github_access_token: ${{ secrets.GH_PAT }}
     with:
       filter_builds: '.top_attr == "checks" or .top_attr == "packages"'
