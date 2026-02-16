@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-
+  workflow_dispatch:
 jobs:
   checks:
     uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v24

@@ -10,7 +10,7 @@ let
     owner = "rathole-org";
     repo = "rathole";
     tag = "v0.5.0";
-    hash = "sha256-jSwqEJcRv2PwBEY7dV20x9d0GjPb/eZ0w7j1e4YlYH8=";
+    hash = "sha256-YfLzR1lHk+0N3YU1XTNxz+KE1S3xaiKJk0zASm6cr1s=";
   };
   src = craneLib.cleanCargoSource "${git}/";
 
