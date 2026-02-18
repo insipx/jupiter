@@ -156,9 +156,6 @@
                 imports = [
                   ./base
                   ./machine-specific/pihole
-                  # ./machine-specific/rpi5
-                  # ./machine-specific/rpi4
-                  # ./machine-specific/rpi3
                 ];
               }
             ];
