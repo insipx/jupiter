@@ -38,10 +38,6 @@ in
               "--exporter.instance-label=opnsense-exporter"
               "--opnsense.insecure"
               "--web.listen-address=:8080"
-              # Disable collectors that require additional API permissions
-              # Remove these flags after granting API user access to gateways/firmware
-              "--exporter.disable-gateways"
-              "--exporter.disable-firmware"
             ];
             env = [
               {
