@@ -78,6 +78,7 @@
         imports = [
           ./scripts
           ./pkgs
+          ./ci.nix
           inputs.pkgs-by-name-for-flake-parts.flakeModule
           inputs.flake-parts.flakeModules.easyOverlay
         ];

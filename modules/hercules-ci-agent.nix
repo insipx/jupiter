@@ -10,8 +10,11 @@
 #        /var/lib/hercules-ci-agent/secrets/binary-caches.json
 #   4. Deploy: colmena apply --on @hercules-ci
 
-_:
+{ config, ... }:
 
+let
+  nixbuildKeyPath = "/var/lib/hercules-ci-agent/secrets/nixbuild_ed25519";
+in
 {
   # ---------------------------------------------------------------------------
   # Hercules CI Agent
@@ -24,6 +27,26 @@ _:
       # Keep low — heavy builds are delegated to nixbuild.net.
       # Local slots handle evaluation and light tasks.
       concurrentTasks = 4;
+    };
+  };
+
+  # ---------------------------------------------------------------------------
+  # SSH key — copy the host key so the hercules-ci-agent user can read it.
+  # The host key at /etc/ssh/ssh_host_ed25519_key is root-only (0600).
+  # ---------------------------------------------------------------------------
+
+  systemd.services.hercules-ci-agent-nixbuild-key = {
+    description = "Copy SSH host key for hercules-ci-agent nixbuild access";
+    wantedBy = [ "multi-user.target" ];
+    before = [ "hercules-ci-agent.service" ];
+    requiredBy = [ "hercules-ci-agent.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = toString [
+        "/bin/sh" "-c"
+        "install -m 0600 -o hercules-ci-agent -g hercules-ci-agent /etc/ssh/ssh_host_ed25519_key ${nixbuildKeyPath}"
+      ];
     };
   };
 
@@ -44,7 +67,7 @@ _:
         PubkeyAcceptedKeyTypes ssh-ed25519
         ServerAliveInterval 60
         IPQoS throughput
-        IdentityFile /etc/ssh/ssh_host_ed25519_key
+        IdentityFile ${nixbuildKeyPath}
     '';
   };
 
@@ -68,28 +91,20 @@ _:
       {
         hostName = "eu.nixbuild.net";
         sshUser = "root";
-        sshKey = "/etc/ssh/ssh_host_ed25519_key";
+        sshKey = nixbuildKeyPath;
         system = "x86_64-linux";
         maxJobs = 100;
         speedFactor = 4;
-        supportedFeatures = [
-          "benchmark"
-          "big-parallel"
-          "nixos-test"
-          "kvm"
-        ];
+        supportedFeatures = [ "benchmark" "big-parallel" "nixos-test" "kvm" ];
       }
       {
         hostName = "eu.nixbuild.net";
         sshUser = "root";
-        sshKey = "/etc/ssh/ssh_host_ed25519_key";
+        sshKey = nixbuildKeyPath;
         system = "aarch64-linux";
         maxJobs = 100;
         speedFactor = 4;
-        supportedFeatures = [
-          "benchmark"
-          "big-parallel"
-        ];
+        supportedFeatures = [ "benchmark" "big-parallel" ];
       }
     ];
   };
