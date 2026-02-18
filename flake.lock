@@ -183,6 +183,27 @@
     },
     "flake-parts_2": {
       "inputs": {
+        "nixpkgs-lib": [
+          "hercules-ci-agent",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768135262,
+        "narHash": "sha256-PVvu7OqHBGWN16zSi6tEmPwwHQ4rLPU9Plvs8/1TUBY=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "80daad04eddbbf5a4d883996a73f3f542fa437ac",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "flake-parts_3": {
+      "inputs": {
         "nixpkgs-lib": "nixpkgs-lib_2"
       },
       "locked": {
@@ -199,7 +220,7 @@
         "type": "github"
       }
     },
-    "flake-parts_3": {
+    "flake-parts_4": {
       "inputs": {
         "nixpkgs-lib": [
           "nixos-anywhere",
@@ -279,6 +300,43 @@
         "type": "github"
       }
     },
+    "haskell-flake": {
+      "locked": {
+        "lastModified": 1768251795,
+        "narHash": "sha256-xxQBxQfgGDvPkzOMvHx3yNLgTuOS0TDwuwqw/cNk1d8=",
+        "owner": "srid",
+        "repo": "haskell-flake",
+        "rev": "28a0a79abeff13d80cdecc58f09f0955ca50fe88",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "haskell-flake",
+        "type": "github"
+      }
+    },
+    "hercules-ci-agent": {
+      "inputs": {
+        "flake-parts": "flake-parts_2",
+        "haskell-flake": "haskell-flake",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1769000415,
+        "narHash": "sha256-C3x2g91uiG5UiBWKOhsXL85PtmX7QUtwdfL+oHWC620=",
+        "owner": "hercules-ci",
+        "repo": "hercules-ci-agent",
+        "rev": "037a7f91a3156a6132171d90e8be2f96aab32ddc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "hercules-ci-agent",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -302,7 +360,7 @@
     },
     "jupiter-secrets": {
       "inputs": {
-        "flake-parts": "flake-parts_2",
+        "flake-parts": "flake-parts_3",
         "nixpkgs": [
           "nixos-raspberrypi",
           "nixpkgs"
@@ -391,7 +449,7 @@
     "nixos-anywhere": {
       "inputs": {
         "disko": "disko_2",
-        "flake-parts": "flake-parts_3",
+        "flake-parts": "flake-parts_4",
         "nix-vm-test": "nix-vm-test",
         "nixos-images": "nixos-images",
         "nixos-stable": "nixos-stable",
@@ -604,6 +662,7 @@
         "disko": "disko",
         "flake-parts": "flake-parts",
         "ghostty": "ghostty",
+        "hercules-ci-agent": "hercules-ci-agent",
         "jupiter-secrets": "jupiter-secrets",
         "kubenix": "kubenix",
         "nixos-anywhere": "nixos-anywhere",

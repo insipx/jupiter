@@ -268,6 +268,8 @@ inputs.colmena.lib.makeHive {
     nixpkgs.system = "x86_64-linux";
     imports = [
       ./../machine-specific/thinkcentre
+      ./../modules/hercules-ci-agent.nix
+      inputs.hercules-ci-agent.nixosModules.agent-service
     ]
     ++ commonImports;
     deployment = {
@@ -275,6 +277,7 @@ inputs.colmena.lib.makeHive {
         "thinkcentre"
         "homelab"
         "workers"
+        "hercules-ci"
       ];
       targetHost = "amalthea.jupiter.lan";
       targetUser = "insipx";
@@ -298,6 +301,8 @@ inputs.colmena.lib.makeHive {
     nixpkgs.system = "x86_64-linux";
     imports = [
       ./../machine-specific/thinkcentre
+      ./../modules/hercules-ci-agent.nix
+      inputs.hercules-ci-agent.nixosModules.agent-service
     ]
     ++ commonImports;
     deployment = {
@@ -305,6 +310,7 @@ inputs.colmena.lib.makeHive {
         "thinkcentre"
         "homelab"
         "workers"
+        "hercules-ci"
       ];
       targetHost = "lysithea.jupiter.lan";
       targetUser = "insipx";

@@ -39,6 +39,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     kubenix.url = "github:hall/kubenix";
+    hercules-ci-agent = {
+      url = "github:hercules-ci/hercules-ci-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   nixConfig = {
     extra-substituters = [
