@@ -78,7 +78,7 @@
         imports = [
           ./scripts
           ./pkgs
-          ./ci.nix
+          ./hercules.nix
           inputs.pkgs-by-name-for-flake-parts.flakeModule
           inputs.flake-parts.flakeModules.easyOverlay
         ];
