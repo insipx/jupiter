@@ -22,7 +22,7 @@ jobs:
       packages: write
     steps:
       - name: Install Nix
-        uses: cachix/install-nix-action@v30
+        uses: cachix/install-nix-action@v31
 
       - name: Set up nixbuild.net
         uses: nixbuild/nixbuild-action@v24
