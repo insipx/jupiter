@@ -1,9 +1,13 @@
-{ self, ... }:
+{ withSystem, ... }:
 {
-  herculesCI = {
+  flake.herculesCI = {
     ciSystems = [ "x86_64-linux" ];
-    onPush.default.outputs = {
-      inherit (self.packages.x86_64-linux) rathole-server-image rathole-client-image;
-    };
+    onPush.default.outputs =
+      withSystem "x86_64-linux" (
+        { config, ... }:
+        {
+          inherit (config.packages) rathole-server-image rathole-client-image;
+        }
+      );
   };
 }
