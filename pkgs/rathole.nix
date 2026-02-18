@@ -9,8 +9,8 @@ let
   git = fetchFromGitHub {
     owner = "rathole-org";
     repo = "rathole";
-    tag = "v0.5.0";
-    hash = "sha256-YfLzR1lHk+0N3YU1XTNxz+KE1S3xaiKJk0zASm6cr1s=";
+    rev = "5a9dd6d939744859af322aeff7fd60f7483a68bc";
+    hash = "sha256-jSwqEJcRv2PwBEY7dV20x9d0GjPb/eZ0w7j1e4YlYH8=";
   };
   src = craneLib.cleanCargoSource "${git}/";
 
