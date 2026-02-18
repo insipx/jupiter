@@ -240,29 +240,36 @@ inputs.colmena.lib.makeHive {
   };
   # pihole runs outside of k3s
   # but is also a k3s worker
-  #elara = _: {
-  #  imports = [
-  #    ./../machine-specific/rpi5
-  #  ] ++ commonImports;
-  #  deployment = {
-  #    targetUser = "insipx";
-  #    tags = [ "tinyca" "homelab" "workers" ];
-  #    targetHost = "elara";
-  #    buildOnTarget = false;
-  #  };
-  #  rpiHomeLab = {
-  #    networking = {
-  #      hostId = "c6c81d8d";
-  #      hostName = "elara";
-  #      address = "10.10.69.20/23";
-  #      interface = "end0";
-  #    };
-  #    k3s = {
-  #      enable = false;
-  #    };
-  #  };
-  #  jupiter-secrets.settings.k3s = true;
-  #};
+  elara = _: {
+    imports = [
+      ./../machine-specific/rpi5
+    ]
+    ++ commonImports;
+    deployment = {
+      targetUser = "insipx";
+      tags = [
+        "tinyca"
+        "homelab"
+        "workers"
+      ];
+      targetHost = "elara";
+      buildOnTarget = false;
+    };
+    rpiHomeLab = {
+      networking = {
+        hostId = "c6c81d8d";
+        hostName = "elara";
+        address = "10.10.69.20/23";
+        interface = "end0";
+      };
+      k3s = {
+        enable = true;
+        longhorn = true;
+        agent = true;
+      };
+    };
+    jupiter-secrets.settings.k3s = true;
+  };
 
   amalthea = _: {
     nixpkgs.system = "x86_64-linux";

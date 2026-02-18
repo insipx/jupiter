@@ -320,6 +320,7 @@
         "flake-parts": "flake-parts_2",
         "haskell-flake": "haskell-flake",
         "nixpkgs": [
+          "nixos-raspberrypi",
           "nixpkgs"
         ]
       },

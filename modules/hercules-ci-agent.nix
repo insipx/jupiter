@@ -20,13 +20,10 @@ _:
   services.hercules-ci-agent = {
     enable = true;
 
-    # Keep low — heavy builds are delegated to nixbuild.net.
-    # Local slots handle evaluation and light tasks.
-    concurrentTasks = 4;
-
     settings = {
-      clusterJoinTokenPath = "/var/lib/hercules-ci-agent/secrets/cluster-join-token.key";
-      binaryCachesPath = "/var/lib/hercules-ci-agent/secrets/binary-caches.json";
+      # Keep low — heavy builds are delegated to nixbuild.net.
+      # Local slots handle evaluation and light tasks.
+      concurrentTasks = 4;
     };
   };
 

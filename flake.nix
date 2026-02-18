@@ -41,7 +41,7 @@
     kubenix.url = "github:hall/kubenix";
     hercules-ci-agent = {
       url = "github:hercules-ci/hercules-ci-agent";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
   };
   nixConfig = {
