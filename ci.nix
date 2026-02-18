@@ -1,10 +1,9 @@
-{ self', ... }:
+{ self, ... }:
 {
-  flake.herculesCI = {
-    onPush.default = {
-      outputs = _: {
-        inherit (self'.packages) rathole-server-image rathole-client-image;
-      };
+  herculesCI = {
+    ciSystems = [ "x86_64-linux" ];
+    onPush.default.outputs = {
+      inherit (self.packages.x86_64-linux) rathole-server-image rathole-client-image;
     };
   };
 }

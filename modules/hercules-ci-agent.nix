@@ -10,7 +10,7 @@
 #        /var/lib/hercules-ci-agent/secrets/binary-caches.json
 #   4. Deploy: colmena apply --on @hercules-ci
 
-{ config, ... }:
+{ config, pkgs, ... }:
 
 let
   nixbuildKeyPath = "/var/lib/hercules-ci-agent/secrets/nixbuild_ed25519";
@@ -43,10 +43,7 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = toString [
-        "/bin/sh" "-c"
-        "install -m 0600 -o hercules-ci-agent -g hercules-ci-agent /etc/ssh/ssh_host_ed25519_key ${nixbuildKeyPath}"
-      ];
+      ExecStart = "${pkgs.coreutils}/bin/install -m 0600 -o hercules-ci-agent -g hercules-ci-agent /etc/ssh/ssh_host_ed25519_key ${nixbuildKeyPath}";
     };
   };
 
