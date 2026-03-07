@@ -248,7 +248,6 @@ inputs.colmena.lib.makeHive {
     deployment = {
       targetUser = "insipx";
       tags = [
-        "tinyca"
         "homelab"
         "workers"
       ];

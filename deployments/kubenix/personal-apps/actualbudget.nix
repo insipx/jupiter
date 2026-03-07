@@ -18,11 +18,14 @@ in
             repo = "https://community-charts.github.io/helm-charts";
             chart = "actualbudget";
             version = "1.8.9";
-            sha256 = "sha256-nzBAH+joPO7j2LIlNhuG6Q0riv3exbMbfGR0k24P+7o=";
+            sha256 = "sha256-LZizPgE0O7oRx2ChPQ/NJBkGYLkmGRrbm8OccxdJp+Y=";
           };
           includeCRDs = true;
           namespace = ns;
           values = {
+            # RWO volume can't attach to two pods: RollingUpdate deadlocks on
+            # Multi-Attach, new pod stuck ContainerCreating until old one dies
+            strategy.type = "Recreate";
             persistence = {
               enabled = true;
               size = "25Gi";

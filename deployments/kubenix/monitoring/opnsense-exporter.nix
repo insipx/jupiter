@@ -3,7 +3,7 @@ let
   ns = "monitoring";
   exporter = {
     label = "opnsense-exporter";
-    version = "0.0.11";
+    version = "0.0.13";
     port = 8080;
     imagePolicy = "IfNotPresent";
     # recuires rec (recursive attr)

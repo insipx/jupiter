@@ -18,7 +18,7 @@ in
             repo = "https://smallstep.github.io/helm-charts";
             chart = "step-issuer";
             version = "1.10.2";
-            sha256 = "sha256-r6U2PxdNmcArIPdKHfP97S5w8P5yOyEswnW2l+uwIUc=";
+            sha256 = "sha256-uqyeFW26FxI5yFhd+al2UT/hcp5y5Tj1QdHVR43/ILc=";
           };
           includeCRDs = true;
           namespace = ns;

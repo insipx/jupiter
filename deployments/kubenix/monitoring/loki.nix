@@ -9,7 +9,7 @@ in
         repo = "https://grafana.github.io/helm-charts";
         chart = "loki";
         version = "7.0.0";
-        sha256 = "sha256-MvpR2chSQp4CADHj6c4UVPbZ+YFUDJBjf3D6IT2fkAk=";
+        sha256 = "sha256-7/sn+8D370BJV0F3BxgFiaUHBIrPXPO+zzzB0USxxWc=";
       };
       namespace = ns;
       values = {

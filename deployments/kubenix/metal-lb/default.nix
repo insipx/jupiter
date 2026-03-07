@@ -17,7 +17,13 @@ in
           chart = kubenix.lib.helm.fetch {
             repo = "https://metallb.github.io/metallb";
             chart = "metallb";
-            version = "0.16.1";
+            # Pinned to 0.15.3: 0.16.x speaker has a ServiceL2Status reconcile
+            # loop (metallb/metallb#3063, OPEN/no fix) that POSTs ServiceL2Status
+            # objects with resourceVersion set, flooding the apiserver+etcd with
+            # "resourceVersion should not be set on objects to be created" at
+            # ~20-30/s and burning the kube-apiserver SLO error budget. 0.15.3 is
+            # the last release confirmed clean by the issue's bisection.
+            version = "0.15.3";
             sha256 = "sha256-KWdVaF6CjFjeHQ6HT1WvkI9JnSurt9emLVCpkxma0fg=";
           };
           namespace = ns;
@@ -28,6 +34,10 @@ in
             speaker.serviceMonitor = {
               enabled = true;
             };
+            # chart >=0.16 defaults this to true, pulling in the frr-k8s BGP
+            # backend; unneeded for L2 mode, and its webhook Service ports omit
+            # `protocol`, which kubenix's ServicePort list-merge requires
+            frrk8s.enabled = false;
           };
         };
       };

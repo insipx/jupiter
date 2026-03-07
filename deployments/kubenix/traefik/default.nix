@@ -41,7 +41,7 @@ in
           repo = "https://helm.traefik.io/traefik";
           chart = "traefik";
           version = "40.3.0";
-          sha256 = "sha256-7MVT4menBVU8QQBYgvBZeFcBEY2PGw3D9bGuMn0YgtA=";
+          sha256 = "sha256-V8l23cMxhtIg1bPtRLXJvvzlzzcIl/uGWFYATzCKtPI=";
         };
         includeCRDs = true;
         noHooks = true;
@@ -67,9 +67,14 @@ in
             # web and websecure are defaults in traefik
             # Rathole on Fly.io should forward to 10.10.68.1:8443
             websecure-external = {
-              port = 8443;
+              # `port` is what the entrypoint binds inside the container —
+              # websecure already binds 8443 there (it exposes 443 on the LB);
+              # both on 8443 crashes traefik with "address already in use"
+              port = 8444;
+              # LoadBalancer-facing port, the one Rathole targets
+              exposedPort = 8443;
+              expose.default = true;
               protocol = "TCP";
-              targetPort = "websecure-external";
             };
             metrics = {
               port = 9100;

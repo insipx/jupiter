@@ -84,7 +84,13 @@
         extraFlags = [
           "--debug"
         ]
-        ++ lib.optionals (!config.rpiHomeLab.k3s.agent) [ "--disable=servicelb" ];
+        ++ lib.optionals (!config.rpiHomeLab.k3s.agent) [
+          "--disable=servicelb"
+          # traefik is managed by kubenix (deployments/kubenix/traefik);
+          # the k3s-bundled chart fights it, re-applying old config on every
+          # k3s restart/upgrade
+          "--disable=traefik"
+        ];
         nodeLabel = lib.mkIf config.rpiHomeLab.k3s.longhorn [ "longhorn-storage=enabled" ];
       };
       # longhorn related
