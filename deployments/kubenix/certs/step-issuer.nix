@@ -17,7 +17,7 @@ in
           chart = kubenix.lib.helm.fetch {
             repo = "https://smallstep.github.io/helm-charts";
             chart = "step-issuer";
-            version = "1.9.11";
+            version = "1.10.2";
             sha256 = "sha256-r6U2PxdNmcArIPdKHfP97S5w8P5yOyEswnW2l+uwIUc=";
           };
           includeCRDs = true;
