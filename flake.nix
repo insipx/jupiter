@@ -2,7 +2,7 @@
   description = "flake for managing rpi homelab";
 
   inputs = {
-    nixpkgs.url = "github:NixOs/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
     };

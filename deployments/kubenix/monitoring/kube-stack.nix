@@ -1,4 +1,4 @@
-{ kubenix, flake, ... }:
+j{ kubenix, flake, ... }:
 let
   ns = "monitoring";
 in
@@ -8,8 +8,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://prometheus-community.github.io/helm-charts";
         chart = "kube-prometheus-stack";
-        version = "82.10.1";
-        sha256 = "sha256-peKXTkzoKC0FThFMFAapBHaFBbb8XrGAutzTMUWXgFY=";
+        version = "84.5.0";
+        sha256 = "sha256-0lrH0F70FjHIQMfBDzuOQJoKmBNKRKloEUChPlDc7qw=";
       };
       namespace = ns;
       # includeCRDs = true; fails
