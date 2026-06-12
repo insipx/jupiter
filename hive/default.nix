@@ -29,7 +29,12 @@ inputs.colmena.lib.makeHive {
       nixpkgs = import inputs.nixos-raspberrypi.inputs.nixpkgs pkgConfig;
       # nodeNixpkgs = rpiPkgSet // x86PkgSet;
       machinesFile = /etc/nix/machines;
-      specialArgs = { inherit inputs; };
+      specialArgs = {
+        inherit inputs;
+        # nixos-raspberrypi modules (raspberry-pi-5.*, nixpkgs-rpi) expect this
+        # arg; upstream's lib.nixosSystem* injects it, colmena does not
+        nixos-raspberrypi = inputs.nixos-raspberrypi;
+      };
     };
 
   ganymede = _: {

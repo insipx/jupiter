@@ -1,4 +1,4 @@
-j{ kubenix, flake, ... }:
+{ kubenix, flake, ... }:
 let
   ns = "monitoring";
 in
