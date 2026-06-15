@@ -40,5 +40,11 @@ in
         secret_key = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/aws_cloudwatch_secret";
       };
     };
+    # Grafana dashboard for the aws_* metrics YACE emits; sidecar picks it up via the label.
+    configMaps.grafana-dashboard-cloudwatch = {
+      metadata.namespace = ns;
+      metadata.labels."grafana_dashboard" = "1";
+      data."cloudwatch.json" = builtins.readFile ./dashboards/cloudwatch.json;
+    };
   };
 }
