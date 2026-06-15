@@ -8,8 +8,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://prometheus-community.github.io/helm-charts";
         chart = "kube-prometheus-stack";
-        version = "84.5.0";
-        sha256 = "sha256-0lrH0F70FjHIQMfBDzuOQJoKmBNKRKloEUChPlDc7qw=";
+        version = "86.2.0";
+        sha256 = "sha256-P3q256QMrdKkc5H9aQvWWtyoagCDZOObf5wW60ljrRw=";
       };
       namespace = ns;
       # includeCRDs = true; fails
@@ -49,6 +49,44 @@ in
         grafana = {
           defaultDashboardsEnabled = true;
           defaultDashboardsTimezone = "America/New_York";
+          # Persist Grafana's DB on Longhorn. Grafana 13's Unified Storage (which backs
+          # Git Sync and UI-saved dashboards) lives in this store; without a PVC it sits
+          # on emptyDir and is wiped on every pod restart.
+          persistence = {
+            enabled = true;
+            type = "pvc";
+            storageClassName = "longhorn-static";
+            accessModes = [ "ReadWriteOnce" ];
+            size = "10Gi";
+          };
+          # grafana-llm-app: self-hosted LLM features (Anthropic provider), provisioned below.
+          # grafana-assistant-app: paid/entitlement-gated partner plugin that also needs a
+          # Grafana Cloud connection completed interactively in the UI; if its download fails
+          # at pod start it can block the Grafana rollout — remove it here if Grafana hangs.
+          plugins = [
+            "grafana-llm-app"
+            "grafana-assistant-app"
+          ];
+          # Anthropic API key injected from the sops-backed secret as $ANTHROPIC_API_KEY,
+          # referenced by the grafana-llm-app provisioning file.
+          envValueFrom = {
+            ANTHROPIC_API_KEY = {
+              secretKeyRef = {
+                name = "grafana-llm-credentials";
+                key = "anthropic-api-key";
+              };
+            };
+          };
+          # Mount the grafana-llm-app provisioning file into Grafana's plugin provisioning dir.
+          extraConfigmapMounts = [
+            {
+              name = "grafana-llm-provisioning";
+              mountPath = "/etc/grafana/provisioning/plugins/llm.yaml";
+              subPath = "llm.yaml";
+              configMap = "grafana-llm-provisioning";
+              readOnly = true;
+            }
+          ];
           admin = {
             existingSecret = "grafana-admin-credentials";
             userKey = "admin-user";
@@ -165,31 +203,28 @@ in
         admin-password = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/grafana_password";
       };
     };
+    # Anthropic API key for the grafana-llm-app plugin (mirrors the admin-creds sops pattern).
+    # Requires `anthropic_api_key` to exist in homelab.yaml.
+    secrets.grafana-llm-credentials = {
+      metadata.namespace = ns;
+      metadata.name = "grafana-llm-credentials";
+      stringData.anthropic-api-key = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/anthropic_api_key";
+    };
     configMaps = {
-      grafana-dashboard-opnsense-firewall = {
+      # Provisioning file that configures grafana-llm-app to use Anthropic.
+      # secureJsonData reads $ANTHROPIC_API_KEY from the pod env (set via envValueFrom).
+      grafana-llm-provisioning = {
         metadata.namespace = ns;
-        metadata.labels."grafana_dashboard" = "1";
-        data."opnsense-firewall.json" = builtins.readFile ./dashboards/opnsense-firewall.json;
-      };
-      grafana-dashboard-opnsense-geomap = {
-        metadata.namespace = ns;
-        metadata.labels."grafana_dashboard" = "1";
-        data."opnsense-geomap.json" = builtins.readFile ./dashboards/opnsense-geomap.json;
-      };
-      grafana-dashboard-suricata = {
-        metadata.namespace = ns;
-        metadata.labels."grafana_dashboard" = "1";
-        data."suricata.json" = builtins.readFile ./dashboards/suricata.json;
-      };
-      grafana-dashboard-unbound-dns = {
-        metadata.namespace = ns;
-        metadata.labels."grafana_dashboard" = "1";
-        data."unbound-dns.json" = builtins.readFile ./dashboards/unbound-dns.json;
-      };
-      grafana-dashboard-network-traffic = {
-        metadata.namespace = ns;
-        metadata.labels."grafana_dashboard" = "1";
-        data."network-traffic.json" = builtins.readFile ./dashboards/network-traffic.json;
+        data."llm.yaml" = ''
+          apiVersion: 1
+          apps:
+            - type: grafana-llm-app
+              disabled: false
+              jsonData:
+                provider: anthropic
+              secureJsonData:
+                anthropicKey: $ANTHROPIC_API_KEY
+        '';
       };
     };
     prometheusrule.unbound-alerts = {

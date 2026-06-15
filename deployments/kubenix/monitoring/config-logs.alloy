@@ -1,0 +1,94 @@
+logging {
+  level = "info"
+}
+
+// Discover pods on THIS node only — metadata for enrichment, NOT log content.
+discovery.kubernetes "pods" {
+  role = "pod"
+  selectors {
+    role  = "pod"
+    field = "spec.nodeName=" + sys.env("NODE_NAME")
+  }
+}
+
+// Turn pod metadata into on-disk log paths + stream labels.
+// Note: discovery.kubernetes role=pod emits one target per declared container port;
+// targets for the same container all resolve to one __path__, and local.file_match
+// collapses identical paths, so a single reader is opened per container log file.
+discovery.relabel "pod_logs" {
+  targets = discovery.kubernetes.pods.targets
+
+  // Do NOT ingest our own namespace's logs (this DaemonSet + the syslog Alloy
+  // StatefulSet). Prevents a write-error feedback amplifier during a Loki outage
+  // and keeps monitoring-plane noise out of app log streams.
+  rule {
+    source_labels = ["__meta_kubernetes_namespace"]
+    regex         = "monitoring"
+    action        = "drop"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_namespace"]
+    target_label  = "namespace"
+  }
+  rule {
+    source_labels = ["__meta_kubernetes_pod_name"]
+    target_label  = "pod"
+  }
+  rule {
+    source_labels = ["__meta_kubernetes_pod_container_name"]
+    target_label  = "container"
+  }
+  rule {
+    source_labels = ["__meta_kubernetes_pod_node_name"]
+    target_label  = "node"
+  }
+
+  // /var/log/pods/<ns>_<pod>_<uid>/<container>/*.log
+  rule {
+    source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+    separator     = "/"
+    action        = "replace"
+    target_label  = "__path__"
+    replacement   = "/var/log/pods/*$1/*.log"
+  }
+}
+
+// Glob the actual files off disk.
+local.file_match "pod_logs" {
+  path_targets = discovery.relabel.pod_logs.output
+}
+
+// Tail files locally — no kubelet, no apiserver.
+loki.source.file "pod_logs" {
+  targets    = local.file_match.pod_logs.targets
+  forward_to = [loki.process.pod_logs.receiver]
+  // Start at the END of each file when there's no stored position (first deploy,
+  // new node, or wiped /var/lib/alloy-logs). Avoids replaying weeks-old backlog
+  // that Loki rejects as "timestamp too old" (reject_old_samples_max_age, 7d).
+  // Once positions are persisted, restarts resume from the stored offset.
+  tail_from_end = true
+}
+
+loki.process "pod_logs" {
+  forward_to = [loki.write.default.receiver]
+
+  // Parse containerd CRI line format ("<ts> stdout F <msg>"): cleans the message and
+  // EXTRACTS `stream` (stdout/stderr) into the pipeline's extracted map. stage.cri does
+  // NOT promote `stream` to a Loki label by itself.
+  stage.cri { }
+
+  // Promote the extracted `stream` into an actual Loki label so {stream="stderr"} works.
+  stage.labels {
+    values = {
+      stream = "",
+    }
+  }
+}
+
+loki.write "default" {
+  endpoint {
+    url       = "http://loki-gateway:80/loki/api/v1/push"
+    tenant_id = "fake"
+  }
+}

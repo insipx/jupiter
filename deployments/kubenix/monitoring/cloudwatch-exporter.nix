@@ -40,11 +40,59 @@ in
         secret_key = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/aws_cloudwatch_secret";
       };
     };
-    # Grafana dashboard for the aws_* metrics YACE emits; sidecar picks it up via the label.
-    configMaps.grafana-dashboard-cloudwatch = {
+    # NOTE: the Grafana dashboard for the aws_* metrics lives in the jupiter-grafana
+    # repo (Git Sync), not as a ConfigMap here — see ../jupiter-grafana/cloudwatch.json.
+
+    # Alerts. These fire into Alertmanager; no receiver is wired yet, so they show
+    # in the Alertmanager UI but do not notify externally until a receiver is added.
+    # NOTE: the `job` label below assumes the ServiceMonitor names the job
+    # "cloudwatch-exporter-prometheus-yet-another-cloudwatch-exporter" (release-chart).
+    # Verify after deploy with `up` in Prometheus and adjust the matcher if different.
+    prometheusrule.cloudwatch-alerts = {
       metadata.namespace = ns;
-      metadata.labels."grafana_dashboard" = "1";
-      data."cloudwatch.json" = builtins.readFile ./dashboards/cloudwatch.json;
+      metadata.name = "cloudwatch-alerts";
+      metadata.labels."prometheus" = "kube-prometheus-stack-prometheus";
+      spec.groups = [
+        {
+          name = "cloudwatch";
+          rules = [
+            {
+              # The exporter is unreachable -> the AWS dashboard goes silently blank.
+              alert = "CloudWatchExporterDown";
+              expr = "up{job=~\".*cloudwatch.*\"} == 0";
+              "for" = "10m";
+              labels.severity = "warning";
+              annotations = {
+                summary = "YACE CloudWatch exporter is down";
+                description = "The cloudwatch exporter has not been scrapeable for 10 minutes; AWS metrics/cost data are stale.";
+              };
+            }
+            {
+              # The failure unique to this exporter: its own GetMetricData calls
+              # inflating the CloudWatch bill line (was $0.00 before YACE).
+              alert = "CloudWatchSelfCostHigh";
+              expr = "aws_billing_estimated_charges_maximum{service_name=\"AmazonCloudWatch\"} > 2";
+              "for" = "1h";
+              labels.severity = "warning";
+              annotations = {
+                summary = "CloudWatch (YACE) estimated charges above $2";
+                description = "AWS CloudWatch estimated charges this month are {{ $value | printf \"%.2f\" }} USD — likely YACE GetMetricData volume. Check scrape interval / namespace scope.";
+              };
+            }
+            {
+              # Overall AWS bill past the ~$23 baseline -> a cost surprise somewhere.
+              alert = "AWSBillOverBudget";
+              expr = "sum(aws_billing_estimated_charges_maximum) > 40";
+              "for" = "1h";
+              labels.severity = "warning";
+              annotations = {
+                summary = "Total AWS estimated bill over $40";
+                description = "Month-to-date AWS estimated charges are {{ $value | printf \"%.2f\" }} USD, above the ~$23 baseline. Check the CloudWatch dashboard for the service driving it.";
+              };
+            }
+          ];
+        }
+      ];
     };
   };
 }
