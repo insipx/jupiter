@@ -8,12 +8,16 @@ let
   ns = "monitoring";
 
   alloy = import ./alloy.nix { inherit flake; };
+  alloy-logs = import ./alloy-logs.nix { inherit flake; };
   opnsense-exporter = import ./opnsense-exporter.nix { inherit flake; };
   ks-res = (import ./kube-stack.nix { inherit kubenix flake; }).resources;
   ks-helm = (import ./kube-stack.nix { inherit kubenix flake; }).helm.releases;
 
   loki-helm = (import ./loki.nix { inherit kubenix flake; }).helm.releases;
   loki-res = (import ./loki.nix { inherit kubenix flake; }).resources;
+
+  cloudwatch-helm = (import ./cloudwatch-exporter.nix { inherit kubenix flake; }).helm.releases;
+  cloudwatch-res = (import ./cloudwatch-exporter.nix { inherit kubenix flake; }).resources;
 in
 {
   imports = with kubenix.modules; [
@@ -28,10 +32,12 @@ in
     args.kubernetes.resources = lib.foldl' lib.recursiveUpdate { } [
       ks-res
       alloy
+      alloy-logs
       opnsense-exporter
       loki-res
+      cloudwatch-res
     ];
-    args.kubernetes.helm.releases = lib.recursiveUpdate ks-helm loki-helm;
+    args.kubernetes.helm.releases = lib.recursiveUpdate (lib.recursiveUpdate ks-helm loki-helm) cloudwatch-helm;
     args.kubernetes.customTypes = {
       servicemonitors = {
         attrName = "servicemonitors";

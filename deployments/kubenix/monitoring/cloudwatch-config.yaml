@@ -1,0 +1,130 @@
+apiVersion: v1alpha1
+sts-region: us-east-1
+discovery:
+  jobs:
+    # Account-level estimated charges — AWS publishes Billing only in us-east-1.
+    - type: AWS/Billing
+      regions: [us-east-1]
+      metrics:
+        - name: EstimatedCharges
+          statistics: [Maximum]
+          period: 21600
+          length: 86400
+    - type: AWS/EC2
+      regions: [us-east-1]
+      metrics:
+        - name: CPUUtilization
+          statistics: [Average]
+          period: 300
+          length: 600
+        - name: NetworkIn
+          statistics: [Average]
+          period: 300
+          length: 600
+        - name: NetworkOut
+          statistics: [Average]
+          period: 300
+          length: 600
+    - type: AWS/EBS
+      regions: [us-east-1]
+      metrics:
+        - name: VolumeReadBytes
+          statistics: [Average]
+          period: 300
+          length: 600
+        - name: VolumeWriteBytes
+          statistics: [Average]
+          period: 300
+          length: 600
+    - type: AWS/S3
+      regions: [us-east-1]
+      metrics:
+        - name: BucketSizeBytes
+          statistics: [Average]
+          period: 86400
+          length: 172800
+        - name: NumberOfObjects
+          statistics: [Average]
+          period: 86400
+          length: 172800
+    - type: AWS/NATGateway
+      regions: [us-east-1]
+      metrics:
+        - name: BytesOutToDestination
+          statistics: [Sum]
+          period: 300
+          length: 600
+        - name: BytesInFromDestination
+          statistics: [Sum]
+          period: 300
+          length: 600
+    - type: AWS/Lambda
+      regions: [us-east-1]
+      metrics:
+        - name: Invocations
+          statistics: [Sum]
+          period: 300
+          length: 600
+        - name: Errors
+          statistics: [Sum]
+          period: 300
+          length: 600
+        - name: Duration
+          statistics: [Average]
+          period: 300
+          length: 600
+    - type: AWS/RDS
+      regions: [us-east-1]
+      metrics:
+        - name: CPUUtilization
+          statistics: [Average]
+          period: 300
+          length: 600
+        - name: DatabaseConnections
+          statistics: [Average]
+          period: 300
+          length: 600
+        - name: FreeStorageSpace
+          statistics: [Average]
+          period: 300
+          length: 600
+    - type: AWS/ApplicationELB
+      regions: [us-east-1]
+      metrics:
+        - name: RequestCount
+          statistics: [Sum]
+          period: 300
+          length: 600
+        - name: TargetResponseTime
+          statistics: [Average]
+          period: 300
+          length: 600
+    - type: AWS/ELB
+      regions: [us-east-1]
+      metrics:
+        - name: RequestCount
+          statistics: [Sum]
+          period: 300
+          length: 600
+        - name: Latency
+          statistics: [Average]
+          period: 300
+          length: 600
+    - type: AWS/SNS
+      regions: [us-east-1]
+      metrics:
+        - name: NumberOfMessagesPublished
+          statistics: [Sum]
+          period: 300
+          length: 600
+    - type: AWS/SQS
+      regions: [us-east-1]
+      metrics:
+        - name: ApproximateNumberOfMessagesVisible
+          statistics: [Average]
+          period: 300
+          length: 600
+        - name: NumberOfMessagesSent
+          statistics: [Sum]
+          period: 300
+          length: 600
