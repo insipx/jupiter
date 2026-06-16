@@ -135,6 +135,13 @@ in
               revision = 31;
               datasource = "Prometheus";
             };
+            # YACE / CloudWatch overview (community). Complements the cost-focused
+            # cloudwatch.json in the jupiter-grafana (Git Sync) repo.
+            yace-cloudwatch = {
+              gnetId = 21327;
+              revision = 1;
+              datasource = "Prometheus";
+            };
           };
         };
 

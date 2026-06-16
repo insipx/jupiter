@@ -155,7 +155,7 @@
                 };
                 imports = [
                   ./base
-                  ./machine-specific/pihole
+                  ./machine-specific/tinyca
                 ];
               }
             ];
