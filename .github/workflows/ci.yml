@@ -24,7 +24,7 @@ jobs:
           - name: rathole-client
             attr: rathole-client-image
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: cachix/install-nix-action@v30
         with:
