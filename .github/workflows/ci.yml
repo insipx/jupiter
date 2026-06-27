@@ -40,10 +40,6 @@ jobs:
           name: insipx
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
 
-      - uses: nixbuild/nixbuild-action@v21
-        with:
-          nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
-
       - name: Build ${{ matrix.image.name }} image
         run: |
           nix build .#${{ matrix.image.attr }} --print-out-paths > image-path.txt
