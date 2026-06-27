@@ -46,6 +46,9 @@
     servers = [
       "lab_gateway.jupiter.lan"
     ];
+    extraConfig = ''
+      makestep 1.0 -1
+    '';
   };
   environment.enableAllTerminfo = true;
   nix = {

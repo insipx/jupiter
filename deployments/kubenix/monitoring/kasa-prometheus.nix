@@ -23,9 +23,11 @@ in
             name = exporter.label;
             image = exporter.image;
             imagePullPolicy = "Always";
-            # HS300 uses the legacy local protocol — no cloud creds. Target the
-            # device by IP (CNI overlay can't UDP-broadcast to the LAN), and
-            # bind the metrics endpoint on the pod.
+            # NO credentials. This HS300 (hw2.0, KLAP login-v2, new_klap=1) uses
+            # a KLAP v2 challenge that no open library can authenticate yet
+            # (python-kasa #1603/#1604). With "Third Party Compatibility" ON in
+            # the Kasa app the device reopens the unauthenticated legacy XOR
+            # protocol on :9999 — kasa-rs uses that only when no creds are set.
             args = [
               "--listen=0.0.0.0:${toString exporter.port}"
               "--target=${exporter.hs300}"

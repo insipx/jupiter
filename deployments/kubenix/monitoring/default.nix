@@ -19,7 +19,7 @@ let
   cloudwatch-helm = (import ./cloudwatch-exporter.nix { inherit kubenix flake; }).helm.releases;
   cloudwatch-res = (import ./cloudwatch-exporter.nix { inherit kubenix flake; }).resources;
 
-  kasa-prometheus = (import ./kasa-prometheus.nix { }).resources;
+  kasa-prometheus = (import ./kasa-prometheus.nix { inherit flake; }).resources;
 in
 {
   imports = with kubenix.modules; [
