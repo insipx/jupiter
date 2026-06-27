@@ -23,8 +23,6 @@ jobs:
             attr: rathole-server-image
           - name: rathole-client
             attr: rathole-client-image
-          - name: kasa-prometheus
-            attr: kasa-prometheus-image
     steps:
       - uses: actions/checkout@v4
 
@@ -63,3 +61,83 @@ jobs:
           docker tag ${{ matrix.image.name }}:latest ${{ env.IMAGE_PREFIX }}/${{ matrix.image.name }}:$SHORT_SHA
           docker push ${{ env.IMAGE_PREFIX }}/${{ matrix.image.name }}:latest
           docker push ${{ env.IMAGE_PREFIX }}/${{ matrix.image.name }}:$SHORT_SHA
+
+  # kasa-prometheus: build each arch NATIVELY on its own runner (no cross), push
+  # an arch-suffixed tag per arch; a follow-up job stitches them into a manifest
+  # list so the mixed-arch k3s cluster pulls the right image on any node.
+  kasa-prometheus-build:
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/insipx/jupiter/kasa-prometheus
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            extra-substituters = https://insipx.cachix.org https://nix-community.cachix.org
+            extra-trusted-public-keys = insipx.cachix.org-1:JMvQq3zItXN5AO7VfPUAILAwMXQrzQ78rLoQTktWs14= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            access-tokens = github.com=${{ secrets.SECRETS_PAT }}
+
+      - uses: cachix/cachix-action@v15
+        with:
+          name: insipx
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+
+      - name: Build kasa-prometheus image (${{ matrix.arch }})
+        run: |
+          nix build .#kasa-prometheus-image --print-out-paths > image-path.txt
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push ${{ matrix.arch }} image to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          docker load < "$(cat image-path.txt)"
+          docker tag kasa-prometheus:latest ${IMAGE}:${SHORT_SHA}-${{ matrix.arch }}
+          docker push ${IMAGE}:${SHORT_SHA}-${{ matrix.arch }}
+
+  kasa-prometheus-manifest:
+    needs: kasa-prometheus-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/insipx/jupiter/kasa-prometheus
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create + push multi-arch manifest
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          for TAG in latest ${SHORT_SHA}; do
+            docker manifest create ${IMAGE}:${TAG} \
+              --amend ${IMAGE}:${SHORT_SHA}-amd64 \
+              --amend ${IMAGE}:${SHORT_SHA}-arm64
+            docker manifest push ${IMAGE}:${TAG}
+          done
