@@ -39,6 +39,20 @@ prometheus.scrape "opnsense_exporter" {
   scrape_timeout = "10s"
 }
 
+prometheus.scrape "kasa_prometheus" {
+  targets = [{
+    __address__ = "kasa-prometheus:9101",
+    instance    = "kasa-hs300",
+    job         = "kasa",
+    group       = "power",
+    host        = "homelab-powerstrip",
+  }]
+
+  forward_to = [prometheus.remote_write.default.receiver]
+  scrape_interval = "15s"
+  scrape_timeout = "10s"
+}
+
 prometheus.scrape "unbound" {
   targets = [{
     __address__ = "10.10.69.1:9167",

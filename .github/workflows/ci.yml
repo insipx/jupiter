@@ -23,6 +23,8 @@ jobs:
             attr: rathole-server-image
           - name: rathole-client
             attr: rathole-client-image
+          - name: kasa-prometheus
+            attr: kasa-prometheus-image
     steps:
       - uses: actions/checkout@v4
 
