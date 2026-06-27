@@ -18,6 +18,11 @@ let
 
   cloudwatch-helm = (import ./cloudwatch-exporter.nix { inherit kubenix flake; }).helm.releases;
   cloudwatch-res = (import ./cloudwatch-exporter.nix { inherit kubenix flake; }).resources;
+
+  influxdb3-res = (import ./influxdb3.nix { inherit kubenix flake; }).resources;
+  influxdb3-helm = (import ./influxdb3.nix { inherit kubenix flake; }).helm.releases;
+
+  kasa-collector = (import ./kasa-collector.nix { inherit flake; }).resources;
 in
 {
   imports = with kubenix.modules; [
@@ -36,8 +41,15 @@ in
       opnsense-exporter
       loki-res
       cloudwatch-res
+      influxdb3-res
+      kasa-collector
     ];
-    args.kubernetes.helm.releases = lib.recursiveUpdate (lib.recursiveUpdate ks-helm loki-helm) cloudwatch-helm;
+    args.kubernetes.helm.releases = lib.foldl' lib.recursiveUpdate { } [
+      ks-helm
+      loki-helm
+      cloudwatch-helm
+      influxdb3-helm
+    ];
     args.kubernetes.customTypes = {
       servicemonitors = {
         attrName = "servicemonitors";

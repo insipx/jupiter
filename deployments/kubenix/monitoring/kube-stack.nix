@@ -76,6 +76,15 @@ in
                 key = "anthropic-api-key";
               };
             };
+            # InfluxDB 3 Core admin bearer token, exposed to Grafana's process env so the
+            # InfluxDB-Kasa datasource below can interpolate it as $INFLUXDB_TOKEN. Reuses
+            # the secret created by kasa-collector.nix (same influxdb3_admin_token from sops).
+            INFLUXDB_TOKEN = {
+              secretKeyRef = {
+                name = "kasa-collector-influx";
+                key = "token";
+              };
+            };
           };
           # Mount the grafana-llm-app provisioning file into Grafana's plugin provisioning dir.
           extraConfigmapMounts = [
@@ -126,6 +135,27 @@ in
               };
               secureJsonData = {
                 httpHeaderValue1 = "fake";
+              };
+            }
+            # InfluxDB 3 Core (kasa power data). Core has no Flux, so query via InfluxQL.
+            # Token handling: this repo's grafana chart values are NOT vals-resolved — every
+            # secret reaches grafana via a k8s Secret + existingSecret/envValueFrom (see the
+            # admin existingSecret and the ANTHROPIC_API_KEY env above), and `ref+sops://`
+            # appears only inside `secrets.*` resources, never in chart values. So we inject
+            # the bearer token through Grafana's env ($INFLUXDB_TOKEN, wired via envValueFrom)
+            # and interpolate it here; Grafana expands $VAR in provisioned datasource fields.
+            {
+              name = "InfluxDB-Kasa";
+              type = "influxdb";
+              url = "http://influxdb3-core:8181";
+              access = "proxy";
+              jsonData = {
+                version = "InfluxQL";
+                dbName = "kasa";
+                httpHeaderName1 = "Authorization";
+              };
+              secureJsonData = {
+                httpHeaderValue1 = "Bearer $INFLUXDB_TOKEN";
               };
             }
           ];
