@@ -331,11 +331,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1781645965,
-        "narHash": "sha256-Ev81P7DKBWWCtWtcaC4gOYfH/pA90CQMsVXdrHJ4Tr4=",
+        "lastModified": 1782591901,
+        "narHash": "sha256-Cmmo1uE8R80HSShvnQ3v7i/CE3uh5sEsgYrJL2H27Yg=",
         "owner": "insipx",
         "repo": "jupiter-secrets",
-        "rev": "0cc3345f4fcfd860e544c60a91577c9e32ecd9e5",
+        "rev": "1308043f82b3f125e30a6f5b514c5a033bfb83f1",
         "type": "github"
       },
       "original": {
