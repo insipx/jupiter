@@ -8,12 +8,20 @@
 #        /var/lib/hercules-ci-agent/secrets/cluster-join-token.key
 #   3. Optionally configure a binary cache:
 #        /var/lib/hercules-ci-agent/secrets/binary-caches.json
-#   4. Deploy: colmena apply --on @hercules-ci
+#   4. For private flake inputs (jupiter-secrets), write a PAT (Contents:read on
+#      insipx/jupiter-secrets) to:
+#        /var/lib/hercules-ci-agent/secrets/github-access-tokens.conf
+#        contents (one line): access-tokens = github.com=ghp_xxx
+#   5. Deploy: colmena apply --on @hercules-ci
 
 { config, pkgs, ... }:
 
 let
   nixbuildKeyPath = "/var/lib/hercules-ci-agent/secrets/nixbuild_ed25519";
+  # Token file granting read access to private flake inputs (e.g. jupiter-secrets).
+  # Populate manually (NOT in the nix store) with a single line:
+  #   access-tokens = github.com=ghp_xxx   (a PAT with read on insipx/jupiter-secrets)
+  githubTokenConf = "/var/lib/hercules-ci-agent/secrets/github-access-tokens.conf";
 in
 {
   # ---------------------------------------------------------------------------
@@ -75,6 +83,12 @@ in
   nix = {
     distributedBuilds = true;
 
+    # Pull the GitHub access token from a secret file (kept out of the store) so
+    # the agent can fetch private flake inputs during evaluation.
+    extraOptions = ''
+      !include ${githubTokenConf}
+    '';
+
     settings = {
       # Let remote builders fetch their own dependencies from substituters
       # instead of uploading closures from this machine.
@@ -112,5 +126,8 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/lib/hercules-ci-agent/secrets 0700 hercules-ci-agent hercules-ci-agent -"
+    # Ensure the access-tokens include target exists so `!include` never fails;
+    # populate with the real PAT manually (f = create empty if missing, never truncate).
+    "f ${githubTokenConf} 0600 hercules-ci-agent hercules-ci-agent -"
   ];
 }

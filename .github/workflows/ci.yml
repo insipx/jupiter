@@ -34,6 +34,7 @@ jobs:
           extra_nix_config: |
             extra-substituters = https://insipx.cachix.org https://nix-community.cachix.org
             extra-trusted-public-keys = insipx.cachix.org-1:JMvQq3zItXN5AO7VfPUAILAwMXQrzQ78rLoQTktWs14= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            access-tokens = github.com=${{ secrets.SECRETS_PAT }}
 
       - uses: cachix/cachix-action@v15
         with:
