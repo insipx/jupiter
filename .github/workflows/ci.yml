@@ -24,7 +24,7 @@ jobs:
           - name: rathole-client
             attr: rathole-client-image
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: cachix/install-nix-action@v31
         with:
@@ -80,7 +80,7 @@ jobs:
     env:
       IMAGE: ghcr.io/insipx/jupiter/kasa-prometheus
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: cachix/install-nix-action@v31
         with:
