@@ -40,7 +40,7 @@ in
         chart = kubenix.lib.helm.fetch {
           repo = "https://helm.traefik.io/traefik";
           chart = "traefik";
-          version = "40.3.0";
+          version = "41.0.1";
           sha256 = "sha256-V8l23cMxhtIg1bPtRLXJvvzlzzcIl/uGWFYATzCKtPI=";
         };
         includeCRDs = true;
