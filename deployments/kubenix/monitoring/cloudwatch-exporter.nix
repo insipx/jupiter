@@ -7,7 +7,7 @@ in
     chart = kubenix.lib.helm.fetch {
       repo = "https://prometheus-community.github.io/helm-charts";
       chart = "prometheus-yet-another-cloudwatch-exporter";
-      version = "0.45.0";
+      version = "0.46.1";
       sha256 = "sha256-U99V8wqVLCn3jnMGKQltFj8iie5lWapnz4IeeHo/eH8=";
     };
     namespace = ns;
