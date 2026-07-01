@@ -7,7 +7,7 @@
         inherit (self'.packages)
           rathole-server-image
           rathole-client-image
-          kasa-prometheus-image
+          kasa-exporter-image
           ;
       }
     );

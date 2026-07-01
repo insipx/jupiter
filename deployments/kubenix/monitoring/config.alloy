@@ -39,13 +39,14 @@ prometheus.scrape "opnsense_exporter" {
   scrape_timeout = "10s"
 }
 
-prometheus.scrape "kasa_prometheus" {
+// kasa-exporter (python-kasa) polls all Kasa devices; per-device labels
+// (alias/ip/plug_*) come from the exporter itself.
+prometheus.scrape "kasa_exporter" {
   targets = [{
-    __address__ = "kasa-prometheus:9101",
-    instance    = "kasa-hs300",
+    __address__ = "kasa-exporter:9101",
+    instance    = "kasa",
     job         = "kasa",
     group       = "power",
-    host        = "homelab-powerstrip",
   }]
 
   forward_to = [prometheus.remote_write.default.receiver]

@@ -19,7 +19,7 @@ let
   cloudwatch-helm = (import ./cloudwatch-exporter.nix { inherit kubenix flake; }).helm.releases;
   cloudwatch-res = (import ./cloudwatch-exporter.nix { inherit kubenix flake; }).resources;
 
-  kasa-prometheus = (import ./kasa-prometheus.nix { inherit flake; }).resources;
+  kasa-exporter = (import ./kasa-exporter.nix { inherit flake; }).resources;
 in
 {
   imports = with kubenix.modules; [
@@ -38,7 +38,7 @@ in
       opnsense-exporter
       loki-res
       cloudwatch-res
-      kasa-prometheus
+      kasa-exporter
     ];
     args.kubernetes.helm.releases = lib.foldl' lib.recursiveUpdate { } [
       ks-helm

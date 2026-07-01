@@ -62,10 +62,10 @@ jobs:
           docker push ${{ env.IMAGE_PREFIX }}/${{ matrix.image.name }}:latest
           docker push ${{ env.IMAGE_PREFIX }}/${{ matrix.image.name }}:$SHORT_SHA
 
-  # kasa-prometheus: build each arch NATIVELY on its own runner (no cross), push
+  # kasa-exporter: build each arch NATIVELY on its own runner (no cross), push
   # an arch-suffixed tag per arch; a follow-up job stitches them into a manifest
   # list so the mixed-arch k3s cluster pulls the right image on any node.
-  kasa-prometheus-build:
+  kasa-exporter-build:
     strategy:
       matrix:
         include:
@@ -78,7 +78,7 @@ jobs:
       contents: read
       packages: write
     env:
-      IMAGE: ghcr.io/insipx/jupiter/kasa-prometheus
+      IMAGE: ghcr.io/insipx/jupiter/kasa-exporter
     steps:
       - uses: actions/checkout@v7
 
@@ -95,9 +95,9 @@ jobs:
           name: insipx
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
 
-      - name: Build kasa-prometheus image (${{ matrix.arch }})
+      - name: Build kasa-exporter image (${{ matrix.arch }})
         run: |
-          nix build .#kasa-prometheus-image --print-out-paths > image-path.txt
+          nix build .#kasa-exporter-image --print-out-paths > image-path.txt
 
       - name: Log in to GHCR
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -112,18 +112,18 @@ jobs:
         run: |
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           docker load < "$(cat image-path.txt)"
-          docker tag kasa-prometheus:latest ${IMAGE}:${SHORT_SHA}-${{ matrix.arch }}
+          docker tag kasa-exporter:latest ${IMAGE}:${SHORT_SHA}-${{ matrix.arch }}
           docker push ${IMAGE}:${SHORT_SHA}-${{ matrix.arch }}
 
-  kasa-prometheus-manifest:
-    needs: kasa-prometheus-build
+  kasa-exporter-manifest:
+    needs: kasa-exporter-build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     env:
-      IMAGE: ghcr.io/insipx/jupiter/kasa-prometheus
+      IMAGE: ghcr.io/insipx/jupiter/kasa-exporter
     steps:
       - name: Log in to GHCR
         uses: docker/login-action@v4
