@@ -17,7 +17,7 @@ in
           chart = kubenix.lib.helm.fetch {
             repo = "https://charts.longhorn.io";
             chart = "longhorn";
-            version = "1.12.0";
+            version = "1.12.1";
             sha256 = "sha256-42GDSNepI7dkqyuVVh8DPwlUqcTEFRMUYg1qz6ZH7/E=";
           };
           noHooks = true;
