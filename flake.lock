@@ -331,17 +331,17 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1782938995,
-        "narHash": "sha256-eHiI001ifu0409sHhXodxDWTBm1QlJDoDGM1S26ziQI=",
-        "owner": "insipx",
-        "repo": "jupiter-secrets",
-        "rev": "9c4eb688cf0e2ff5c9d6a19804c0ea662ed9d1e7",
-        "type": "github"
+        "lastModified": 1789233312,
+        "narHash": "sha256-FYuFFchBm2m4WN6OKOarDHkdCXJA3oTiXkOFbowrG9Q=",
+        "ref": "refs/heads/main",
+        "rev": "f76d46dabc42fc3168ecb194ccbefb040844114b",
+        "revCount": 62,
+        "type": "git",
+        "url": "ssh://git@github.com/insipx/jupiter-secrets"
       },
       "original": {
-        "owner": "insipx",
-        "repo": "jupiter-secrets",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/insipx/jupiter-secrets"
       }
     },
     "kubenix": {
