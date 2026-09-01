@@ -121,7 +121,7 @@
               nativeBuildInputs = [
                 inputs'.nixos-anywhere.packages.default
                 inputs'.colmena.packages.colmena
-                self'.packages.kubenix
+                # self'.packages.kubenix
                 self'.packages.build_session
                 pkgs.kubernetes-helm
                 pkgs.sops

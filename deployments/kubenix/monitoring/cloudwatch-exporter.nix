@@ -8,7 +8,7 @@ in
       repo = "https://prometheus-community.github.io/helm-charts";
       chart = "prometheus-yet-another-cloudwatch-exporter";
       version = "0.47.0";
-      sha256 = "sha256-U99V8wqVLCn3jnMGKQltFj8iie5lWapnz4IeeHo/eH8=";
+      sha256 = "sha256-MgNYAhehyQ7PtUma6CGyTeOOx5d7t3D0qaANwcIoovM=";
     };
     namespace = ns;
     values = {

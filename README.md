@@ -2,28 +2,4 @@
 
 # Jupiter Homelab
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 sup
