@@ -17,7 +17,7 @@ in
           chart = kubenix.lib.helm.fetch {
             repo = "https://mojo2600.github.io/pihole-kubernetes";
             chart = "pihole";
-            version = "2.35.0";
+            version = "2.38.0";
             sha256 = "sha256-wWFj3/2BsiQMXcAoG8buJRWUXkcKS6Ies1veUtMcHYc=";
           };
           includeCRDs = true;
