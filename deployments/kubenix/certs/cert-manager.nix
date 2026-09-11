@@ -17,7 +17,7 @@ in
           chart = kubenix.lib.helm.fetch {
             repo = "https://charts.jetstack.io";
             chart = "cert-manager";
-            version = "v1.21.1";
+            version = "v1.21.2";
             sha256 = "sha256-7OgOm+kDjwAow9EoWM+5XPNmrNte+zxhZq3ZHSf2aqc=";
           };
           includeCRDs = true;
