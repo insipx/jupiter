@@ -17,7 +17,7 @@ in
           chart = kubenix.lib.helm.fetch {
             repo = "https://argoproj.github.io/argo-helm";
             chart = "argo-cd";
-            version = "v3.21.0";
+            version = "10.9.0";
             sha256 = "sha256-0000000000000000000000000000000000000000000=";
           };
           includeCRDs = true;
