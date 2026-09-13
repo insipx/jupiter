@@ -13,6 +13,24 @@ in
     submodule = "namespaced";
     args.kubernetes = {
       helm.releases = {
+        argocd-image-updater = {
+          chart = kubenix.lib.helm.fetch {
+            repo = "https://argoproj.github.io/argo-helm";
+            chart = "argocd-image-updater";
+            version = "1.3.1";
+            sha256 = "sha256-ShJpGAHqMDvX6i3wLIExxcuHD1/uEqKgDG+x0brZtzk=";
+          };
+          namespace = ns;
+          values = {
+            config.argocd = {
+              serverAddress = "https://argocd.${flake.lib.hostname}";
+              # argocd-server runs plaintext behind traefik (server.insecure),
+              # so the updater must not negotiate TLS against it.
+              insecure = true;
+              plaintext = true;
+            };
+          };
+        };
         argocd = {
           chart = kubenix.lib.helm.fetch {
             repo = "https://argoproj.github.io/argo-helm";
@@ -27,6 +45,7 @@ in
             configs.secret.createSecret = false;
             configs.params."server.insecure" = true;
             controller.metrics.serviceMonitor.enabled = true;
+            global.domain = "argocd.${flake.lib.hostname}";
 
             notifications = {
               secret.create = false;
@@ -61,6 +80,20 @@ in
       };
       resources = {
         secrets = {
+          # Used by image-updater to push the new image tag back to the
+          # manifest repo. Needs `contents: write`; the notifications app only
+          # needs checks/statuses, so confirm the permission before reusing it.
+          git-creds = {
+            metadata = {
+              name = "git-creds";
+              namespace = ns;
+            };
+            stringData = {
+              githubAppID = "4924749";
+              githubAppInstallationID = "161237440";
+              githubAppPrivateKey = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/argo_git_app_private_key";
+            };
+          };
           argocd-secret = {
             metadata = {
               name = "argocd-secret";
@@ -78,6 +111,31 @@ in
             stringData = {
               github-privateKey = "ref+sops://${flake.lib.secrets}/secrets/homelab.yaml#/argo_git_app_private_key";
             };
+          };
+        };
+        imageupdater.website = {
+          metadata = {
+            name = "website";
+            namespace = ns;
+          };
+          spec = {
+            # also could be git to commit new image to git
+            writeBackConfig.method = "argocd";
+            applicationRefs = [
+              {
+                namePattern = "insipx";
+                images = [
+                  {
+                    alias = "web";
+                    imageName = "ghcr.io/insipx/website";
+                    commonUpdateSettings = {
+                      updateStrategy = "newest-build";
+                      allowTags = "regexp:^[0-9a-f]{40}$";
+                    };
+                  }
+                ];
+              }
+            ];
           };
         };
         ingressroute.argo-cd = {
@@ -121,6 +179,12 @@ in
           group = "traefik.io";
           version = "v1alpha1";
           kind = "IngressRoute";
+        };
+        imageupdater = {
+          attrName = "imageupdater";
+          group = "argocd-image-updater.argoproj.io";
+          version = "v1alpha1";
+          kind = "ImageUpdater";
         };
       };
     };

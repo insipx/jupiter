@@ -11,6 +11,7 @@
     ./metal-lb/default.nix
     ./certs
     ./personal-apps
+    ./website
     ./argocd
     # ./pihole
   ];

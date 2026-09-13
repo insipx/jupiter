@@ -11,8 +11,8 @@ let
   wealthfolio = import ./wealthfolio.nix { inherit flake; };
 
   apps = [
-    actualbudget
     wealthfolio
+    actualbudget
   ];
 
   mergeAttr = attr: lib.foldl' lib.recursiveUpdate { } (map (a: a.${attr} or { }) apps);
