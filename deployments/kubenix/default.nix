@@ -12,6 +12,7 @@
     ./certs
     ./personal-apps
     ./website
+    ./rathole
     ./argocd
     # ./pihole
   ];

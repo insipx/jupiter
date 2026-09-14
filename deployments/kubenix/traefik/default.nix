@@ -76,6 +76,16 @@ in
               expose.default = true;
               protocol = "TCP";
             };
+            # Public site via Rathole -- no mTLS, unlike websecure-external.
+            # Rathole on Fly.io forwards to 10.10.68.1:8445.
+            websecure-public = {
+              # 8444 is already taken by websecure-external's container port
+              # (see above), so bind 8446 inside and expose 8445 on the LB.
+              port = 8446;
+              exposedPort = 8445;
+              expose.default = true;
+              protocol = "TCP";
+            };
             metrics = {
               port = 9100;
               protocol = "TCP";

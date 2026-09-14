@@ -7,24 +7,36 @@ app = 'jupiter-homelab-gateway'
 primary_region = 'ewr'
 
 [build]
-image = "ghcr.io/insipx/rathole-server:latest"
+image = "ghcr.io/insipx/jupiter/rathole-server:latest"
 
-[env]
-# Rathole will read config from /etc/rathole/server.toml
-CONFIG_PATH = "/etc/rathole/server.toml"
+# The config is a fly secret (it contains the shared token, and rathole has no
+# env-var interpolation -- the token must be literal text in the file).
+#   fly secrets set RATHOLE_CONFIG="$(cat rathole-server.toml)" -a jupiter-homelab-gateway
+[[files]]
+guest_path = "/etc/rathole/server.toml"
+secret_name = "RATHOLE_CONFIG"
 
-# Mount a volume for persistent data if needed
-# [[mounts]]
-#   source = "rathole_data"
-#   destination = "/data"
+# rathole takes the config path as a positional arg.
+[experimental]
+cmd = ["/etc/rathole/server.toml"]
 
-[http_service]
+# 2333 is rathole's control channel -- raw TCP, not HTTP, so it must not sit
+# behind fly's http proxy.
+[[services]]
+protocol = "tcp"
 internal_port = 2333
-force_https = true
-auto_stop_machines = 'stop'
-auto_start_machines = true
-min_machines_running = 0
-processes = ['app']
+
+[[services.ports]]
+port = 2333
+
+# The public site, forwarded to traefik's websecure-public entrypoint.
+# TLS terminates at traefik, so fly passes bytes through untouched.
+[[services]]
+protocol = "tcp"
+internal_port = 8445
+
+[[services.ports]]
+port = 443
 
 [[vm]]
 memory = '256mb'

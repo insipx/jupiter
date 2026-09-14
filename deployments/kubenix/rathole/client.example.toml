@@ -1,0 +1,20 @@
+# Rathole Client Configuration Example
+#
+# This file is NOT read directly -- it documents the shape of the value stored
+# at `rathole_client_config` in jupiter-secrets/secrets/homelab.yaml, which the
+# rathole-client-config Secret pulls in via vals at apply time.
+#
+# The token must be literal text -- rathole has no env-var interpolation -- so
+# the whole file is treated as a secret rather than a ConfigMap.
+
+[client]
+# The fly.io app's control port.
+remote_addr = "jupiter-homelab-gateway.fly.dev:2333"
+default_token = "YOUR_SECRET_TOKEN_HERE"
+
+heartbeat_timeout = 40
+
+# Pulls the public site through to traefik's websecure-public entrypoint,
+# where TLS terminates. Service name must match [server.services.public].
+[client.services.public]
+local_addr = "10.10.68.1:8445"

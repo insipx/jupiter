@@ -1,27 +1,25 @@
 # Rathole Server Configuration Example
-# Copy this to rathole-server.toml and configure with your values
-# Deploy secrets using: fly secrets set RATHOLE_CONFIG="$(cat rathole-server.toml)"
+#
+# Copy to rathole-server.toml, fill in the token, then push it as a fly secret:
+#   fly secrets set RATHOLE_CONFIG="$(cat rathole-server.toml)" -a jupiter-homelab-gateway
+#
+# The token must be literal text here -- rathole has no env-var interpolation.
+# Keep the canonical copy in jupiter-secrets/secrets/homelab.yaml so this and
+# the cluster-side client.toml cannot drift.
 
 [server]
-bind_addr = "0.0.0.0:2333" # Bind to all interfaces on port 2333
-default_token = "YOUR_SECRET_TOKEN_HERE" # Replace with a secure token
+bind_addr = "0.0.0.0:2333"
+default_token = "YOUR_SECRET_TOKEN_HERE"
 
-# Optional: Enable heartbeat to detect dead connections
-# heartbeat_interval = 30
+# Detect dead connections rather than holding a stale tunnel open.
+heartbeat_interval = 30
 
-# Optional: Enable noise protocol for encryption
-# [server.transport]
-# type = "noise"
+# The public website. Fly accepts :443 and forwards here; the client pulls it
+# through to traefik's websecure-public entrypoint (10.10.68.1:8445), where TLS
+# terminates. Service name must match [client.services.public] exactly.
+[server.services.public]
+bind_addr = "0.0.0.0:8445"
 
-# Define services that clients can forward
-[server.services.web]
-bind_addr = "0.0.0.0:8080" # The address rathole will listen on for this service
-# token = "service_specific_token" # Optional: override default token
-
-# Example: SSH service
-# [server.services.ssh]
-# bind_addr = "0.0.0.0:2222"
-
-# Example: Custom service
-# [server.services.myapp]
-# bind_addr = "0.0.0.0:3000"
+# NOTE: the mTLS services on traefik's websecure-external (8443) -- budget,
+# wealth, rotki -- are deliberately NOT forwarded. Adding one here exposes it
+# to the internet.
