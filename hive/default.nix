@@ -55,7 +55,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "445ba108";
         hostName = "ganymede";
-        address = "10.10.69.10/23";
+        address = "10.10.69.10/22";
         interface = "end0";
       };
     };
@@ -88,7 +88,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostName = "io";
         hostId = "19454311";
-        address = "10.10.69.11/23";
+        address = "10.10.69.11/22";
         interface = "end0";
       };
       k3s.longhorn = true;
@@ -117,7 +117,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "29af5daa";
         hostName = "europa";
-        address = "10.10.69.12/23";
+        address = "10.10.69.12/22";
         interface = "end0";
       };
       k3s.enable = true;
@@ -152,7 +152,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "b0d6aebd";
         hostName = "callisto";
-        address = "10.10.69.14/23";
+        address = "10.10.69.14/22";
         interface = "end0";
       };
     };
@@ -179,7 +179,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "0c461a51";
         hostName = "sinope";
-        address = "10.10.69.16/23";
+        address = "10.10.69.16/22";
         interface = "enu1u1";
       };
       k3s.agent = true;
@@ -206,7 +206,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "5ae157ad";
         hostName = "carme";
-        address = "10.10.69.17/23";
+        address = "10.10.69.17/22";
         interface = "end0";
       };
       k3s = {
@@ -235,7 +235,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "c3adcefb";
         hostName = "volos";
-        address = "10.10.69.18/23";
+        address = "10.10.69.18/22";
         interface = "end0";
       };
       k3s = {
@@ -263,7 +263,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "c6c81d8d";
         hostName = "elara";
-        address = "10.10.69.20/23";
+        address = "10.10.69.20/22";
         interface = "end0";
       };
       k3s = {
@@ -279,8 +279,12 @@ inputs.colmena.lib.makeHive {
     nixpkgs.system = "x86_64-linux";
     imports = [
       ./../machine-specific/thinkcentre
-      ./../modules/hercules-ci-agent.nix
-      inputs.hercules-ci-agent.nixosModules.agent-service
+      # hercules-ci-agent 0.10.8 (037a7f91, upstream latest) pins
+      # pkg-config nix-store <2.34, but nixpkgs now ships 2.34.8, so
+      # hercules-ci-cnix-store fails to configure. Re-enable once upstream
+      # relaxes the bound.
+      # ./../modules/hercules-ci-agent.nix
+      # inputs.hercules-ci-agent.nixosModules.agent-service
     ]
     ++ commonImports;
     deployment = {
@@ -297,7 +301,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "b31fd201";
         hostName = "amalthea";
-        address = "10.10.69.50/23";
+        address = "10.10.69.50/22";
         interface = "enp0s31f6";
       };
       k3s = {
@@ -312,8 +316,12 @@ inputs.colmena.lib.makeHive {
     nixpkgs.system = "x86_64-linux";
     imports = [
       ./../machine-specific/thinkcentre
-      ./../modules/hercules-ci-agent.nix
-      inputs.hercules-ci-agent.nixosModules.agent-service
+      # hercules-ci-agent 0.10.8 (037a7f91, upstream latest) pins
+      # pkg-config nix-store <2.34, but nixpkgs now ships 2.34.8, so
+      # hercules-ci-cnix-store fails to configure. Re-enable once upstream
+      # relaxes the bound.
+      # ./../modules/hercules-ci-agent.nix
+      # inputs.hercules-ci-agent.nixosModules.agent-service
     ]
     ++ commonImports;
     deployment = {
@@ -330,7 +338,7 @@ inputs.colmena.lib.makeHive {
       networking = {
         hostId = "a3a7b911";
         hostName = "lysithea";
-        address = "10.10.69.51/23";
+        address = "10.10.69.51/22";
         interface = "enp0s31f6";
       };
       k3s = {

@@ -50,7 +50,7 @@
       makestep 1.0 -1
     '';
   };
-  environment.enableAllTerminfo = true;
+  environment.enableAllTerminfo = false;
   nix = {
     settings.experimental-features = [
       "nix-command"
