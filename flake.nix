@@ -30,7 +30,8 @@
     jupiter-secrets = {
       # github: fetcher hits github.com/archive which 404s for this private
       # repo even with a valid token; git+ssh clones over SSH and works.
-      url = "git+ssh://git@github.com/insipx/jupiter-secrets";
+      # url = "git+ssh://git@github.com/insipx/jupiter-secrets";
+      url = "github:insipx/jupiter-secrets";
       # url = "path:/Users/andrewplaza/code/insipx/jupiter-secrets";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
