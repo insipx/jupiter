@@ -23,7 +23,7 @@ jobs:
             attr: rathole-server-image
             arch: amd64
           - image: rathole-client
-            attr: rathole-client-image
+            attr: rathole-client-image-x86
             arch: amd64
           - image: rathole-client
             attr: rathole-client-image-aarch64

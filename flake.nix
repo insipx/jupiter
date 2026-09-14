@@ -180,7 +180,6 @@
                   homelabModules.default
                   inputs.disko.nixosModules.disko
                   inputs.jupiter-secrets.nixosModules.default
-
                   ./base
                   ./machine-specific/thinkcentre
                 ];

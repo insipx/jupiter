@@ -5,7 +5,10 @@
     let
       commonPkgs = {
         inherit system;
+        overlays = [ inputs.rust-overlay.overlays.default ];
       };
+      # we could be more clever here and use an iterator to apply a list of
+      # cross systems to the packageset
       crossPkgsx86 = import inputs.nixpkgs (
         commonPkgs
         // {
@@ -28,16 +31,16 @@
         }
       );
       crossLibAarch64 = (inputs.crane.mkLib crossPkgsAarch64).overrideToolchain (
-        tp:
-        tp.rust-bin.stable.latest.default.override {
+        p:
+        p.rust-bin.stable.latest.default.override {
           targets = [
             "aarch64-unknown-linux-musl"
           ];
         }
       );
-      rathole = pkgs.callPackage ./rathole.nix { inherit craneLib; };
-      rathole-muslX86 = crossPkgsx86.callPackage ./rathole.nix { craneLib = crossLibx86; };
-      rathole-muslAarch64 = crossPkgsAarch64.callpackage ./rathole.nix { craneLib = crossLibAarch64; };
+      rathole = pkgs.callPackage ./package.nix { inherit craneLib; };
+      rathole-muslX86 = crossPkgsx86.callPackage ./package.nix { craneLib = crossLibx86; };
+      rathole-muslAarch64 = crossPkgsAarch64.callPackage ./package.nix { craneLib = crossLibAarch64; };
     in
     {
       packages = {

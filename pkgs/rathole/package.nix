@@ -1,15 +1,12 @@
-#lib.optionalAttrs stdenv.hostPlatform.isMusl {
-#    RUSTFLAGS = "-C target-feature=+crt-static";
-#    doCheck = false;
-#  }
-#  //
-
 {
   craneLib,
   fetchFromGitHub,
   zlib,
   stdenv,
   lib,
+  libiconv,
+  pkg-config,
+  buildPackages,
   ...
 }:
 let
@@ -34,7 +31,13 @@ let
 
         {
           inherit src;
-          buildInputs = [ zlib ];
+          nativeBuildInputs = [ pkg-config ] ++ lib.optionals stdenv.buildPlatform.isDarwin [ libiconv ];
+          # b/c vergen/libgit2 is included as a build dependency in Cargo
+          depsBuildBuild = [
+            buildPackages.stdenv.cc
+            buildPackages.zlib
+            buildPackages.pkg-config
+          ];
           cargoExtraArgs = "--no-default-features --features rustls,noise ${args}";
           strictDeps = true;
           CARGO_BUILD_TARGET = stdenv.hostPlatform.rust.rustcTarget;

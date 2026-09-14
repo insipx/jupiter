@@ -7,7 +7,7 @@ _: {
         name = "rathole-server";
         tag = "latest";
         config = {
-          Entrypoint = [ "${server-musl}/bin/rathole" ];
+          Entrypoint = [ "${self'.packages.rathole-server-muslX86}/bin/rathole" ];
           # rathole's control port: where the in-cluster client dials in.
           ExposedPorts."2333/tcp" = { };
         };
