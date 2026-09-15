@@ -8,13 +8,16 @@
 # the whole file is treated as a secret rather than a ConfigMap.
 
 [client]
-# The fly.io app's control port.
-remote_addr = "jupiter-homelab-gateway.fly.dev:2333"
+remote_addr = "123.45.67.89:2333"
 default_token = "YOUR_SECRET_TOKEN_HERE"
 
 heartbeat_timeout = 40
 
-# Pulls the public site through to traefik's websecure-public entrypoint,
-# where TLS terminates. Service name must match [server.services.public].
+[client.transport]
+type = "noise"
+
+[client.transport.noise]
+remote_public_key = "SERVER_PUBLIC_KEY_BASE64"
+
 [client.services.public]
-local_addr = "10.10.68.1:8445"
+local_addr = "10.10.70.1:8445"

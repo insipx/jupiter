@@ -65,6 +65,18 @@ in
             avoidBuggyIPs = true;
           };
         };
+        IPAddressPool.public = {
+          metadata = {
+            namespace = ns;
+          };
+          spec = {
+            addresses = [
+              "10.10.70.0/24"
+            ];
+            autoAssign = false;
+            avoidBuggyIPs = true;
+          };
+        };
         L2Advertisement.default = {
           metadata = {
             namespace = ns;

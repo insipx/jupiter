@@ -12,8 +12,7 @@ env:
 
 jobs:
   # Build each arch NATIVELY on its own runner (no cross), push an arch-suffixed
-  # tag per arch; a follow-up job stitches them into a manifest list so the
-  # mixed-arch k3s cluster pulls the right image on any node.
+  # tag per arch.
   build:
     strategy:
       matrix:
@@ -40,7 +39,7 @@ jobs:
       - uses: cachix/cachix-action@v17
         with:
           name: insipx
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Build kasa-exporter image (${{ matrix.arch }})
         run: nix build .#kasa-exporter-image --print-out-paths > image-path.txt

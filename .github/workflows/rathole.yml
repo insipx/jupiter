@@ -42,7 +42,7 @@ jobs:
       - uses: cachix/cachix-action@v17
         with:
           name: insipx
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Build ${{ matrix.image }} (${{ matrix.arch }})
         run: nix build .#${{ matrix.attr }} --print-out-paths > image-path.txt
@@ -64,9 +64,8 @@ jobs:
             ${IMAGE_PREFIX}/${{ matrix.image }}:${SHORT_SHA}-${{ matrix.arch }}
           docker push ${IMAGE_PREFIX}/${{ matrix.image }}:${SHORT_SHA}-${{ matrix.arch }}
 
-  # The client runs on the mixed-arch k3s cluster, so its two arch builds are
-  # stitched into one manifest list and the kubelet picks per node. The server
-  # only ever runs on fly.io (amd64), so its single arch is republished as-is.
+  # build client for arm64 and amd64 so that my cluster
+  # that has both architectures can all run the rathole client
   manifest:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

@@ -3,31 +3,26 @@ let
   ns = "kube-system";
 in
 {
-  # Traefik configuration with selective mTLS support
+  # Traefik with mTLS support
   #
   # Architecture:
-  #   - Internal routes (port 443): No mTLS, wildcard cert, accessible from jupiter.lan
-  #   - External routes (port 8443): mTLS required, for internet-facing services via Rathole
+  #   - Internal routes (port 443): No mTLS accessible from lan
+  #   - External routes (port 8443): mTLS required, this is for external services via rathole proxy
   #
-  # mTLS Flow:
-  #   1. Step CA (volos.jupiter.lan) issues both server and client certificates
-  #   2. Server certs: Issued via cert-manager/step-issuer (automated)
-  #   3. Client certs: Issued manually via `step ca certificate` command
-  #   4. Traefik verifies client certs against Step CA root certificate
+  # mTLS:
+  #   1. Step CA (volos.jupiter.lan) issues both server and client certs
+  #   2. Server certs are issued with cert-manager
+  #   3. Client certs are issued manually via `step ca certificate` command
   #
   # Generating Client Certificates:
   #   step ca certificate user@jupiter.lan user.crt user.key
   #
-  # Testing mTLS:
-  #   # Without client cert (should fail on external entrypoint):
+  # Testing:
+  #   # fails:
   #   curl https://10.10.68.1:8443
   #
-  #   # With client cert (should succeed):
+  #   # succeeds:
   #   curl --cert user.crt --key user.key --cacert ca.crt https://10.10.68.1:8443
-  #
-  # Rathole Configuration:
-  #   Configure Rathole on Fly.io to forward to: 10.10.68.1:8443
-
   imports = with kubenix.modules; [
     k8s
     submodules
@@ -65,25 +60,29 @@ in
           service.type = "LoadBalancer";
           ports = {
             # web and websecure are defaults in traefik
-            # Rathole on Fly.io should forward to 10.10.68.1:8443
+            # Rathole should forward to 10.10.68.1:8443
             websecure-external = {
-              # `port` is what the entrypoint binds inside the container —
-              # websecure already binds 8443 there (it exposes 443 on the LB);
-              # both on 8443 crashes traefik with "address already in use"
               port = 8444;
               # LoadBalancer-facing port, the one Rathole targets
               exposedPort = 8443;
               expose.default = true;
               protocol = "TCP";
             };
-            # Public site via Rathole -- no mTLS, unlike websecure-external.
-            # Rathole on Fly.io forwards to 10.10.68.1:8445.
+            # Public site via Rathole -- no mTLS
+            # Rathole forwards to 10.10.70.1:8445 (and 10.10.70.1:80 -> web for
+            # the https redirect + ACME HTTP-01); see services.traefik-public.
             websecure-public = {
-              # 8444 is already taken by websecure-external's container port
-              # (see above), so bind 8446 inside and expose 8445 on the LB.
               port = 8446;
               exposedPort = 8445;
-              expose.default = true;
+              expose.default = false;
+              protocol = "TCP";
+            };
+            # Plain-HTTP twin of websecure-public: https redirect + ACME HTTP-01
+            # for public hosts only. Never attach content routes here.
+            web-public = {
+              port = 8001;
+              exposedPort = 80;
+              expose.default = false;
               protocol = "TCP";
             };
             metrics = {
@@ -113,7 +112,7 @@ in
             namespace = ns;
           };
           spec = {
-            entryPoints = [ "web" ];
+            entryPoints = [ "web" "web-public" ];
             routes = [
               {
                 match = "HostRegexp(`.+`)";
@@ -195,6 +194,38 @@ in
             defaultCertificate = {
               secretName = "traefik-wildcard-tls-secret";
             };
+          };
+        };
+        services.traefik-public = {
+          metadata = {
+            name = "traefik-public";
+            namespace = "kube-system";
+            annotations = {
+              "metallb.io/address-pool" = "public";
+              "metallb.io/loadBalancerIPs" = "10.10.70.1";
+            };
+          };
+          spec = {
+            type = "LoadBalancer";
+            selector = {
+              "app.kubernetes.io/name" = "traefik";
+              "app.kubernetes.io/instance" = "traefik-kube-system";
+            };
+            ports = [
+              {
+                name = "websecure-public";
+                port = 8445;
+                targetPort = 8446;
+                protocol = "TCP";
+              }
+              {
+                # Plain HTTP for the https redirect and ACME HTTP-01 challenges.
+                name = "web-public";
+                port = 80;
+                targetPort = 8001;
+                protocol = "TCP";
+              }
+            ];
           };
         };
       };

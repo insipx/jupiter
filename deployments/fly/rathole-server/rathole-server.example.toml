@@ -1,7 +1,13 @@
-# Rathole Server Configuration Example
+# Rathole Server Configuration
 #
-# Copy to rathole-server.toml, fill in the token, then push it as a fly secret:
-#   fly secrets set RATHOLE_CONFIG="$(cat rathole-server.toml)" -a jupiter-homelab-gateway
+# Copy to rathole-server.toml, fill in the token and key, then push it as a
+# fly secret. [[files]] base64-DECODES the secret, so it must be encoded --
+# and macos `base64` wraps its output, which corrupts it, hence the tr:
+#
+#   fish: fly secrets set RATHOLE_CONFIG=(base64 < rathole-server.toml | tr -d '\n') -a jupiter-gateway
+#   bash: fly secrets set RATHOLE_CONFIG=$(base64 < rathole-server.toml | tr -d '\n') -a jupiter-gateway
+#
+# Secrets only reach [[files]] on a NEW machine, so `fly deploy` after setting.
 #
 # The token must be literal text here -- rathole has no env-var interpolation.
 # Keep the canonical copy in jupiter-secrets/secrets/homelab.yaml so this and
@@ -11,15 +17,13 @@
 bind_addr = "0.0.0.0:2333"
 default_token = "YOUR_SECRET_TOKEN_HERE"
 
-# Detect dead connections rather than holding a stale tunnel open.
 heartbeat_interval = 30
 
-# The public website. Fly accepts :443 and forwards here; the client pulls it
-# through to traefik's websecure-public entrypoint (10.10.68.1:8445), where TLS
-# terminates. Service name must match [client.services.public] exactly.
+[server.transport]
+type = "noise"
+
+[server.transport.noise]
+local_private_key = "SERVER_PRIVATE_KEY_BASE64"
+
 [server.services.public]
 bind_addr = "0.0.0.0:8445"
-
-# NOTE: the mTLS services on traefik's websecure-external (8443) -- budget,
-# wealth, rotki -- are deliberately NOT forwarded. Adding one here exposes it
-# to the internet.

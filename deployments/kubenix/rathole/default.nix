@@ -13,15 +13,6 @@ in
     submodule = "namespaced";
     args.kubernetes = {
       resources = {
-        # The whole config is the secret, not a ConfigMap plus a token: rathole
-        # has no env-var interpolation, so the shared token has to sit in the
-        # file as literal text. Keep the canonical copy (both client and server
-        # config) in jupiter-secrets so the two ends cannot drift.
-        #
-        # Must live in `resources`, not helm values -- the ref+sops:// string
-        # interpolates flake.lib.secrets, a store path, and kubenix refuses to
-        # let a generated manifest refer to one. stringData (not data) is what
-        # vals resolves at apply time.
         secrets.rathole-client-config = {
           metadata = {
             name = "rathole-client-config";

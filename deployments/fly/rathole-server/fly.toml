@@ -1,42 +1,42 @@
-# fly.toml app configuration file for rathole-server
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
-app = 'jupiter-homelab-gateway'
+app = 'jupiter-gateway'
 primary_region = 'ewr'
 
-[build]
-image = "ghcr.io/insipx/jupiter/rathole-server:latest"
-
-# The config is a fly secret (it contains the shared token, and rathole has no
-# env-var interpolation -- the token must be literal text in the file).
-#   fly secrets set RATHOLE_CONFIG="$(cat rathole-server.toml)" -a jupiter-homelab-gateway
-[[files]]
-guest_path = "/etc/rathole/server.toml"
-secret_name = "RATHOLE_CONFIG"
-
-# rathole takes the config path as a positional arg.
 [experimental]
-cmd = ["/etc/rathole/server.toml"]
+cmd = ['/etc/rathole/server.toml']
 
-# 2333 is rathole's control channel -- raw TCP, not HTTP, so it must not sit
-# behind fly's http proxy.
+[build]
+image = 'ghcr.io/insipx/jupiter/rathole-server:latest'
+
+[deploy]
+strategy = "rolling"
+#strategy = 'bluegreen'
+
 [[services]]
-protocol = "tcp"
+protocol = 'tcp'
 internal_port = 2333
 
 [[services.ports]]
 port = 2333
 
-# The public site, forwarded to traefik's websecure-public entrypoint.
-# TLS terminates at traefik, so fly passes bytes through untouched.
+# Expose public HTTPS
 [[services]]
-protocol = "tcp"
+protocol = 'tcp'
 internal_port = 8445
 
 [[services.ports]]
 port = 443
+
+# Plain HTTP: https redirect for ACME HTTP-01
+[[services]]
+protocol = "tcp"
+internal_port = 8080
+
+[[services.ports]]
+port = 80
+
+[[files]]
+guest_path = '/etc/rathole/server.toml'
+secret_name = 'RATHOLE_CONFIG'
 
 [[vm]]
 memory = '256mb'
