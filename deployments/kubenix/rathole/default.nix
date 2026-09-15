@@ -13,6 +13,8 @@ in
     submodule = "namespaced";
     args.kubernetes = {
       resources = {
+        networkpolicies = import ./network-policies.nix { inherit ns; };
+
         secrets.rathole-client-config = {
           metadata = {
             name = "rathole-client-config";
@@ -37,8 +39,6 @@ in
                   name = "rathole-client";
                   image = "ghcr.io/insipx/jupiter/rathole-client:latest";
                   imagePullPolicy = "Always";
-                  # rathole takes the config path positionally; the image's
-                  # Entrypoint is the binary itself.
                   args = [ "/etc/rathole/client.toml" ];
                   volumeMounts = [
                     {
