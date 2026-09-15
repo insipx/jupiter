@@ -13,7 +13,7 @@ in
     submodule = "namespaced";
     args.kubernetes = {
       resources = {
-        networkpolicies = import ./network-policies.nix { inherit ns; };
+        networkPolicies = import ./network-policies.nix { inherit ns; };
 
         secrets.rathole-client-config = {
           metadata = {

@@ -70,6 +70,8 @@
   };
 
   # allow traefik via metallb load balancer IP
+  # Rathole dials the LoadBalancer IP 10.10.70.1, but kube-proxy DNATs it and
+  # the it as traefik's POD ip. Allow both LB IP and pod ips.
   allow-traefik-public = {
     metadata = {
       name = "allow-traefik-public";
@@ -80,7 +82,13 @@
       policyTypes = [ "Egress" ];
       egress = [
         {
-          to = [ { ipBlock.cidr = "10.10.70.0/24"; } ];
+          to = [
+            { ipBlock.cidr = "10.10.70.0/24"; }
+            {
+              namespaceSelector.matchLabels."kubernetes.io/metadata.name" = "kube-system";
+              podSelector.matchLabels."app.kubernetes.io/name" = "traefik";
+            }
+          ];
           ports = [
             {
               protocol = "TCP";
@@ -88,7 +96,15 @@
             }
             {
               protocol = "TCP";
+              port = 8446;
+            }
+            {
+              protocol = "TCP";
               port = 80;
+            }
+            {
+              protocol = "TCP";
+              port = 8001;
             }
           ];
         }
