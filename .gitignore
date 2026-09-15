@@ -3,3 +3,5 @@
 result
 result/**
 docs/**
+rathole-server.toml
+rathole-client.toml
