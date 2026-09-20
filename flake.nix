@@ -75,6 +75,7 @@
         ./hercules.nix
         ./nixos
         ./shell.nix
+        ./installer-images.nix
         inputs.flake-parts.flakeModules.easyOverlay
       ];
       systems = [
