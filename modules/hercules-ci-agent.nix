@@ -7,7 +7,7 @@
 #   2. Get a cluster join token from the Hercules CI dashboard and save it:
 #        /var/lib/hercules-ci-agent/secrets/cluster-join-token.key
 #   3. Optionally configure a binary cache:
-#        /var/lib/hercules-ci-agent/secrets/binary-caches.json
+
 #   4. For private flake inputs (jupiter-secrets), write a PAT (Contents:read on
 #      insipx/jupiter-secrets) to:
 #        /var/lib/hercules-ci-agent/secrets/github-access-tokens.conf
@@ -106,7 +106,12 @@ in
         system = "x86_64-linux";
         maxJobs = 100;
         speedFactor = 4;
-        supportedFeatures = [ "benchmark" "big-parallel" "nixos-test" "kvm" ];
+        supportedFeatures = [
+          "benchmark"
+          "big-parallel"
+          "nixos-test"
+          "kvm"
+        ];
       }
       {
         hostName = "eu.nixbuild.net";
@@ -115,7 +120,10 @@ in
         system = "aarch64-linux";
         maxJobs = 100;
         speedFactor = 4;
-        supportedFeatures = [ "benchmark" "big-parallel" ];
+        supportedFeatures = [
+          "benchmark"
+          "big-parallel"
+        ];
       }
     ];
   };

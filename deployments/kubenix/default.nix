@@ -14,7 +14,6 @@
     ./website
     ./rathole
     ./argocd
-    # ./pihole
   ];
 
   submodules.imports = [

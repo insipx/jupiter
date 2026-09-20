@@ -7,6 +7,23 @@ in one flake :)
 
 <img width="4032" height="3024" alt="IMG_3160" src="https://github.com/user-attachments/assets/21280979-292c-45b3-8fa2-9b3e6d52fd24" />
 
+## Project structure
+
+```text
+.
+├── hive/                 # Colmena deployment configurations.
+├── base/                 # Shared NixOS Configuration amongst all hosts.
+├── machine-specific/     # NixOS Configuration specific to host types (rpi5/rpi4/thinkcentre/etc.).
+├── nixos/                # initial Raspberry Pi and x86 NixOS configurations.
+├── deployments/          # kubenix cluster definitions and the rathole deployment.
+├── apps/                 # app source if any, so far just kasa exporter for power metrics.
+├── pkgs/                 # Any software that requires custom packaging (rathole).
+├── images/               # Nix-built docker images.
+├── modules/              # Extra modules/configs, so far just a quick and dirty hercules-ci agent config.
+├── scripts/              # helper scripts, AWS build server script for aarch64-linux / freebsd.
+└── .github/workflows/    # Github actions (mostly building docker images).
+```
+
 ## Architecture
 
 ### Hosts

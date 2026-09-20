@@ -243,8 +243,6 @@ inputs.colmena.lib.makeHive {
       };
     };
   };
-  # pihole runs outside of k3s
-  # but is also a k3s worker
   elara = _: {
     imports = [
       ./../machine-specific/rpi5
