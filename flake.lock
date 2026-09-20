@@ -359,6 +359,21 @@
         "type": "github"
       }
     },
+    "homelab": {
+      "locked": {
+        "lastModified": 1789872267,
+        "narHash": "sha256-rvsfWkcjvcN36tz5EFLPYq2ADQ5eIMP1Z4L875ZEOJM=",
+        "owner": "insipx",
+        "repo": "nixos-rpi-lab",
+        "rev": "4c88154c9e04a9a50056d82c1a94b85c3348206a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "insipx",
+        "repo": "nixos-rpi-lab",
+        "type": "github"
+      }
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1784254960,
@@ -704,21 +719,6 @@
         "type": "github"
       }
     },
-    "pkgs-by-name-for-flake-parts": {
-      "locked": {
-        "lastModified": 1769286518,
-        "narHash": "sha256-F7VlUICvYp2wJKyQqM6d46BNEZCzMQ6dMH9zbmjuybc=",
-        "owner": "drupol",
-        "repo": "pkgs-by-name-for-flake-parts",
-        "rev": "7ba1cd4a9a72c9c6c272018a63f090f2c912a171",
-        "type": "github"
-      },
-      "original": {
-        "owner": "drupol",
-        "repo": "pkgs-by-name-for-flake-parts",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "colmena": "colmena",
@@ -727,12 +727,12 @@
         "flake-parts": "flake-parts",
         "ghostty": "ghostty",
         "hercules-ci-agent": "hercules-ci-agent",
+        "homelab": "homelab",
         "jupiter-secrets": "jupiter-secrets",
         "kubenix": "kubenix",
         "nixos-anywhere": "nixos-anywhere",
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixpkgs": "nixpkgs_5",
-        "pkgs-by-name-for-flake-parts": "pkgs-by-name-for-flake-parts",
         "rust-overlay": "rust-overlay"
       }
     },

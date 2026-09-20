@@ -20,7 +20,6 @@
       # flake parts does not use nixpkgs
       # inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
-    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
@@ -34,6 +33,9 @@
       url = "github:insipx/jupiter-secrets";
       # url = "path:/Users/andrewplaza/code/insipx/jupiter-secrets";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
+    };
+    homelab = {
+      url = "github:insipx/nixos-rpi-lab";
     };
     crane.url = "github:ipetkov/crane";
     rust-overlay = {
@@ -63,132 +65,61 @@
       self,
       flake-parts,
       nixos-raspberrypi,
-      nixpkgs,
       ...
     }:
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      _:
-      let
-        homelabModules.default =
-          { ... }:
-          {
-            imports = [ ./homelab ];
+    flake-parts.lib.mkFlake { inherit inputs; } (_: {
+      imports = [
+        ./scripts
+        ./pkgs
+        ./images
+        ./hercules.nix
+        ./nixos
+        ./shell.nix
+        inputs.flake-parts.flakeModules.easyOverlay
+      ];
+      systems = [
+        "aarch64-darwin"
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
+      perSystem =
+        {
+          pkgs,
+          system,
+          inputs',
+          ...
+        }:
+        let
+          extra = _: prev: {
+            writeFishScriptBin = pkgs.callPackage ./scripts/write_fish_script { };
           };
-      in
-      {
-        imports = [
-          ./scripts
-          ./pkgs
-          ./images
-          ./hercules.nix
-          inputs.pkgs-by-name-for-flake-parts.flakeModule
-          inputs.flake-parts.flakeModules.easyOverlay
-        ];
-        systems = [
-          "aarch64-darwin"
-          "aarch64-linux"
-          "x86_64-linux"
-        ];
-        perSystem =
-          {
-            pkgs,
-            self',
-            system,
-            inputs',
-            ...
-          }:
-          let
-            extra = _: prev: {
-              writeFishScriptBin = pkgs.callPackage ./scripts/write_fish_script { };
-            };
-            kubenixPkg = inputs'.kubenix.packages.default.override {
+        in
+        {
+          _module.args = import nixos-raspberrypi.inputs.nixpkgs {
+            inherit system;
+            overlays = [
+              inputs.ghostty.overlays.default
+              inputs.jupiter-secrets.overlays.default
+              extra
+              (import inputs.rust-overlay)
+            ];
+          };
+          packages = {
+            kubenix = inputs'.kubenix.packages.default.override {
               module = import ./deployments/kubenix/default.nix;
               specialArgs = {
                 flake = self;
               };
             };
-          in
-          {
-            # pkgsDirectory = ./deployments;
-            _module.args = import nixos-raspberrypi.inputs.nixpkgs {
-              inherit system;
-              overlays = [
-                inputs.ghostty.overlays.default
-                inputs.jupiter-secrets.overlays.default
-                extra
-                (import inputs.rust-overlay)
-              ];
-            };
-            devShells.default = pkgs.mkShell {
-              nativeBuildInputs = [
-                inputs'.nixos-anywhere.packages.default
-                inputs'.colmena.packages.colmena
-                # self'.packages.kubenix
-                self'.packages.build_session
-                pkgs.kubernetes-helm
-                pkgs.sops
-                pkgs.vals
-                pkgs.age-plugin-yubikey
-              ];
-            };
-            packages = {
-              kubenix = kubenixPkg;
-            };
           };
-        flake = {
-          inherit homelabModules;
-          lib = {
-            hostname = "jupiter.lan";
-            external-hostname = "insipx.xyz";
-            secrets = inputs.jupiter-secrets.outPath;
-          };
-          nixosConfigurations.rpi5Install = nixos-raspberrypi.lib.nixosSystemFull {
-            modules = [
-              homelabModules.default
-              {
-                rpiHomeLab = {
-                  networking = {
-                    hostId = "c6c81d8d"; # this should be unique per-machine
-                    hostName = "elara"; # change before installing
-                    address = "10.10.69.20/23"; # change before installing
-                    interface = "end0";
-                  };
-                  k3s.enable = false;
-                };
-                imports = [
-                  ./base
-                  ./machine-specific/tinyca
-                ];
-              }
-            ];
-            specialArgs = inputs;
-          };
-          nixosConfigurations.x86Install = nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
-            modules = [
-              {
-                rpiHomeLab = {
-                  networking = {
-                    hostId = "a3a7b911"; # this should be unique per-machine
-                    hostName = "lysithea"; # change before installing
-                    address = "10.10.69.51/23"; # change before installing
-                    interface = "enp0s31f6";
-                  };
-                  k3s.enable = false;
-                };
-                imports = [
-                  homelabModules.default
-                  inputs.disko.nixosModules.disko
-                  inputs.jupiter-secrets.nixosModules.default
-                  ./base
-                  ./machine-specific/thinkcentre
-                ];
-              }
-            ];
-            specialArgs = { inherit inputs; };
-          };
-          colmenaHive = import ./hive { inherit inputs homelabModules; };
         };
-      }
-    );
+      flake = {
+        lib = {
+          hostname = "jupiter.lan";
+          external-hostname = "insipx.xyz";
+          secrets = inputs.jupiter-secrets.outPath;
+        };
+        colmenaHive = import ./hive { inherit inputs; };
+      };
+    });
 }
