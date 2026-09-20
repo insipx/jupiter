@@ -1,7 +1,4 @@
 { inputs, ... }:
-let
-  root = ./..;
-in
 {
   # plain `nixosSystem` already imports `inject-overlays`, and `nixos-raspberrypi.lib.nixosSystem{,Full}`
   # would apply those overlays a second time, resulting in infinite recursion in `raspberrypifw`
@@ -21,8 +18,8 @@ in
           k3s.enable = false; # install w/o k3s enabled at first
         };
         imports = [
-          (root + ./base)
-          (root + ./machine-specific/rpi5)
+          ./../base
+          ./../machine-specific/rpi5
         ];
       }
     ];

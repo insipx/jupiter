@@ -4,6 +4,7 @@ _: {
       pkgs,
       self',
       inputs',
+      ...
     }:
     {
       devShells.default = pkgs.mkShell {

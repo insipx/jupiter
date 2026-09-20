@@ -1,9 +1,6 @@
 { inputs, ... }:
-let
-  root = ./..;
-in
 {
-  nixosConfigurations.x86Install = inputs.nixpkgs.lib.nixosSystem {
+  flake.nixosConfigurations.x86Install = inputs.nixpkgs.lib.nixosSystem {
     system = "x86_64-linux";
     modules = [
       {
@@ -20,8 +17,8 @@ in
           inputs.homelab.nixosModules.default
           inputs.disko.nixosModules.disko
           inputs.jupiter-secrets.nixosModules.default
-          (root + ./base)
-          (root + ./machine-specific/thinkcentre)
+          ./../base
+          ./../machine-specific/thinkcentre
         ];
       }
     ];
