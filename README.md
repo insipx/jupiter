@@ -11,11 +11,11 @@ in one flake :)
 
 ```text
 .
-├── hive/                 # Colmena deployment configurations.
-├── base/                 # Shared NixOS Configuration amongst all hosts.
-├── machine-specific/     # NixOS Configuration specific to host types (rpi5/rpi4/thinkcentre/etc.).
+├── hive/                 # Per-node deployment configurations for Colmena.
+├── base/                 # Shared host configurations, including NixOS user config.
+├── machine-specific/     # NixOS config specific to host machines (rpi5/rpi4/thinkcentre/etc.).
 ├── nixos/                # initial Raspberry Pi and x86 NixOS configurations.
-├── deployments/          # kubenix cluster definitions and the rathole deployment.
+├── deployments/          # where stuff deployed on the cluster goes.
 ├── apps/                 # app source if any, so far just kasa exporter for power metrics.
 ├── pkgs/                 # Any software that requires custom packaging (rathole).
 ├── images/               # Nix-built docker images.
