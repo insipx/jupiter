@@ -1,9 +1,9 @@
-{ inputs, homelabModules }:
+{ inputs }:
 let
   commonImports = [
     inputs.disko.nixosModules.disko
     inputs.jupiter-secrets.nixosModules.default
-    homelabModules.default
+    inputs.homelab.nixosModules.default
     ./../base
   ];
   # example to override specific package
@@ -62,6 +62,8 @@ inputs.colmena.lib.makeHive {
     rpiHomeLab.k3s.leader = true;
     rpiHomeLab.k3s.enable = true;
     rpiHomeLab.k3s.longhorn = true;
+    rpiHomeLab.k3s.longhornDiskSize = "800G";
+
     jupiter-secrets.settings.k3s = true;
     services.k3s.extraFlags = [
       "--tls-san ganymede.jupiter.lan"
@@ -91,8 +93,12 @@ inputs.colmena.lib.makeHive {
         address = "10.10.69.11/22";
         interface = "end0";
       };
-      k3s.longhorn = true;
-      k3s.enable = true;
+      k3s = {
+        longhorn = true;
+        longhornDiskSize = "800G";
+
+        enable = true;
+      };
     };
     jupiter-secrets.settings.k3s = true;
 
@@ -120,9 +126,12 @@ inputs.colmena.lib.makeHive {
         address = "10.10.69.12/22";
         interface = "end0";
       };
-      k3s.enable = true;
-      k3s.longhorn = true;
+      k3s = {
+        enable = true;
+        longhorn = true;
+        longhornDiskSize = "800G";
 
+      };
     };
     jupiter-secrets.settings.k3s = true;
 
@@ -147,6 +156,7 @@ inputs.colmena.lib.makeHive {
         agent = true;
         enable = true;
         longhorn = true;
+        longhornDiskSize = "800G";
 
       };
       networking = {
@@ -182,9 +192,11 @@ inputs.colmena.lib.makeHive {
         address = "10.10.69.16/22";
         interface = "enu1u1";
       };
-      k3s.agent = true;
-      k3s.enable = true;
-
+      k3s = {
+        longhorn = false;
+        agent = true;
+        enable = true;
+      };
     };
   };
 
@@ -268,6 +280,7 @@ inputs.colmena.lib.makeHive {
         enable = true;
         longhorn = true;
         agent = true;
+        longhornDiskSize = "900G";
       };
     };
     jupiter-secrets.settings.k3s = true;
@@ -306,6 +319,7 @@ inputs.colmena.lib.makeHive {
         enable = true;
         agent = true;
         longhorn = true;
+        longhornDiskSize = "400G";
       };
     };
     jupiter-secrets.settings.k3s = true;
@@ -343,6 +357,7 @@ inputs.colmena.lib.makeHive {
         enable = true;
         agent = true;
         longhorn = true;
+        longhornDiskSize = "400G";
       };
     };
     jupiter-secrets.settings.k3s = true;

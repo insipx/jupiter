@@ -2,7 +2,7 @@
 { inputs, self, ... }:
 let
   inherit (inputs) nixos-raspberrypi;
-  initial = self.nixosConfigurations.rpi5;
+  initial = self.nixosConfigurations.rpi5Install;
   inherit (initial.config.users.users.root.openssh.authorizedKeys) keys;
 
   # nixos-raspberry pi rpi5 stock installer image, with ssh keys added from 'initial' config

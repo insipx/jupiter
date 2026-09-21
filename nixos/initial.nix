@@ -5,7 +5,7 @@
   flake.nixosConfigurations.rpi5Install = inputs.nixos-raspberrypi.inputs.nixpkgs.lib.nixosSystem {
     modules = [
       inputs.disko.nixosModules.disko
-      inputs.lab-secrets.nixosModules.default
+      inputs.jupiter-secrets.nixosModules.default
       inputs.homelab.nixosModules.default
       {
         rpiHomeLab = {
