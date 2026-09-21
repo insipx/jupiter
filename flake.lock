@@ -361,14 +361,17 @@
     },
     "homelab": {
       "locked": {
-        "lastModified": 1790001892,
-        "narHash": "sha256-rXOxUYAFrCAPIu5ftlD89b0bz17mjl72JZIoVSp7RDA=",
-        "path": "/Users/andrewplaza/code/insipx/nixos-lab",
-        "type": "path"
+        "lastModified": 1790001013,
+        "narHash": "sha256-NRfuDI8v7BTX1oBG8svNNTreNmak/UNcFbi38aCpuGI=",
+        "owner": "insipx",
+        "repo": "nixos-rpi-lab",
+        "rev": "72dc58c7fd28548ae7e0eb122feb4887ada25332",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/andrewplaza/code/insipx/nixos-lab",
-        "type": "path"
+        "owner": "insipx",
+        "repo": "nixos-rpi-lab",
+        "type": "github"
       }
     },
     "import-tree": {

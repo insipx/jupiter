@@ -5,6 +5,10 @@
     ./network.nix
     ./user.nix
   ];
+  rpiHomeLab.networking = {
+    gateway = "10.10.69.1";
+    dns = "10.10.69.1";
+  };
   time.timeZone = "America/New_York";
   environment.systemPackages = with pkgs; [
     tree

@@ -35,8 +35,8 @@
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
     homelab = {
-      # url = "github:insipx/nixos-rpi-lab";
-      url = "path:/Users/andrewplaza/code/insipx/nixos-lab";
+      url = "github:insipx/nixos-rpi-lab";
+      # url = "path:/Users/andrewplaza/code/insipx/nixos-lab";
     };
     crane.url = "github:ipetkov/crane";
     rust-overlay = {
