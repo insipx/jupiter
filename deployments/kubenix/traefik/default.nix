@@ -3,26 +3,6 @@ let
   ns = "kube-system";
 in
 {
-  # Traefik with mTLS support
-  #
-  # Architecture:
-  #   - Internal routes (port 443): No mTLS accessible from lan
-  #   - External routes (port 8443): mTLS required, this is for external services via rathole proxy
-  #
-  # mTLS:
-  #   1. Step CA (volos.jupiter.lan) issues both server and client certs
-  #   2. Server certs are issued with cert-manager
-  #   3. Client certs are issued manually via `step ca certificate` command
-  #
-  # Generating Client Certificates:
-  #   step ca certificate user@jupiter.lan user.crt user.key
-  #
-  # Testing:
-  #   # fails:
-  #   curl https://10.10.68.1:8443
-  #
-  #   # succeeds:
-  #   curl --cert user.crt --key user.key --cacert ca.crt https://10.10.68.1:8443
   imports = with kubenix.modules; [
     k8s
     submodules
@@ -112,7 +92,10 @@ in
             namespace = ns;
           };
           spec = {
-            entryPoints = [ "web" "web-public" ];
+            entryPoints = [
+              "web"
+              "web-public"
+            ];
             routes = [
               {
                 match = "HostRegexp(`.+`)";
