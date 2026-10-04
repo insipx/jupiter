@@ -8,7 +8,7 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://community-charts.github.io/helm-charts";
         chart = "actualbudget";
-        version = "1.9.4";
+        version = "1.9.5";
         sha256 = "sha256-xfL8IAiwF3s877Zb09noeOnhwTWuF57gLHY3+zqdfxk=";
       };
       includeCRDs = true;
